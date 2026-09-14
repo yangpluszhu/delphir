@@ -1,0 +1,11 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.Rmd$
+^\.Rhistory$
+^data-raw$
+^tmp-
+^docs$
+^\.github$
+^CITATION\.cff$
+^vignettes/\.build\.timestamp$

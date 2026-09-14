@@ -1,0 +1,247 @@
+---
+title: "教学文档 2：RAND/UCLA 适宜性评价全流程"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 2：RAND/UCLA 适宜性评价全流程}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. 为什么这不是普通 Delphi
+
+Delphi 的核心逻辑是：匿名反复评分 → 反馈 → 再评分 → 意见逐渐收敛。它适合共识条目、指标选择、优先级、核心结局和定义。
+
+**RAND/UCLA Appropriateness Method（RAM）** 要回答的是另一个问题：
+
+> 某临床措施在特定场景下是否“适宜”？
+
+适宜指：对普通患者、由普通医生在普通机构实施时，**预期获益超过预期伤害的程度**（通常不考虑成本）。Fitch 等（2001）手册是本教程的方法学依据。
+
+关键差别：
+
+| | 医学共识 Delphi | RAND/UCLA |
+|---|---|---|
+| 目标 | 条目是否纳入共识 | 指征是否适宜 / 不确定 / 不适宜 |
+| 面板 | 常 30–80+ 人 | 经典 9 人左右（约 7–15） |
+| 分歧 | 用 IQR、赞同率 | 经典两端规则 + IPRAS / DI |
+| 会议 | 讨论临界条目 | 第 1 轮后正式讨论，再独立复评 |
+| 强迫一致 | 仍常被误用 | **明确不强迫共识** |
+
+样本数据 `rand_ucla_demo`：9 名多学科专家、24 个血运重建指征、两轮 1–9 分。
+
+```{r}
+library(delphir)
+data("rand_ucla_demo", package = "delphir")
+rand_ucla_demo
+unlist(rand_ucla_demo$meta)
+```
+
+# 2. 流程概览（按手册）
+
+1. 选主题，做文献综述并形成**指征清单**（临床场景 × 操作）；
+2. 组成多学科面板（专科 + 全科 + 必要时方法学）；
+3. 第 1 轮：独立、匿名、邮寄/在线评分；
+4. 个性化反馈：本人评分 + 全组分布；
+5. 面对面或在线会议，讨论分歧，**再独立评分**；
+6. 用 Median + 分歧判定 Appropriate / Uncertain / Inappropriate；
+7. 可选第 3 轮：只对“适宜”的指征评 Necessity（必要性）。
+
+DCAT 将 RAM 视为一种 Modified Delphi：轮次有限、中间有讨论、9 分量表、会前必须提供证据。
+
+# 3. 锁定 RAM 方案
+
+```{r}
+protocol <- preset_protocol("rand_ucla")
+protocol
+protocol$rand
+```
+
+判定规则（写入方案，分析时不得改）：
+
+- Median 1–3 且**无分歧** → Inappropriate
+- Median 7–9 且**无分歧** → Appropriate
+- Median 4–6，**或任何分歧** → Uncertain
+
+分歧有两套定义，本包默认都算：
+
+1. **经典：** 约三分之一评 1–3 且约三分之一评 7–9（9 人面板即各 ≥3 人）；
+2. **IPRAS / DI（Fitch 2001）：**
+
+\[
+IPR = P_{70}-P_{30},\quad
+AI = \left|\frac{P_{30}+P_{70}}{2}-5\right|,\quad
+IPRAS = 2.35 + 1.5\times AI,\quad
+DI = IPR/IPRAS
+\]
+
+`DI ≥ 1` 为分歧。IPRAS 可推广到非 3 倍数的面板。
+
+# 4. 指征表与证据
+
+```{r}
+head(rand_ucla_demo$items[, c("item_id", "item_text", "evidence_level", "pattern")])
+table(rand_ucla_demo$panel$specialty)
+```
+
+**解读：** 指征必须具体到“何种患者、何种解剖、何种并存情况”，不能只写“冠心病适合血运重建”。`evidence_level` 用于会前证据综述；面板评分的是适宜性，不是证据等级本身。
+
+# 5. 手工看清 DI 在算什么
+
+高度一致：
+
+```{r}
+rand_disagreement(c(8, 8, 9, 9, 8, 7, 9, 8, 8))
+```
+
+两端拉扯：
+
+```{r}
+rand_disagreement(c(1, 1, 2, 2, 5, 8, 9, 9, 9))
+```
+
+**解读：**
+
+- 第一组 IPR 很小，DI 远小于 1，无分歧。
+- 第二组两端都有多人，经典规则与 DI 通常同时报警。
+- 若 Median 仍是 7 或 8，**只要存在分歧，最终仍是 Uncertain**。这是 RAM 与“只看中位数”的 Delphi 最重要的不同。
+
+手册强调：两轮的目的是区分“真实临床分歧”和“疲劳/误解造成的假分歧”，不是把人推向一致。
+
+# 6. 第 1 轮独立评分
+
+```{r}
+s1 <- classify_rand(rand_ucla_demo, round = 1)
+s1[, c("item_id", "n_valid", "median_iqr", "di", "classic_disagreement",
+       "ipras_disagreement", "class_zh")]
+table(s1$class_zh)
+```
+
+**解读输出：**
+
+- `median_iqr`：位置。7–9 区只是“候选适宜”，还要过分歧关。
+- `di`：越小越集中。接近或超过 1 要在会上重点讨论。
+- `classic_disagreement` 与 `ipras_disagreement` 偶尔不一致：IPRAS 对“不对称但很散”的分布更敏感，经典规则只看两端人数。报告建议两列都留。
+- Uncertain 既包含“大家觉得中等”，也包含“有人 1 分有人 9 分”。读表时不要混为一谈。
+
+```{r}
+plot_rand_panel(s1)
+```
+
+点的大小反映 DI。落在 7 右侧但仍可能被标成不确定——那就是分歧条目。
+
+# 7. 受控反馈：RAM 的个性化表单
+
+会议前每位专家拿到自己的表：直方图/分布、本人原分、Median。
+
+```{r}
+fb <- prepare_feedback(rand_ucla_demo, round = 1)
+fb[fb$expert_id == "P1",
+   c("item_id", "own_score", "median", "di", "class_zh", "anonymous_comments")]
+```
+
+**解读：** 讨论由有经验的主持人聚焦分歧指征。讨论后**再次独立评分**，不是举手表决出一个集体分数。匿名在讨论会中往往只能做到“发言可被识别、评分仍不具名”。
+
+# 8. 第 2 轮：最终适宜性
+
+```{r}
+res <- analyze_delphi(rand_ucla_demo)
+res
+last <- res$last_classification
+last[, c("item_id", "median_iqr", "di", "disagreement", "class_zh", "evidence_level")]
+```
+
+**解读最终三类：**
+
+- **适宜：** 可以进入后续“该做”清单；若研究设计含 Necessity，只对这些指征再评“不做是否不可接受”。
+- **不适宜：** 预期伤害大于获益；质量改进中常作为减少过度使用的靶点。
+- **不确定：** 可能是证据不足，也可能是真实学派分歧。正确写法是“本面板在该指征上不确定”，而不是继续投到出现 80%。
+
+对照两套分歧：
+
+```{r}
+last[, c("item_id", "classic_disagreement", "ipras_disagreement", "di", "class_zh")]
+```
+
+# 9. 稳定性：RAM 允许改变，但不追求全员一致
+
+```{r}
+res$stability[, c("item_id", "median_r1", "median_r2", "class_r1", "class_r2",
+                  "class_unchanged")]
+res$stopping
+```
+
+**解读：** 若干指征从 Uncertain 转为 Appropriate，通常是误解被讨论澄清。若 DI 仍然 ≥1，应保留 Uncertain。Policy Delphi / RAM 都承认：**没有共识本身就是结果。**
+
+```{r}
+plot_round_shift(res, metric = "median")
+```
+
+# 10. 证据列与适宜性列必须分开
+
+```{r}
+last[, c("item_id", "evidence_level", "median", "di", "class_zh")]
+```
+
+证据等级 C 的指征仍可能被评为适宜（专家判断补证据缺口）；证据等级 A 仍可能不确定（获益伤害权衡有争议）。RAM 明确把文献综述和面板判断分成两步。
+
+# 11. 定性意见
+
+```{r}
+summarize_comments(study = rand_ucla_demo)$by_theme
+```
+
+“仅对高危亚组适宜”提示：也许应该**拆分指征**，而不是强行给一条总指征打分。手册允许在会中修改指征清单。
+
+# 12. 报告
+
+```{r}
+html <- delphi_report(res, file = tempfile(fileext = ".html"), template = "rand_ucla")
+file.exists(html)
+accord_checklist(res)[accord_checklist(res)$id %in% c("T1", "M9", "M11", "M14", "R3"),
+                      c("id", "item", "status")]
+```
+
+写 RAM 论文时，题目就应写明 RAND/UCLA 或 appropriateness panel。ACCORD 的 M9 专门点名可报告 Delphi / RAND-UCLA / 名义群体法。
+
+# 13. 本场景常见错误
+
+1. 用 40 人开放 Delphi 的 75% 规则套在 RAM 上；
+2. 只看 Median，忽略分歧，把两极条目写成“适宜”；
+3. 开会举手“统一意见”，破坏独立复评；
+4. 把 Uncertain 当成失败，反复投到出现共识；
+5. 面板全是实施该操作的专科医生，缺少全科或相邻学科；
+6. 第 1 轮前不提供证据综述；
+7. 指征过于笼统，无法对应真实患者；
+8. 用 Kendall W 或 Cr 代替 DI。
+
+# 14. 换成自己的指征数据
+
+```r
+study <- delphi_study(
+  preset_protocol("rand_ucla"),
+  panel = your_panel,   # 建议 7–15 人
+  items = your_indications,
+  ratings = your_ratings,
+  meta = list(
+    title = "……适宜性评价",
+    objective = "判断何种指征下实施……是否适宜",
+    evidence_note = "会前系统综述摘要……"
+  )
+)
+analyze_delphi(study) |> delphi_report(file = "ram-report.html")
+```
+
+相关教程：`vignette("clinical-consensus", package = "delphir")`；核心结局集见 `vignette("comet-cos", package = "delphir")`。

@@ -1,0 +1,7 @@
+expert_id,stakeholder,specialty,region,title,years,invited
+E01,临床医生,感染,华北,主任医师,18,TRUE
+E02,临床医生,肿瘤内科,华东,副主任医师,12,TRUE
+E03,方法学专家,临床流行病学,华北,教授,20,TRUE
+E04,方法学专家,临床流行病学,华南,研究员,10,TRUE
+E05,药学专家,临床药学,西南,主任医师,16,TRUE
+E06,监管人员,药品监管,华东,研究员,14,TRUE

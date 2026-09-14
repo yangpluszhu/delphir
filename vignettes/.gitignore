@@ -1,0 +1,4 @@
+*-cache/
+*_files/
+*.R
+*.knit.md

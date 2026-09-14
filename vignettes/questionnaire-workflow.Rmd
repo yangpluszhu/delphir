@@ -1,0 +1,385 @@
+---
+title: "教学文档 4：从第 1 轮问卷设计到 ACCORD 方法学报告"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 4：从第 1 轮问卷设计到 ACCORD 方法学报告}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. 这份文档解决什么问题
+
+前三套教学文档假定评分数据已经在手。真实研究的卡点往往在更前面：
+
+1. 第 1 轮问卷怎么写（含权威系数自评）；
+2. 回收后如何录入成长表，而不是一张「专家 × 条目」的宽表；
+3. 如何由熟悉程度 / 判断依据勾选算出 Ca、Cs、Cr；
+4. 如何写出**第 1 轮中间报告**，再生成带受控反馈的第 2 轮问卷；
+5. 两轮结束后如何输出符合 ACCORD / DCAT / CREDES 的方法学报告。
+
+本教程用医学专家共识（Modified Delphi、9 分 Likert、复合共识规则）从零走完上述路径。场景与 `vignette("clinical-consensus")` 相同，但起点是**空白问卷**。
+
+随包材料（安装后即可用，不必另下）：
+
+```{r}
+library(delphir)
+delphi_guides()
+```
+
+- 完整样稿：`system.file("questionnaires", "round1-complete.md", package = "delphir")`
+- 空白录入表：`write_survey_templates()` 拷到本地
+- 6 名专家 × 4 条目的填好示例：`inst/extdata/survey_*.csv`
+
+# 2. 看数据之前：锁定问题与阈值
+
+ACCORD 要求先写清目标、目标使用者和地理范围。Diamond 等的系统评价表明文献里的「共识」定义差异很大——**正确原则不是必须 ≥70%，而是第一轮前写明阈值及其理由。**
+
+```{r}
+protocol <- preset_protocol("clinical_consensus")
+protocol
+```
+
+本教程锁定：
+
+- 高度共识：P(7–9) ≥ 80%，且 Median ≥ 7，且 IQR ≤ 2
+- 基本共识：75% ≤ P(7–9) < 80%，且 Median ≥ 7
+- 倾向排除：P(1–3) ≥ 75%
+- 两极分化：两端同时 ≥ 25%
+- 最多 3 轮；相邻轮分类不变 ≥ 80%
+
+`classify_consensus()` 没有阈值参数，防止分析阶段静默改规则。
+
+# 3. 第 1 轮问卷设计（完整样稿）
+
+把样稿拷到工作目录，或直接打开随包文件：
+
+```{r}
+qn1 <- system.file("questionnaires", "round1-complete.md", package = "delphir")
+file.exists(qn1)
+substr(paste(readLines(qn1, encoding = "UTF-8", warn = FALSE), collapse = "\n"), 1, 180)
+```
+
+一份合格的第 1 轮问卷至少包含：
+
+| 板块 | 作用 |
+|---|---|
+| 邀请函 | 说明匿名、轮次、大约耗时、截止日期 |
+| 知情与利益冲突 | ACCORD / 伦理 |
+| 填表说明 | 1–9 含义；**无法判断不得填成 5 分**；已锁定的共识规则公开给专家 |
+| 专家背景 | 与 `delphi_panel()` 列对齐 |
+| 权威程度自评 | 熟悉程度 + 判断依据四项，**每人一次** |
+| 条目 | 重要性、可行性、修改意见、允许新增条目 |
+
+也可以用条目池自动排版（不必手抄 40 条）：
+
+```{r}
+mini_items <- utils::read.csv(
+  system.file("extdata", "survey_items.csv", package = "delphir"),
+  fileEncoding = "UTF-8", stringsAsFactors = FALSE
+)
+draft <- delphi_study(
+  protocol,
+  panel = data.frame(expert_id = "E01", stringsAsFactors = FALSE),
+  items = mini_items,
+  ratings = data.frame(
+    expert_id = "E01", item_id = mini_items$item_id[1],
+    round = 1, score = 8, stringsAsFactors = FALSE
+  ),
+  meta = list(
+    title = "药物临床试验质量源于设计实施专家共识（教学）",
+    objective = "就方案设计与实施中的关键质量要求形成专家共识。",
+    users = "申办者、研究者、伦理与监管相关人员",
+    geography = "中国大陆",
+    anonymity = "评分匿名汇总；反馈含本人上轮评分与组统计。"
+  ),
+  validate = FALSE
+)
+q_auto <- delphi_questionnaire(draft, round = 1)
+grepl("权威程度自评", q_auto)
+```
+
+# 4. 为什么 Ca、Cs、Cr 不按条目评
+
+国内 Delphi 常用
+
+\[
+Cr = (Ca + Cs) / 2
+\]
+
+| 符号 | 含义 | 粒度 |
+|---|---|---|
+| Cs | 对**本次主题**的熟悉程度 | 专家，一次 |
+| Ca | 判断依据（实践 / 理论 / 文献 / 直觉）的影响程度之和 | 专家，一次 |
+| Cr | 权威程度 | 专家，再报组均数 |
+
+默认赋分表（须预先锁定，可用 `authority_scales()` 取出）：
+
+```{r}
+authority_scales()$cs
+authority_scales()$ca
+```
+
+- 全选「大」：Ca = 1.0；全「中」= 0.8；全「小」= 0.6。
+- 条目层面要处理的是「会不会评」：勾选**无法判断 / 超出专业领域**，该评分不进 1–9 分母。
+- 不要用 Cr 加权均数：Delphi 以匿名等权降低权威效应。
+- 第 2 轮不必重评 Ca/Cs。
+- 组均数 Cr ≥ 0.70 可作国内投稿参考；**不是 DCAT 核心项**，也不能证明专家选择科学。
+
+若误把条目表传给赋分函数，会报错：
+
+```{r}
+raw_ok <- data.frame(
+  expert_id = c("E1", "E2"),
+  familiarity = c("较熟悉", "很熟悉"),
+  practice = c("大", "中"),
+  theory = c("中", "大"),
+  literature = c("大", "中"),
+  intuition = c("小", "小"),
+  stringsAsFactors = FALSE
+)
+score_authority(raw_ok)[, c("expert_id", "Ca", "Cs", "Cr")]
+```
+
+```{r, error=TRUE}
+score_authority(cbind(raw_ok[c(1, 1), ], item_id = c("C01", "C02")))
+```
+
+# 5. 发放、回收与质控
+
+- 国内常报的「专家积极系数」就是回收率：有效回收 / 发放 × 100%。
+- 对 Delphi 更关键的是**跨轮脱落**：第 2 轮未应答者的第 1 轮数据必须保留，用于脱落偏倚。
+- 质控清单（样稿第 I 节）：权威自评是否完整；有无「无法判断」却同时填了分；有无把缺失录入为 5。
+- 收集可用邮件或问卷星，但**分析前必须整理成长表**：一行 = 一位专家 × 一条目 × 一轮 × 一个维度。
+
+```{r}
+d <- tempfile("survey-kit-")
+invisible(write_survey_templates(d, overwrite = TRUE))
+list.files(d, recursive = TRUE)
+```
+
+# 6. 数据录入：从 CSV 到 delphi_study
+
+以下使用随包迷你示例（6 名专家、4 个条目、两轮；第 2 轮 E06 脱落；C02 有「无法判断」）。真实研究把 `write_survey_templates()` 的空白表填满即可，列名不要改。
+
+```{r}
+ex <- system.file("extdata", package = "delphir")
+readu <- function(f) {
+  utils::read.csv(file.path(ex, f), fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+}
+panel <- readu("survey_panel.csv")
+auth_raw <- readu("survey_authority_raw.csv")
+items <- readu("survey_items.csv")
+ratings <- readu("survey_ratings.csv")
+comments <- readu("survey_comments.csv")
+scored <- score_authority(auth_raw)
+panel$Ca <- scored$Ca[match(panel$expert_id, scored$expert_id)]
+panel$Cs <- scored$Cs[match(panel$expert_id, scored$expert_id)]
+knitr::kable(scored[, c("expert_id", "familiarity", "Ca", "Cs", "Cr", "cr_ok")],
+             caption = "由问卷勾选赋分，而不是直接填写无法追溯的小数")
+```
+
+**解读：** E01「很熟悉」且实践「大」、理论「中」、文献「大」、直觉「小」→ Cs = 1.0，Ca = 0.5+0.2+0.1+0.1 = 0.9，Cr = 0.95。这是专家级结果，后面四条条目共用这一套系数。
+
+先只装第 1 轮，模拟「第 1 轮刚收回」的时点：
+
+```{r}
+meta <- list(
+  title = "药物临床试验质量源于设计实施专家共识（迷你教学数据）",
+  objective = "就方案设计与实施中的关键质量要求形成专家共识。",
+  users = "申办者、研究者、伦理委员会与监管相关人员",
+  geography = "中国大陆",
+  evidence_note = "条目来自 ICH E6(R3)、GCP 及方法学综述后的初始条目池（教学）。",
+  pilot_tested = TRUE,
+  anonymity = "评分匿名汇总；第 2 轮反馈含本人上轮评分。"
+)
+study_r1 <- delphi_study(
+  protocol,
+  panel = panel,
+  items = items,
+  ratings = ratings[ratings$round == 1, ],
+  comments = comments,
+  meta = meta
+)
+study_r1
+```
+
+# 7. 第 1 轮分析
+
+```{r}
+part <- response_summary(study_r1)
+part$by_round
+auth <- expert_authority(study_r1$panel)
+attr(auth, "overall")[c("mean_ca", "mean_cs", "mean_cr", "pct_ok", "threshold")]
+```
+
+```{r}
+s1 <- summarize_items(study_r1, rounds = 1, dimensions = "重要性")
+c1 <- classify_consensus(s1, protocol)
+c1[, c("item_id", "n_valid", "n_unable", "median_iqr", "p_high", "p_low", "class_zh", "action")]
+```
+
+**解读每一行（样本量小，只为演示管道）：**
+
+- `n_unable`：C02 有一名监管专家声明超出专业，分母是 5 不是 6。
+- C01：高区 100%、Median 8、IQR 小 → 高度共识，第 2 轮可不重评。
+- C03：高区不足 → 未达共识，必须带反馈重评。
+- C04：两端同时升高 → 两极分化；均数接近中部并不等于「大家觉得一般」。
+
+```{r}
+res1 <- analyze_delphi(study_r1)
+r1_html <- delphi_report(res1, file = tempfile(fileext = ".html"),
+                         template = "clinical", stage = "round1")
+file.exists(r1_html)
+```
+
+第 1 轮报告标题会标明**非最终共识**，并列出建议进入第 2 轮的条目、反馈单预览。不要把这一份当作终稿对外发布推荐意见。
+
+# 8. 制作第 2 轮问卷（受控反馈）
+
+真正的 Delphi 不是把同一张表再发一次。DCAT 要求每位专家看到：**本人上轮评分 + 组 Median/IQR/高区比例 + 匿名意见**。
+
+```{r}
+fb <- prepare_feedback(res1, round = 1, dimension = "重要性")
+fb[fb$expert_id == "E01", c("item_id", "own_score", "median_iqr", "p_high", "class_zh")]
+```
+
+```{r}
+q2 <- delphi_questionnaire(res1, round = 2, expert_id = "E01", items = "unresolved")
+grepl("不再", q2)
+grepl("C03", q2)
+```
+
+`items = "unresolved"` 时，高度/基本共识且动作为 keep 的条目放到「可不重评」表；临界、未达共识、两极分化进入重评区。若方案规定「全部条目均重评」，改用 `items = "all"`。
+
+随包还有手写样稿 `round2-complete.md`，结构与函数输出一致，便于改成 Word/问卷星。
+
+# 9. 第 2 轮录入、分析与停止规则
+
+第 2 轮评分**追加**到长表（`round = 2`），不要覆盖第 1 轮，也不要删除脱落者 E06 的第 1 轮记录。
+
+```{r}
+study <- delphi_study(
+  protocol,
+  panel = panel,
+  items = items,
+  ratings = ratings,
+  comments = comments,
+  meta = meta
+)
+res <- analyze_delphi(study)
+res
+```
+
+```{r}
+last <- res$last_classification
+last <- last[last$dimension == "重要性", ]
+last[, c("item_id", "n_valid", "median_iqr", "p_high", "p_low", "class_zh", "action")]
+```
+
+```{r}
+head(res$stability[, c("item_id", "median_r1", "median_r2", "p_high_r1",
+                       "p_high_r2", "class_unchanged")])
+res$stopping
+```
+
+**解读：**
+
+- C03 从「未达共识」收到紧，说明反馈后判断在收敛。
+- C04 若仍两极，正确写法是「未形成共识」，而不是加开第 4 轮直到表面一致。
+- `wilcoxon_p` 可报，**不能**用 P>0.05 定义稳定。
+- 迷你数据人数少，停止规则的百分比会抖；正式研究用预设的 40 人量级，见 `consensus_demo`。
+
+```{r}
+plot_round_shift(res, metric = "p_high")
+```
+
+脱落：
+
+```{r}
+res$participation$retention
+head(res$dropout)
+```
+
+E06 未进入第 2 轮。若脱落者在第 1 轮对关键条目更反对，终稿赞同率可能被高估，必须写进报告。
+
+# 10. 终稿方法学报告
+
+```{r}
+html <- delphi_report(res, file = tempfile(fileext = ".html"),
+                      template = "clinical", stage = "final")
+file.exists(html)
+```
+
+终稿应包括：范围、锁定方案、专家构成、权威系数（国内补充）、分轮结果、稳定性、分层、脱落、意见主题、会议建议，以及清单对照。
+
+```{r}
+head(accord_checklist(res)[, c("id", "section", "status")], 8)
+dcat_checklist(res)[1:4, c("id", "core", "item", "status")]
+```
+
+标记为 Unsure 的条目必须由作者在论文里补写（例如伦理批件号、邀请策略原文）。软件不能假装已经完成报告规范。
+
+DCAT 四个核心项是：**匿名、迭代、受控反馈、统计汇总**。任一为 No，总体质量应评为关键缺陷。Cr 不在其中。
+
+共识会议：已达高度共识的条目不要在少数人参加的会议上推翻大样本匿名结果。会议聚焦临界、无共识、组间相反、仅需改文字的条目；再次表决建议匿名。
+
+# 11. 规模更大的可复现数据
+
+迷你 CSV 适合练习录入。若要看 40 人、20 条、脱落与多种条目原型，使用模拟数据（原始勾选 + 赋分，不再 `runif` 出无法追溯的 Ca）：
+
+```{r}
+sim <- simulate_delphi(n_experts = 16, n_items = 8, n_rounds = 2, seed = 2026)
+head(sim$panel[, c("expert_id", "familiarity", "practice", "Ca", "Cs")])
+```
+
+完整解读见 `vignette("clinical-consensus", package = "delphir")`。
+
+# 12. 常见错误
+
+1. 第一轮前没有把共识规则写进问卷和方案；
+2. 根据第 1 轮结果把 80% 改成「刚好能过」的 75%；
+3. **对每个条目都填 Ca/Cs**，或用 Cr 加权 Likert；
+4. 把「不熟」录入为 5 分；
+5. 第 2 轮不反馈本人上轮评分，或要求重填权威系数；
+6. 用宽表分析，无法区分轮次、维度和无法判断；
+7. 只报 Mean±SD 或 Kendall W 的 P 值当作条目共识；
+8. 把 Cr = 0.90 当成专家选择科学的主证据；
+9. 删除脱落者的第 1 轮数据；
+10. 反复投票直到全部「达成共识」。
+
+# 13. 换成自己的数据
+
+```r
+protocol <- preset_protocol("clinical_consensus")
+write_survey_templates("my-delphi")
+# 发放 questionnaires/round1-complete.md（或 delphi_questionnaire() 排版结果）
+# 按 templates/*.csv 录入后：
+auth <- score_authority(authority_raw)
+panel$Ca <- auth$Ca[match(panel$expert_id, auth$expert_id)]
+panel$Cs <- auth$Cs[match(panel$expert_id, auth$expert_id)]
+study1 <- delphi_study(protocol, panel, items, ratings_r1, comments_r1, meta = meta)
+res1 <- analyze_delphi(study1)
+delphi_report(res1, file = "round1.html", stage = "round1")
+delphi_questionnaire(res1, round = 2, file = "round2-forms")
+# 回收第 2 轮，追加 ratings 后：
+res <- analyze_delphi(study)
+delphi_report(res, file = "final-accord.html", stage = "final")
+```
+
+RAND/UCLA 适宜性与 COMET 核心结局集的分析规则不同（不强迫共识；70/15），问卷结构可参照本教程，判定请分别阅读：
+
+- `vignette("rand-ucla", package = "delphir")`
+- `vignette("comet-cos", package = "delphir")`

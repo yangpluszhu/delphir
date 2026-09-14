@@ -1,0 +1,13 @@
+# 使用本软件时请引用
+#
+# 建议同时引用所遵循的报告规范：
+# ACCORD (Gattrell et al., 2024); DCAT (BMJ, 2025); CREDES (Jünger et al., 2017)
+
+bibentry(
+  bibtype  = "Manual",
+  title    = "{delphir}: Structured Delphi and RAND/UCLA Analysis for Consensus Studies",
+  author   = person("Ming", "Yang"),
+  year     = "2026",
+  note     = "R package version 0.2.0",
+  url      = "https://github.com/yangpluszhu/delphir"
+)
