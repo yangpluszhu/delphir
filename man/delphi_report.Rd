@@ -7,33 +7,35 @@
 delphi_report(
   result,
   file = NULL,
-  format = c("html", "word"),
-  template = c("auto", "clinical", "rand_ucla", "comet_cos"),
-  stage = c("auto", "round1", "final"),
+  format = c("html", "word", "docx", "both"),
+  template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard", "delphi_ram"),
+  stage = c("auto", "round1", "round2", "final"),
   open = FALSE
 )
 }
 \arguments{
 \item{result}{\code{\link[=analyze_delphi]{analyze_delphi()}} 结果。}
 
-\item{file}{输出路径。若为空，写入临时文件。}
+\item{file}{输出路径。若为空，写入临时文件。若为目录，使用默认文件名。
+\code{format = "both"} 时在同一目录写出 \code{.html} 与 \code{.docx}。}
 
-\item{format}{\code{"html"} 或 \code{"word"}。}
+\item{format}{\code{"html"}、\code{"word"} / \code{"docx"} 或 \code{"both"}。}
 
 \item{template}{\code{"auto"} 时按场景选择；也可指定 \code{"clinical"}、
-\code{"rand_ucla"}、\code{"comet_cos"}。}
+\code{"rand_ucla"}、\code{"comet_cos"}、\code{"standard"}（5 分核心技术要素）或
+\code{"delphi_ram"}（改良德尔菲结合 RAM）。}
 
-\item{stage}{\code{"auto"}、\code{"round1"} 或 \code{"final"}。仅一轮或显式 \code{round1}
-时输出中间报告（非最终共识）；两轮及以上默认终稿。}
+\item{stage}{\code{"auto"}、\code{"round1"}、\code{"round2"} 或 \code{"final"}。
+\code{auto}：若当前轮次仍小于方案 \code{max_rounds} 则写中间报告，否则写终稿。}
 
 \item{open}{是否打开文件，默认 \code{FALSE}。}
 }
 \value{
-不可见的输出文件路径。
+不可见的输出文件路径（\code{both} 时为长度为 2 的命名向量）。
 }
 \description{
-将 \code{\link[=analyze_delphi]{analyze_delphi()}} 结果渲染为 HTML 或 Word。模板会分列证据与共识，
-并附 ACCORD、DCAT 清单。
+将 \code{\link[=analyze_delphi]{analyze_delphi()}} 结果渲染为 HTML 或 Word。模板会完整打印预设方案、
+各轮问卷结构、逐轮结果、终结果与方法学参考文献，并附 ACCORD、DCAT、CREDES 清单。
 }
 \examples{
 \donttest{

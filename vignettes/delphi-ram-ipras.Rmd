@@ -1,0 +1,136 @@
+---
+title: "教学文档 13：改良德尔菲结合 IPRAS"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 13：改良德尔菲结合 IPRAS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5,
+                      message = FALSE, warning = FALSE)
+```
+
+# 1. 这次要完成什么
+
+IPRAS 是 RAM 手册附录里的另一套分歧定义，不是表 4 的别名。计算是：
+
+- IPR = 第 70 百分位数 − 第 30 百分位数。本包用 R 的分位数 `type = 7`。
+- IPR 的中心 IPRCP = (P30 + P70) / 2。
+- 非对称指数 AI = |5 − IPRCP|。
+- IPRAS = 2.35 + 1.5 × AI。
+- **IPR 严格大于 IPRAS** 才算分歧。相等不算。
+
+分布整体偏高或偏低时，AI 变大，IPRAS 阈值放宽。所以同一组分数，表 4 可以判分歧，IPRAS 可以不判。必须在第 1 轮前选定一种，不能两种都算完再挑好看的。
+
+流程仍是改良德尔菲：匿名函询，默认 3 轮，每轮复评全部条目。2.35 和 1.5 只适用于 1–9 分。其他量表不能套用这两常数，应改用百分比规则，或事先写明非标准常数和理由。
+
+样本是 `simulate_delphi_ram("ipras")`，安装后为 `data(delphi_ram_ipras_demo)`。9 名专家、6 条陈述、三轮。分数与表 4 教程相同，方便看出**唯一被规则改变的那一条**。
+
+```{r}
+library(delphir)
+ram <- simulate_delphi_ram("ipras")
+ram$protocol$rand$rule
+ram$meta$objective
+```
+
+**解读：** 规则已经锁成 `ipras`。目的句写的是 IPRAS，不是表 4，也不是百分比。
+
+# 2. 方案里哪些数真的会用
+
+```{r}
+p <- ram$protocol
+p$rand[c("rule", "iprr", "cfa", "qtype", "round2_mode", "nonstandard_ipras")]
+p$rules$high_pct
+protocol_table(p)[protocol_table(p)$parameter %in% c("rand_disagreement", "rand_iprr", "rand_cfa", "rand_qtype", "max_rounds"), ]
+```
+
+**解读：**
+
+- IPRr = 2.35，CFA = 1.5，分位数 type = 7。`nonstandard_ipras = FALSE`，报告不必写成非标准常数。
+- 函询仍是 `mail`，最多 3 轮。这和经典两轮面对面专家组不同，和所选的分歧公式是两件事。
+- `high_pct` 仍是 `NA`。不要用 80% 高区比例覆盖 IPRAS。
+- 因为默认预设是表 4，改成 IPRAS 会标成偏离预设。理由已经写在方案里：这是事先规定的规则，不是看到 ST05 之后才改的。
+
+# 3. 问卷仍然复评全部条目
+
+```{r}
+qdir <- tempfile("ram-ipras-")
+dir.create(qdir)
+q1 <- delphi_ram_questionnaire(ram, round = 1, format = "both", file = file.path(qdir, "round1"))
+basename(q1)
+q2 <- delphi_ram_questionnaire(ram, round = 3, format = "docx", file = file.path(qdir, "round3.docx"))
+basename(q2)
+```
+
+**解读：** 第 1 轮 docx 与 xlsx 都有。第 3 轮问卷可以生成，软件不会因为它不是经典 RAM 的第 2 轮而拒绝。问卷文字会说明：这是再次函询，分歧可以保留。第 3 轮仍然列出全部条目。xlsx 可用 `read_survey_xlsx()` 读回；读回时只传入新的一轮，不要把已经入库的轮次再覆盖一次。
+
+# 4. 第 1 轮：哪一条和表 4 不同
+
+```{r}
+r1 <- classify_delphi_ram(ram, round = 1)
+r1[, c("item_id", "median", "n_low", "n_high", "p30", "p70", "ipr", "ai", "ipras",
+       "table4_disagreement", "ipras_disagreement", "class_zh", "consensus_zh")]
+```
+
+**解读：** 主判定看 `ipras_disagreement`，不看 `table4_disagreement`。两列都打印，是为了能核对，不是为了事后改规则。
+
+- ST01：分数集中在高区。IPR 远小于 IPRAS。适宜，正向共识。
+- ST02：分数集中在低区。不适宜，负向共识。IPRAS 并不妨碍「明确不适宜」这个结论。
+- ST03：中位数 5，分数挤在中区。IPR 很小，无分歧，但中位数在 4–6，所以是不确定（中位数居中），不是正向共识。
+- ST04：两端对拉。P30 低、P70 高，IPR 大于 IPRAS。表 4 和 IPRAS **都**判分歧。不确定（存在分歧）。中位数 5 是两派对拉的结果，不是温和的中间意见。
+- ST05：中位数 8，低区有 3 人。表 4 认为这是分歧。IPR 约 3.4，分布中心高于 5，AI 把 IPRAS 抬到约 4.3，因此 IPR 没有超过 IPRAS，IPRAS **不**判分歧。在本方案下，ST05 是适宜、正向共识。若方案锁的是表 4，同一条必须保持不确定。两种写法都合法，但不能在分析完之后互换。
+- ST06：低区没有人，IPRAS 无分歧，中位数在高区。适宜。它不是百分比规则下的「70% 高区」问题；那一套规则没有被锁定。
+
+# 5. 末轮不要只看一个总数
+
+```{r}
+res <- run_delphi_ram(ram, report = FALSE)
+tab <- table(res$last_classification$consensus_zh)
+tab
+res$last_classification[res$last_classification$item_id == "ST05",
+                        c("item_id", "ipr", "ipras", "di", "class_zh", "consensus_zh")]
+```
+
+**解读：** `di = IPR / IPRAS`。ST05 的 DI 小于或等于 1 的一侧（IPR 未超过 IPRAS），所以不是分歧。正向共识在这里的意思是「中位数在高区且 IPRAS 无分歧」，不是「9 个人完全一致」，也不是「高区比例至少 80%」。
+
+末轮若仍有 ST04 这种分歧，应写入分歧清单。不要再开一轮，直到 DI 降到 1 以下才肯停。
+
+# 6. 敏感性格告诉你什么、不能告诉你什么
+
+```{r}
+sens <- res$sensitivity
+sens$kappa
+sens$by_item[, c("item_id", "class_table4", "class_ipras", "class_percent")]
+sens$note
+```
+
+**解读：** κ 不是 1，主要因为 ST05：表 4 为不确定，IPRAS 为适宜。百分比列还会把高区比例不足 70% 的条目记成不确定。这些差异证明规则必须事先锁定。`note` 写的是：敏感性不替换锁定规则。正式报告的分类列使用 IPRAS。
+
+# 7. 稳定性只描述变化
+
+```{r}
+tail(res$stability[, c("item_id", "from_round", "to_round", "class_r1", "class_r2", "class_unchanged")], 6)
+res$stopping$recommend_stop
+res$stopping$note
+```
+
+**解读：** 教学分数在三轮之间分类基本不变。`recommend_stop` 即使为真，也只是预设的描述性参考。它不表示证据等级提高了，也不表示可以把 ST04 从分歧清单里删掉。Wilcoxon 的 P 值同样不能单独当作停止或继续的标准。
+
+# 8. 写出 docx 报告
+
+```{r}
+report_file <- tempfile("delphi-ram-ipras-", fileext = ".docx")
+reported <- run_delphi_ram(ram, report = TRUE, format = "docx", file = report_file)
+file.exists(attr(reported, "report_file"))
+file.info(attr(reported, "report_file"))$size
+```
+
+**解读：** 报告应写明 IPR、IPRAS、DI、分位数 type 7，以及 IPR 必须**大于** IPRAS。还应写明这是三轮匿名函询，ST05 按 IPRAS 为适宜，若改用表 4 则会不同，但方案没有改。权威系数和 Kendall's W 若出现，只作为补充。
+
+# 9. 什么时候不要用 IPRAS
+
+人数少于 7 时，分类只供描述。量表不是 1–9，或三分区不是 1–3 / 4–6 / 7–9 时，不要沿用 2.35 和 1.5。把常数改成别的数而又不写理由，报告会标成非标准参数；更稳妥的做法是改用下一篇教程的百分比规则，并把百分比在发问卷前写死。

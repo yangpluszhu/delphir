@@ -8,7 +8,9 @@ analyze_delphi(
   study,
   by_stakeholder = TRUE,
   check_dropout = TRUE,
-  wilcoxon = TRUE
+  wilcoxon = TRUE,
+  reliability = TRUE,
+  up_to_round = NULL
 )
 }
 \arguments{
@@ -18,17 +20,32 @@ analyze_delphi(
 
 \item{check_dropout}{是否比较完成者与脱落者。}
 
-\item{wilcoxon}{稳定性分析中是否计算 Wilcoxon，默认 \code{TRUE}。}
+\item{wilcoxon}{稳定性分析和轮次比较中是否计算 Wilcoxon，默认 \code{TRUE}。
+P 值只作探索性描述，不定义稳定或共识。}
+
+\item{reliability}{是否计算 Cronbach's \eqn{\alpha}、ICC(2,1)、ICC(2,k)，
+以及已安装 \code{irr} 时的 Krippendorff's \eqn{\alpha}。默认 \code{TRUE}。
+数据不足时写入原因，不中断分类。}
+
+\item{up_to_round}{只分析 \code{ratings$round <= up_to_round} 的数据（保留历史轮，
+不丢弃脱落者上轮评分）。默认 \code{NULL} 表示研究中已有的全部轮次。}
 }
 \value{
 \code{delphi_result} 列表，主要元素：
 \code{study}, \code{item_summary}, \code{classification}, \code{participation},
 \code{stability}, \code{stakeholder}, \code{dropout}, \code{authority},
-\code{comments_summary}, \code{kendall}, \code{stopping}。
+\code{comments_summary}, \code{kendall}, \code{stopping}, \code{round_comparison},
+\code{reliability}, \code{sensitivity}。核心技术要素场景另含
+\code{expert_profile}、\code{panel_compliance}、\code{open_round}；此时 \code{stopping}
+来自 \code{\link[=coordination_decision]{coordination_decision()}}，而不是中位数稳定性。
+若方案允许第一轮新增条目，另含 \code{new_item_review}、\code{item_log}、
+\code{meeting_agenda}、\code{new_item_audit}。没有编码表时这些审查结果为空，
+不会改写已有条目的共识分类。
 }
 \description{
 主分析入口：参与度、条目汇总、共识/适宜性判定、稳定性、利益相关者分层、
-脱落偏倚、权威系数（若有）、意见主题与 Kendall W。
+脱落偏倚、权威系数（若有）、意见主题、Kendall W、轮次比较、
+评分者信度与敏感性分析。后三项不参与锁定规则下的正式分类。
 }
 \examples{
 study <- simulate_delphi(n_experts = 16, n_items = 8, n_rounds = 2, seed = 16)

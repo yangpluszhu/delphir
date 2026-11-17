@@ -11,7 +11,9 @@ response_summary(study)
 }
 \value{
 列表：\code{by_round} 每轮回收率；\code{retention} 相邻轮保留率；
-\code{attrition_ids} 脱落专家。
+\code{attrition_ids} 脱落专家。\code{by_round$positive_coefficient} 与
+\code{response_rate} 相同，都是积极系数（0–100）。\code{meets_reference}
+只表示是否不低于方案里的参考线，不是合格结论，也不加权。
 }
 \description{
 专家积极系数即问卷回收率。对 Delphi 更关键的是跨轮保留率（retention）

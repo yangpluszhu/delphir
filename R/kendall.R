@@ -8,7 +8,9 @@
 #' @param expert_col,item_col,score_col 长表列名。
 #' @param round,dimension 若传入 [delphi_study()]，用于筛选。
 #'
-#' @return 列表：`w`, `chi_sq`, `df`, `p_value`, `n_expert`, `n_item`, `note`。
+#' @return 列表：`w`, `chi_sq`, `df`, `p_value`, `n_expert`, `n_item`,
+#'   `tie_correction`, `tie_adjusted`, `note`。`tie_correction` 为
+#'   \eqn{\sum(t^3-t)}；无同分时为 0。卡方使用修正后的 W。
 #'
 #' @section 方法学要点:
 #' 不要把“W 显著 (P<0.05)”解释为每条都已达成共识。显著性依赖样本量。
@@ -71,7 +73,12 @@ kendall_w <- function(ratings, expert_col = "expert_id", item_col = "item_id",
     p_value = as.numeric(p),
     n_expert = m,
     n_item = n,
-    note = "W \u8bc4\u4ef7\u7684\u662f\u6392\u5e8f\u534f\u8c03\u6027\uff0c\u4e0d\u662f\u6761\u76ee\u7ea7\u5171\u8bc6\u3002"
+    tie_correction = as.numeric(tie_adj),
+    tie_adjusted = isTRUE(tie_adj > 0),
+    note = paste0(
+      "W \u8bc4\u4ef7\u7684\u662f\u6392\u5e8f\u534f\u8c03\u6027\uff0c\u4e0d\u662f\u6761\u76ee\u7ea7\u5171\u8bc6\u3002",
+      "\u5361\u65b9 = m(n-1)W\uff0c\u5df2\u6309\u540c\u5206\u4fee\u6b63\uff1b\u65e0\u540c\u5206\u65f6\u6821\u6b63\u91cf\u4e3a 0\u3002"
+    )
   )
 }
 

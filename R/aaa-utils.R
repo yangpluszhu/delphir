@@ -25,6 +25,19 @@
   )
 }
 
+.pkg_version <- function() {
+  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.8.0")
+}
+
+.need_pkg <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(
+      sprintf("\u9700\u8981\u5b89\u88c5\u5305 %s\uff1ainstall.packages(\"%s\")", pkg, pkg),
+      call. = FALSE
+    )
+  }
+}
+
 .scale_range <- function(protocol) {
   c(protocol$scale_min, protocol$scale_max)
 }
@@ -101,6 +114,12 @@
 }
 
 .ensure_unable <- function(ratings) {
+  n <- nrow(ratings)
+  if (is.null(n) || n == 0L) {
+    if (!"unable" %in% names(ratings)) ratings$unable <- logical()
+    ratings$unable <- as.logical(ratings$unable)
+    return(ratings)
+  }
   if (!"unable" %in% names(ratings)) {
     ratings$unable <- is.na(ratings$score)
   }
@@ -111,8 +130,14 @@
 }
 
 .ensure_dimension <- function(ratings) {
+  n <- nrow(ratings)
+  if (is.null(n) || n == 0L) {
+    if (!"dimension" %in% names(ratings)) ratings$dimension <- character()
+    ratings$dimension <- as.character(ratings$dimension)
+    return(ratings)
+  }
   if (!"dimension" %in% names(ratings) || all(is.na(ratings$dimension))) {
-    ratings$dimension <- "overall"
+    ratings$dimension <- rep("overall", n)
   }
   ratings$dimension <- as.character(ratings$dimension)
   ratings
@@ -138,6 +163,9 @@
     keep = "\u4fdd\u7559",
     drop = "\u5220\u9664",
     discuss = "\u5272\u5165\u4f1a\u8bae\u8ba8\u8bba",
+    retain = "\u7eb3\u5165\u6838\u5fc3\u6280\u672f\u8981\u7d20",
+    not_retain = "\u672a\u7eb3\u5165",
+    described = "\u63cf\u8ff0\u6027\uff08\u719f\u6089\u7a0b\u5ea6\uff09",
     stable = "\u7a33\u5b9a",
     unstable = "\u5c1a\u4e0d\u7a33\u5b9a"
   )
@@ -149,10 +177,12 @@
     clinical_consensus = "\u533b\u5b66\u4e13\u5bb6\u5171\u8bc6\uff08Modified Delphi\uff09",
     comet_cos = "COMET \u6838\u5fc3\u7ed3\u5c40\u96c6",
     rand_ucla = "RAND/UCLA \u9002\u5b9c\u6027\u8bc4\u4ef7",
+    delphi_ram = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM",
     indicator = "\u6307\u6807\u4f53\u7cfb\u7b5b\u9009",
     ranking = "\u4f18\u5148\u7ea7\u6392\u5e8f",
     definition = "\u5b9a\u4e49/\u8bca\u65ad\u6807\u51c6\u5171\u8bc6",
-    policy = "Policy Delphi"
+    policy = "Policy Delphi",
+    standard_element = "\u6807\u51c6\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff085 \u5206\u91cf\u8868\uff09"
   )
   unname(ifelse(scenario %in% names(map), map[scenario], scenario))
 }

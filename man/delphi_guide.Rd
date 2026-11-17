@@ -5,12 +5,19 @@
 \title{打开一套教学文档}
 \usage{
 delphi_guide(
-  which = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow")
+  which = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow",
+    "preset-protocol", "three-round-workflow", "standard-5point-workflow",
+    "new-item-workflow", "rand-classic-workflow", "rand-necessity-workflow",
+    "rand-rules-workflow", "delphi-ram-table4", "delphi-ram-ipras", "delphi-ram-percent")
 )
 }
 \arguments{
-\item{which}{\code{"clinical-consensus"}、\code{"rand-ucla"}、\code{"comet-cos"} 或
-\code{"questionnaire-workflow"}。}
+\item{which}{\code{"clinical-consensus"}、\code{"rand-ucla"}、\code{"comet-cos"}、
+\code{"questionnaire-workflow"}、\code{"preset-protocol"}、\code{"three-round-workflow"}、
+\code{"standard-5point-workflow"}、\code{"new-item-workflow"}、
+\code{"rand-classic-workflow"}、\code{"rand-necessity-workflow"}、
+\code{"rand-rules-workflow"}、\code{"delphi-ram-table4"}、\code{"delphi-ram-ipras"} 或
+\code{"delphi-ram-percent"}。}
 }
 \value{
 不可见的文件路径。

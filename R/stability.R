@@ -20,7 +20,7 @@
 analyze_stability <- function(summary, protocol, ratings = NULL, wilcoxon = TRUE) {
   .stop_if(!inherits(protocol, "delphi_protocol"), "\u9700\u8981 delphi_protocol\u3002")
   .stop_if(!"round" %in% names(summary), "summary \u9700\u8981 round \u5217\u3002")
-  if (!"class" %in% names(summary) && protocol$scenario != "rand_ucla") {
+  if (!"class" %in% names(summary) && !protocol$scenario %in% c("rand_ucla", "delphi_ram")) {
     summary <- classify_consensus(summary, protocol)
   }
   rounds <- .unique_sorted(summary$round)

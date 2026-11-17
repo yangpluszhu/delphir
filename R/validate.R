@@ -58,6 +58,15 @@ validate_delphi <- function(study, error = TRUE) {
   if (p$high_range[2] > p$scale_max || p$low_range[1] < p$scale_min) {
     add("error", "\u5171\u8bc6\u533a\u95f4\u4e0e\u91cf\u8868\u7aef\u70b9\u4e0d\u5339\u914d\u3002")
   }
+  if (identical(p$scenario, "standard_element")) {
+    comp <- tryCatch(panel_compliance(study), error = function(e) NULL)
+    if (!is.null(comp)) {
+      bad <- comp[!comp$ok & comp$level == "warn", , drop = FALSE]
+      if (nrow(bad)) {
+        for (i in seq_len(nrow(bad))) add("warning", bad$message[i])
+      }
+    }
+  }
 
   errs <- issues$message[issues$level == "error"]
   warns <- issues$message[issues$level == "warning"]

@@ -16,6 +16,8 @@
 #' * 定义共识：默认 P(高区)≥80% 且 IQR≤2。
 #' * 指标体系：高区达基本阈值且 IQR、CV 可接受则保留。
 #' * Policy：不判定“必须共识”，只描述分布。
+#' * 核心技术要素：重要程度均数达到 `mean_min` 且 CV 不超过 `cv_max` 则纳入。
+#'   熟悉程度只作描述，不决定去留。满分比不单独作为剔除线。
 #'
 #' @examples
 #' study <- simulate_delphi(n_experts = 14, n_items = 8, seed = 5)
@@ -41,6 +43,7 @@ classify_consensus <- function(summary, protocol = NULL, study = NULL) {
     indicator = .class_indicator(summary, protocol),
     policy = .class_policy(summary, protocol),
     ranking = .class_policy(summary, protocol),
+    standard_element = .class_standard(summary, protocol),
     rand_ucla = {
       warning("RAND/UCLA \u8bf7\u4f7f\u7528 classify_rand()\u3002\u6b64\u5904\u6309 Median \u533a\u95f4\u7ed9\u51fa\u521d\u6b65\u6807\u7b7e\uff0c\u672a\u7eb3\u5165\u5206\u6b67\u3002",
               call. = FALSE)
@@ -126,6 +129,17 @@ classify_consensus <- function(summary, protocol = NULL, study = NULL) {
   class <- ifelse(keep, "keep", "discuss")
   class[isTRUE(s$polarized)] <- "polarized"
   action <- ifelse(class == "keep", "keep", "discuss")
+  list(class = class, action = action)
+}
+
+.class_standard <- function(s, p) {
+  r <- p$rules
+  dim <- if ("dimension" %in% names(s)) as.character(s$dimension) else rep("\u91cd\u8981\u7a0b\u5ea6", nrow(s))
+  fam <- grepl("\u719f\u6089", dim)
+  mean_ok <- !is.na(s$mean) & !is.na(r$mean_min) & s$mean >= r$mean_min
+  cv_ok <- is.na(s$cv) | is.na(r$cv_max) | s$cv <= r$cv_max
+  class <- ifelse(fam, "described", ifelse(mean_ok & cv_ok, "retain", "not_retain"))
+  action <- ifelse(fam, "report", ifelse(class == "retain", "keep", "drop"))
   list(class = class, action = action)
 }
 

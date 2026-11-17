@@ -1,0 +1,220 @@
+---
+title: "改良德尔菲结合 RAM 分析报告"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+params:
+  result: NULL
+  template: delphi_ram
+  stage: auto
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    number_sections: true
+---
+
+```{r report-setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5)
+`%||%` <- function(x, y) if (is.null(x) || (length(x) == 1L && is.na(x))) y else x
+res <- params$result
+study <- res$study
+p <- study$protocol
+meta <- study$meta
+stage <- params$stage %||% "auto"
+if (identical(stage, "auto")) {
+  rnd <- res$last_round %||% max(res$item_summary$round)
+  maxr <- p$stability$max_rounds %||% 3L
+  stage <- if (isTRUE(rnd < maxr)) sprintf("round%s", rnd) else "final"
+}
+is_final <- identical(stage, "final")
+cls_all <- res$classification
+rounds_all <- sort(unique(cls_all$round))
+meta_ram <- res$delphi_ram_meta
+if (is.null(meta_ram)) meta_ram <- list()
+last_show <- res$last_classification
+stage_label <- if (!is_final) paste0("第 ", res$last_round, " 轮中间报告") else "终稿"
+```
+
+# 报告性质
+
+`r if (!is_final) paste0("**这是", stage_label, "，不是最终结论。**") else "**这是按预先锁定方案生成的终稿。** 分轮过程必须保留。"`
+
+本报告属于**改良德尔菲结合 RAM**，不是普通 Delphi 的高区比例复合标准，也不是经典 RAND/UCLA 两轮面对面适宜性专家组。
+
+- **场景**：`r delphir:::.scenario_label(p$scenario)`
+- **锁定规则**：`r meta_ram$rule %||% p$rand$rule`
+- **函询形式**：`r meta_ram$round_mode %||% p$rand$round2_mode`
+- **流程说明**：`r meta_ram$deviation %||% "匿名多轮函询。"`
+- **目的**：`r meta$objective %||% "未说明"`
+- **目标使用者**：`r meta$users %||% "未说明"`
+- **地理范围**：`r meta$geography %||% "未说明"`
+- **条目来源**：`r meta$evidence_note %||% "未说明"`
+- **匿名**：`r meta$anonymity %||% "评分匿名汇总"`
+- **伦理**：`r meta$ethics %||% "未说明"`
+
+> 专家高度一致不等于高质量证据。诊疗推荐仍应回到系统评价与 GRADE。分歧是正式结果，不是调查失败。
+
+# 预先锁定的方案
+
+规则在第 1 轮问卷发出前写入。分析阶段不得改用另一套规则来“凑”共识。临床共识的 `high_pct` 若出现在下表中，只作对照，不参与本场景分类。
+
+```{r}
+knitr::kable(delphir::protocol_table(p),
+             caption = "预设方案（value 为锁定值，preset 为该场景默认值）")
+```
+
+`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）") else paste0("规则相对该场景默认值未再改写。理由记录：", p$rationale %||% "无")`
+
+文献：Fitch K, Bernstein SJ, Aguilar MD, et al. The RAND/UCLA Appropriateness Method User's Manual. Santa Monica, CA: RAND; 2001. 百分比规则必须标明为 RAM 修改版。
+
+# 与经典 RAM 的差别
+
+- 经典适宜性专家组通常是两轮，第 2 轮为面对面会议后的独立复评。
+- 本流程是匿名函询，默认最多 3 轮。第 3 轮不是为了把分歧涂掉。
+- 每一轮复评全部条目，不剔除已经适宜或已经达成共识的条目。
+- `r meta_ram$supplement %||% "权威系数与 Kendall's W 不替代 RAM 判定。"`
+
+# 专家构成
+
+```{r}
+panel <- study$panel
+if ("stakeholder" %in% names(panel)) {
+  knitr::kable(as.data.frame(table(panel$stakeholder)), col.names = c("利益相关者", "n"),
+               caption = "专家构成（目的抽样）")
+}
+```
+
+专家人数 `r nrow(panel)`。少于 7 份有效应答时，分类只供描述。7 人沿用表 4 的 8–10 人档。
+
+# 各轮问卷要点
+
+第 1 轮独立评分。之后每轮反馈本人上轮分数、1–3 / 4–6 / 7–9 人数、中位数和分歧标记。
+
+```{r}
+cat(delphir:::.protocol_rules_delphi_ram(p))
+```
+
+```{r}
+for (rnd in rounds_all) {
+  cat(sprintf("\n\n## 第 %s 轮覆盖的条目\n\n", rnd))
+  sub <- cls_all[cls_all$round == rnd, , drop = FALSE]
+  keep <- intersect(c("item_id", "item_text", "median", "n_low", "n_high",
+                      "class_zh", "consensus_zh", "agreement_status"), names(sub))
+  show <- sub[, keep, drop = FALSE]
+  if ("item_text" %in% names(show)) show$item_text <- substr(as.character(show$item_text), 1, 36)
+  knitr::kable(show, digits = 2, caption = sprintf("第 %s 轮分类", rnd))
+}
+```
+
+# 参与度
+
+```{r}
+knitr::kable(res$participation$by_round, digits = 1, caption = "各轮回收率（积极系数，不加权）")
+if (!is.null(res$participation$retention)) {
+  knitr::kable(res$participation$retention, digits = 1, caption = "相邻轮保留率")
+}
+```
+
+# 末轮适宜性与共识
+
+表 4 与 IPRAS：适宜性由中位数区间和有无分歧决定。正向共识、负向共识和未达成共识只是报告用语。“无分歧”不等于“一致”，请同时看 `agreement_status`。
+
+百分比规则：主判定是预先锁定的比例。中位数在高区但高区比例未达标，记为未达成共识。适宜性列由同一判定映射，并标明修改版。
+
+```{r}
+keep <- intersect(c("item_id", "n_valid", "median", "n_low", "n_mid", "n_high",
+                    "p30", "p70", "ipr", "ipras", "di", "disagreement",
+                    "agreement_status", "class_zh", "consensus_zh", "decision_basis"),
+                  names(last_show))
+knitr::kable(last_show[, keep, drop = FALSE], digits = 2, caption = "末轮适宜性与共识")
+```
+
+# 分歧与未达成共识清单
+
+```{r}
+flag <- rep(FALSE, nrow(last_show))
+if ("disagreement" %in% names(last_show)) flag <- flag | last_show$disagreement %in% TRUE
+if ("consensus" %in% names(last_show)) {
+  flag <- flag | last_show$consensus %in% c("no_consensus", "disagreement")
+}
+show <- last_show[flag, intersect(c("item_id", "median", "class_zh", "consensus_zh", "agreement_status"), names(last_show)), drop = FALSE]
+if (!nrow(show)) {
+  cat("末轮没有分歧或未达成共识的条目。这不表示应当放宽规则。")
+} else {
+  knitr::kable(show, digits = 2, caption = "需要在正文中保留的分歧或未达成共识条目")
+}
+```
+
+# 轮次间稳定性
+
+稳定性描述分类是否还在变。它不是把分歧送回去直到表面一致的理由。Wilcoxon P 值只作探索。
+
+```{r}
+if (is.null(res$stability)) {
+  cat("只有一轮，不能评价稳定性。")
+} else {
+  knitr::kable(res$stability[, intersect(c("item_id", "from_round", "to_round",
+                                          "median_r1", "median_r2", "class_r1", "class_r2",
+                                          "class_unchanged", "wilcoxon_p"),
+                                        names(res$stability)), drop = FALSE],
+               digits = 2, caption = "相邻轮变化")
+  st <- res$stopping
+  if (!is.null(st)) {
+    cat(sprintf("\n\n描述性终止参考：%s。分类不变 %.1f%%。这不自动授权提前停止，也不授权改规则。\n",
+                if (isTRUE(st$recommend_stop)) "达到预设稳定性参考" else "尚未达到预设稳定性参考",
+                100 * st$class_unchanged_pct))
+  }
+}
+```
+
+# 规则敏感性
+
+下表用另外的规则重算同一轮。κ 低说明“事先写哪一条规则”会改变结论，所以不能在看到结果后改规则。
+
+```{r}
+sens <- res$sensitivity
+if (is.null(sens) || !is.null(sens$error)) {
+  cat(sens$error %||% "未计算敏感性。")
+} else {
+  knitr::kable(sens$kappa, digits = 3, caption = "规则之间的 Cohen's kappa（探索性）")
+  cols <- intersect(c("item_id", "class_table4", "class_ipras", "class_percent", "matches_locked"),
+                    names(sens$by_item))
+  knitr::kable(sens$by_item[, cols, drop = FALSE], caption = "同一条目在三种规则下的适宜性分类")
+  cat("\n\n")
+  cat(sens$note)
+}
+```
+
+# 补充指标的限制
+
+```{r}
+if (is.null(res$authority)) {
+  cat("未提供权威系数。若收集，Cr 不加权、不替代中位数和分歧。")
+} else {
+  ov <- attr(res$authority, "overall")
+  knitr::kable(data.frame(
+    指标 = c("组平均 Cr", "参考界值"),
+    结果 = c(round(ov$mean_cr, 3), ov$threshold)
+  ), caption = "权威系数（补充，不参与分类）")
+}
+if (!is.null(res$kendall) && is.null(res$kendall$error)) {
+  cat(sprintf("\n\nKendall's W = %s。它描述排序是否像随机，不替代 RAM 分类。\n",
+              if (!is.null(res$kendall$w)) round(res$kendall$w, 3) else "未计算"))
+}
+```
+
+```{r extended-metrics, results='asis'}
+delphir::report_extended_section(res)
+delphir::report_rounds_section(res)
+delphir::report_sensitivity_section(res)
+```
+
+# 参考文献
+
+Fitch K, Bernstein SJ, Aguilar MD, et al. The RAND/UCLA Appropriateness Method User's Manual. Santa Monica, CA: RAND; 2001.
+
+Gattrell WT, Logullo P, van Zuuren EJ, et al. ACCORD (ACcurate COnsensus Reporting Document): a reporting guideline for consensus methods in biomedicine developed via a modified Delphi. PLoS Med. 2024;21(1):e1004326.
+
+Jünger S, Payne SA, Brine J, Radbruch L, Brearley SG. Guidance on Conducting and REporting DElphi Studies (CREDES) in palliative care. Palliat Med. 2017;31(8):684-706.
+
+Diamond IR, Grant RC, Feldman BM, et al. Defining consensus: a systematic review recommends methodologic criteria for reporting of Delphi studies. J Clin Epidemiol. 2014;67(4):401-409.

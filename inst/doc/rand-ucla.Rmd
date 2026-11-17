@@ -75,19 +75,17 @@ protocol$rand
 - Median 7–9 且**无分歧** → Appropriate
 - Median 4–6，**或任何分歧** → Uncertain
 
-分歧有两套定义，本包默认都算：
+从 0.6.0 起，预设规则是手册**表 4**（按实际应答人数查一致与分歧阈值），不再把「表 4 或 IPRAS」取并集当作默认。`rand_disagreement = "classic"` 也改指表 4，不再使用旧的 `ceiling(n/3)`。人数为 10 或 16 时，和 0.5.0 的结果可能不同。
 
-1. **经典：** 约三分之一评 1–3 且约三分之一评 7–9（9 人面板即各 ≥3 人）；
-2. **IPRAS / DI（Fitch 2001）：**
+IPRAS 仍可选用。分歧条件是 **IPR 严格大于 IPRAS**，分位数固定为 R 的 type 7：
 
 \[
 IPR = P_{70}-P_{30},\quad
-AI = \left|\frac{P_{30}+P_{70}}{2}-5\right|,\quad
-IPRAS = 2.35 + 1.5\times AI,\quad
-DI = IPR/IPRAS
+AI = \left|5-\frac{P_{30}+P_{70}}{2}\right|,\quad
+IPRAS = 2.35 + 1.5\times AI
 \]
 
-`DI ≥ 1` 为分歧。IPRAS 可推广到非 3 倍数的面板。
+不确定要写成两种正式结果：中位数落在 4–6，或存在分歧。完整的两轮问卷、必要性评价和规则比较见教学文档 9–11：`delphi_guide("rand-classic-workflow")`、`delphi_guide("rand-necessity-workflow")`、`delphi_guide("rand-rules-workflow")`。
 
 # 4. 指征表与证据
 

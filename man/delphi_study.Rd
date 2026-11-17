@@ -8,8 +8,11 @@ delphi_study(
   protocol,
   panel,
   items,
-  ratings,
+  ratings = NULL,
   comments = NULL,
+  suggestions = NULL,
+  concept_review = NULL,
+  floor_items = NULL,
   meta = list(),
   validate = TRUE
 )
@@ -21,20 +24,27 @@ delphi_study(
 
 \item{items}{\code{\link[=delphi_items]{delphi_items()}} 或数据框。}
 
-\item{ratings}{\code{\link[=delphi_ratings]{delphi_ratings()}} 或数据框。}
+\item{ratings}{\code{\link[=delphi_ratings]{delphi_ratings()}} 或数据框。可省略（空表）以表示尚未回收。}
 
 \item{comments}{\code{\link[=delphi_comments]{delphi_comments()}} 或数据框，可省略。}
+
+\item{suggestions}{\code{\link[=delphi_suggestions]{delphi_suggestions()}}，第 1 轮结构化新增建议，可省略。}
+
+\item{concept_review}{研究组编码后的概念表，供 \code{\link[=screen_new_items]{screen_new_items()}} 使用，可省略。}
+
+\item{floor_items}{共识会议上临时提出、尚未匿名评分的条目，可省略。}
 
 \item{meta}{命名列表。建议字段：\code{title}、\code{objective}、\code{users}、\code{geography}、
 \code{evidence_note}、\code{pilot_tested}、\code{anonymity}、\code{ethics}。}
 
-\item{validate}{是否立即调用 \code{\link[=validate_delphi]{validate_delphi()}}，默认 \code{TRUE}。}
+\item{validate}{是否立即调用 \code{\link[=validate_delphi]{validate_delphi()}}，默认 \code{TRUE}。无评分时自动跳过。}
 }
 \value{
 \code{delphi_study} 对象。
 }
 \description{
 把方案、专家、条目、评分（及可选意见）装入单一 S3 对象，供后续分析使用。
+第一轮发放前若尚无评分，请用 \code{\link[=delphi_blueprint]{delphi_blueprint()}}。
 }
 \examples{
 study <- simulate_delphi(n_experts = 12, n_items = 6, n_rounds = 2, seed = 1)

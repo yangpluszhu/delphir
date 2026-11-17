@@ -21,7 +21,9 @@ kendall_w(
 \item{round, dimension}{若传入 \code{\link[=delphi_study]{delphi_study()}}，用于筛选。}
 }
 \value{
-列表：\code{w}, \code{chi_sq}, \code{df}, \code{p_value}, \code{n_expert}, \code{n_item}, \code{note}。
+列表：\code{w}, \code{chi_sq}, \code{df}, \code{p_value}, \code{n_expert}, \code{n_item},
+\code{tie_correction}, \code{tie_adjusted}, \code{note}。\code{tie_correction} 为
+\eqn{\sum(t^3-t)}；无同分时为 0。卡方使用修正后的 W。
 }
 \description{
 评价多位专家对一组项目的\strong{相对排序}是否协调。W 接近 0 表示排序几乎无关，

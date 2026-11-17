@@ -1,0 +1,120 @@
+---
+title: "教学文档 10：必要性评价，只评适宜且无分歧的条目"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 10：必要性评价，只评适宜且无分歧的条目}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5,
+                      message = FALSE, warning = FALSE)
+```
+
+# 1. 必要性不是第三轮适宜性
+
+适宜回答的是：做这件事，预期获益是否超过预期危害。必要更窄（Kahan 等，1994）：这件事已经适宜，而且不提供它就算不当的医疗，获益机会合理，获益幅度也不小。
+
+因此必要性评分只发给「适宜且无分歧」的条目。不确定、不适宜、因分歧被降为不确定的条目，都不进入这张问卷。手册把这一步放在适宜性第 2 轮之后，通常再次邮寄。它使用 1–9 分，但锚点改成「显然不必要—显然必要」。把它写成「第 3 轮适宜性评分」是方法学错误。
+
+样本 `ram_necessity_demo` 由 `simulate_rand_necessity()` 生成。适宜性部分与教学文档 9 相同。必要性分数只加在第 2 轮已经适宜且无分歧的三条上，放在第 3 轮、维度「必要性」。
+
+```{r}
+library(delphir)
+nec <- simulate_rand_necessity()
+nec$protocol$rand$necessity
+sort(unique(nec$ratings$round))
+unique(nec$ratings$dimension)
+```
+
+**解读：** `necessity = TRUE` 只表示方案计划做必要性，不表示每条都要评。评分表里第 1、2 轮是「适宜性」，第 3 轮才是「必要性」。安装后同一对象为 `data(ram_necessity_demo)`。
+
+# 2. 先看适宜性末轮，再决定谁有资格
+
+```{r}
+app <- classify_rand(nec, round = 2)
+app[, c("item_id", "median", "disagreement", "class", "class_zh")]
+```
+
+**解读：** 只有 `class` 为 appropriate 且 `disagreement` 为 FALSE 的条目可以评必要性。IND02、IND06 不适宜，IND03 是中位数居中的不确定，IND04 和 IND08 因分歧成为不确定。这五条即使有人私下打了必要性分数，软件也不给必要性结论。
+
+IND01、IND05、IND07 三条过线。过线只说明「可以讨论是否必要」，不说明它们已经必要。
+
+# 3. 必要性问卷里只有这三条
+
+```{r}
+path <- rand_questionnaire(nec, round = "necessity", format = "both",
+                           file = tempfile("ram-nec-"))
+basename(path)
+raw <- openxlsx::read.xlsx(path[grepl("xlsx", path)][1], sheet = "\u8bc4\u5206")
+unique(raw$item_id)
+unique(raw$dimension)
+unique(raw$round)
+```
+
+**解读：** Excel 里只有 IND01、IND05、IND07，维度是必要性，轮次是 3。没有出现的条目不是漏项。问卷正文会写明：未列入的条目未达到「适宜且无分歧」。锚点也换成了必要性，不要沿用「危害—获益」。
+
+`format = "both"` 同时给出 docx 供专家阅读、xlsx 供录入。回收后仍用 `read_survey_xlsx()` 合并进原研究。空白分数不会被当成 0 分或 5 分；读回时没有填写的行会被留下待补，而不是自动参加分类。上面直接读工作表，是为了看见问卷设计本身，而不是看见已填分数。
+
+# 4. 三条必要性分数分别说明什么
+
+```{r}
+out <- classify_necessity(nec)
+out[, c("item_id", "appropriateness_zh", "eligible", "n_valid", "median",
+        "disagreement", "necessity_class", "necessity_zh", "note")]
+```
+
+**解读，逐条：**
+
+- IND01：必要性中位数 ≥ 7，而且按与适宜性相同的表 4 没有分歧。结论是「必要」。必要包含适宜，但比适宜多了一层：不提供就算不当。
+- IND05：适宜性已经无分歧地落在 7–9，所以有资格评必要性。必要性中位数在 4–6。结论是「适宜但非必要」。临床上可以做，但不是必须做。不要把它改写成不适宜。
+- IND07：有资格评必要性，但必要性分数两端都达到表 4 的分歧阈值。中位数即使偏高，也因为分歧而不能叫必要。结论仍是「适宜但非必要」。分歧本身要在表里看得见（`disagreement = TRUE`），不能只留一个「非必要」。
+- 其余条目 `eligible = FALSE`，`necessity_class` 为缺失。`note` 写的是不评的原因，不是数据缺失。
+
+`n_valid` 对没有必要性评分的条目是 0。不要把 0 理解成「大家都打了 0 分」。
+
+# 5. 末轮分析不会把必要性当成新的适宜性
+
+```{r}
+res <- run_rand(nec, report = FALSE, loo = FALSE)
+res$last_round
+res$rand_meta$deviation
+table(res$necessity$necessity_zh, useNA = "ifany")
+```
+
+**解读：**
+
+- `last_round` 仍是 2。第 3 轮没有参加适宜性分类，所以不会触发「适宜性超过 2 轮」的偏离警告。`deviation = FALSE`。
+- 若有人把第 3 轮的维度仍写成「适宜性」，`classify_rand()` 会警告这是对经典流程的偏离，报告也会写明。那和必要性不是一回事。
+- 必要性表里的缺失是「未进入必要性评价」，统计时不要把这些缺失插补成中间分。
+
+轮次比较只比较适宜性的第 1 轮和第 2 轮。必要性没有「上一轮必要性中位数」，除非你又做了第二次必要性评分。本包不把第二次必要性评分当作经典流程。
+
+```{r}
+res$round_comparison$group
+```
+
+**解读：** 各轮条目数是适宜性条目数，不含必要性维度。适宜条数在两轮之间的变化，解释方式与教学文档 9 相同。不要把必要性轮的「必要」比例画进这张表，以免读者以为小组在第 3 轮突然达成了更多适宜。
+
+# 6. 报告里必要性单独成节
+
+```{r}
+docx <- tempfile("ram-nec-report-", fileext = ".docx")
+reported <- run_rand(nec, report = TRUE, format = "docx", file = docx, loo = FALSE)
+attr(reported, "report_file")
+```
+
+**解读：** docx 报告在适宜性清单之外另有必要性一节。可以放进指南附录的句子应当分成三列，而不是一列「共识」：
+
+1. 适宜且必要；
+2. 适宜但非必要；
+3. 不确定或不适宜（不评价必要性）。
+
+必要的条目仍然要和证据等级分开写。面板认为必要，不能代替「不提供就有试验证明会伤害患者」这种证据陈述。Kahan 提出的四条概念标准是写在问卷说明里给专家看的，不是软件的输入变量。
+
+# 7. 若误把不适宜条目送去评必要性
+
+软件会拒绝给出必要性分类，并警告这些分数不参与判定。正确做法是改问卷，而不是放宽「必须已经适宜」这条。把不确定条目也送去评必要性，会把「证据不足或意见分裂」伪装成「已经值得讨论是否必须做」。

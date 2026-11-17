@@ -1,0 +1,284 @@
+---
+title: "德尔菲法分析报告（核心技术要素）"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+params:
+  result: NULL
+  template: standard
+  stage: auto
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    number_sections: true
+---
+
+```{r report-setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5)
+`%||%` <- function(x, y) if (is.null(x) || (length(x) == 1L && is.na(x))) y else x
+res <- params$result
+study <- res$study
+p <- study$protocol
+meta <- study$meta
+stage <- params$stage %||% "auto"
+if (identical(stage, "auto")) {
+  rnd <- res$last_round %||% max(res$item_summary$round)
+  maxr <- p$stability$max_rounds %||% 4L
+  stage <- if (isTRUE(rnd < maxr)) sprintf("round%s", rnd) else "final"
+}
+is_final <- identical(stage, "final")
+cls <- res$classification
+imp <- cls[cls$dimension == "重要程度", , drop = FALSE]
+fam <- cls[cls$dimension == "熟悉程度", , drop = FALSE]
+rounds <- sort(unique(imp$round))
+last_round <- max(rounds)
+last_imp <- imp[imp$round == last_round, , drop = FALSE]
+rules <- p$rules
+pct <- function(x) sprintf("%.1f%%", x)
+```
+
+# 报告性质
+
+`r if (is_final) "这是按调查开始前锁定的方案写成的终稿。" else paste0("这是第 ", res$last_round, " 轮之后的中间报告，还不是最终要素清单。")`
+
+本报告对应标准起草中的德尔菲法：用 5 分量表询问每个核心技术要素的重要程度和熟悉程度，用均数说明重要性，并同时给出调查人数和满分比。专家意见是否已经接近一致，看协调系数，而不是看中位数。
+
+- **题目**：`r meta$title %||% "未命名"`
+- **目的**：`r meta$objective %||% "未说明"`
+- **使用者**：`r meta$users %||% "未说明"`
+- **地区**：`r meta$geography %||% "未说明"`
+- **匿名**：`r meta$anonymity %||% "评分匿名汇总"`
+- **轮次说明**：`r meta$numbering_note %||% if (isTRUE(p$open_first)) "第 1 轮为开放式征询，其后为 5 分评分。" else "要素已有前期基础，本次从评分调查开始，对应技术要求中的第 2 轮及以后。"`
+
+**怎么读：** 先看这份报告是中间结果还是终稿。中间结果里的「纳入」只说明按目前分数会怎样，调查还没结束时不要把它写进标准正文。
+
+# 核心技术要素从哪里来
+
+`r meta$evidence_note %||% "未说明要素来源。"`
+
+```{r}
+items <- study$items
+keep <- intersect(c("item_id", "item_text", "domain", "source_type", "source_note"), names(items))
+knitr::kable(items[, keep, drop = FALSE], caption = "核心技术要素及其来源")
+```
+
+**怎么读：** 「古籍」「现代文献」表示这条在发问卷之前就有文献基础。「开放式凝练」表示它是第 1 轮专家建议整理出来的，不是事先就写死的。来源只说明这条为什么被拿来问，不说明专家最后是否认为它重要。
+
+# 调查开始前锁定的规则
+
+这些数字在发出第一份问卷之前就已经写死。看到结果以后不能再改，否则「达标」就没有意义。
+
+```{r}
+knitr::kable(delphir::protocol_table(p), caption = "锁定的方案参数")
+```
+
+**怎么读：** 这次真正用来决定去留的是两句话。第一，最终轮重要程度的平均分至少 `r rules$mean_min` 分，并且大家的分歧不要太大（变异系数不超过 `r rules$cv_max`）。第二，至少做过两轮 5 分评分之后，如果协调系数不低于 `r rules$w_min`、统计检验 P 小于 `r rules$w_p_max`，而且各条平均分比上一轮平均挪动不到 `r rules$mean_delta_max` 分，就可以结束。满分比要写进报告，但不单独用来删掉某一条。积极系数 `r round(100 * rules$response_rate_min)`% 和权威系数 `r rules$cr_min` 只用来描述专家组，不用来给分数加权。
+
+`r if (isTRUE(p$modified_from_preset)) paste0("本方案改过预设界值。理由：", p$rationale %||% "（未填写理由）") else "本方案使用该场景的预设界值，没有在看到结果后改过。"`
+
+# 调查对象
+
+技术要求：调查对象为相关科室的临床专家，可以包括专家组以外的专家，人数不宜少于 30 人；应具有高级职称，科室和地域分布均衡。
+
+```{r}
+comp <- res$panel_compliance
+if (is.null(comp)) comp <- delphir::panel_compliance(study)
+show <- comp[, c("check", "value", "threshold", "ok", "message")]
+names(show) <- c("检查", "结果", "要求", "是否符合", "说明")
+knitr::kable(show, caption = "调查对象是否符合技术要求")
+```
+
+**怎么读：** 「是否符合」为否，表示这一项没有达到技术要求，需要在审查材料里说明原因，例如某地区专家过少。它不会自动把某位专家的分数删掉。组外专家可以有，不是必须有。
+
+# 各轮问卷在问什么
+
+```{r}
+cat(if (isTRUE(p$open_first)) {
+  "第 1 轮是开放式征询：只收集保留、修改和新增建议，不打 1–5 分。研究组据此凝练要素。首次评分轮同时询问重要程度和熟悉程度，并请专家做一次权威程度自评。此后每一轮都先告诉专家本人上一轮的分数，以及全组的均数和满分比，再请他们重新评分。\n"
+} else {
+  "要素在调查前已有文献基础，因此没有开放式第 1 轮。软件中的第 1 轮就是 5 分评分，对应技术要求里的第 2 轮。反馈轮会给出本人上轮答案、组均数和满分比。\n"
+})
+```
+
+```{r}
+if (!is.null(res$open_round) && res$open_round$n_comments > 0L) {
+  cat(sprintf("开放式第 1 轮收回 %s 位专家的 %s 条意见。\n\n",
+              res$open_round$n_experts, res$open_round$n_comments))
+  knitr::kable(res$open_round$by_theme, caption = "开放式意见的主题（由研究组事先编码）")
+}
+```
+
+**怎么读：** 开放式轮次的作用是把清单补全，不是计算重要性。主题频数高，只表示提到的人多，还要由研究组改写成可以评分的条款。
+
+# 专家积极系数
+
+积极系数就是问卷回收率：这一轮有多少受邀专家把问卷寄回来了。它说明专家愿不愿意参加，不说明他们的意见是否一致。
+
+```{r}
+part <- res$participation$by_round
+part$reading <- ifelse(
+  part$response_rate >= 100 * rules$response_rate_min,
+  "达到参考值",
+  "低于参考值，宜说明原因"
+)
+knitr::kable(part, digits = 1, caption = "各轮回收率（专家积极系数）")
+if (!is.null(res$participation$retention)) {
+  knitr::kable(res$participation$retention, digits = 1, caption = "相邻轮还有多少人继续参加")
+}
+```
+
+**怎么读：** 参考值是 `r round(100 * rules$response_rate_min)`%。高于它，表示大多数受邀专家作了回答。低于它，不能靠删掉未回复的人来「提高」这个比例。后一轮人数变少时，要看离开的人是不是某一类专家特别多，以免最后的平均分只代表留下来的人。
+
+# 专家权威程度
+
+权威程度描述专家对这次咨询主题的把握，按人计算一次，不按每一条要素重复计算，也不用来给重要程度加权。计算公式是：权威系数 =（判断依据 + 熟悉程度系数）/ 2。国内文献常把全组平均不低于 `r rules$cr_min` 当作参考。
+
+```{r}
+if (is.null(res$authority)) {
+  cat("本次数据没有权威系数自评。首次评分轮的问卷中应包含熟悉程度和判断依据。")
+} else {
+  ov <- attr(res$authority, "overall")
+  knitr::kable(data.frame(
+    指标 = c("判断依据均数", "熟悉程度系数均数", "权威系数均数", "不低于参考值的专家比例", "参考值"),
+    结果 = c(
+      round(ov$mean_ca, 3), round(ov$mean_cs, 3), round(ov$mean_cr, 3),
+      sprintf("%.1f%%", ov$pct_ok), ov$threshold
+    )
+  ), caption = "专家组权威程度（每人一次，不是每一条一次）")
+  cat(ov$note, "\n")
+  cat(sprintf(
+    "\n\n怎么读：全组权威系数平均 %.2f。%s 权威系数高，只说明这些专家自己认为对这个主题比较有把握，不能代替匿名、多轮反馈，也不能证明某条要素就该写入标准。\n",
+    ov$mean_cr,
+    if (ov$mean_cr >= rules$cr_min) "达到了 0.70 的参考值。" else "没有达到 0.70 的参考值，宜在报告中说明专家构成。"
+  ))
+}
+```
+
+# 专家的个人情况
+
+技术要求要求描述性别、年龄、学历、专业、职称、工作年限，以及专家对所评价领域的熟悉程度。
+
+```{r}
+prof <- res$expert_profile
+if (is.null(prof)) prof <- delphir::expert_profile(study = study)
+show_tab <- function(x, caption) {
+  if (is.null(x) || !nrow(x)) return(invisible(NULL))
+  knitr::kable(x, caption = caption)
+}
+show_tab(prof$tables$sex, "性别")
+if (!is.null(prof$age)) {
+  knitr::kable(prof$age, digits = 1, caption = "年龄（岁）")
+}
+show_tab(prof$tables$age_band, "年龄分组")
+show_tab(prof$tables$education, "学历")
+show_tab(prof$tables$specialty, "专业")
+show_tab(prof$tables$title, "职称")
+show_tab(prof$tables$title_level, "职称级别")
+if (!is.null(prof$years)) knitr::kable(prof$years, digits = 1, caption = "从事本专业年限")
+show_tab(prof$tables$department, "科室")
+show_tab(prof$tables$region, "地域")
+show_tab(prof$tables$familiarity, "对评价领域的熟悉程度（专家级自评）")
+show_tab(prof$tables$in_expert_group, "是否专家组成员")
+```
+
+**怎么读：** 这一节回答「谁在评」。如果某一职称、某一地区占了大多数，平均分就更多地反映那一类专家的看法。熟悉程度在这里是专家对整个主题的自我评价；下面对每一条要素还有单独的 5 分熟悉程度，两者不要混成一个数。
+
+# 各要素的重要程度
+
+技术要求规定：各要素的重要性，以重要程度分数的均数确定。均数越高，专家整体越认为这条重要。满分比是打出最高分（5 分）的人数占有效评分人数的百分比。变异系数 = 标准差 / 均数，数值越大，说明分数越散。调查人数是给出有效分数的人数，打了「无法判断」的不计算在内。
+
+```{r}
+for (rnd in rounds) {
+  sub <- imp[imp$round == rnd, , drop = FALSE]
+  keep <- intersect(c("item_id", "item_text", "n_valid", "mean", "sd", "cv",
+                      "n_full", "full_rate", "class_zh"), names(sub))
+  show <- sub[, keep, drop = FALSE]
+  if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 42)
+  names(show) <- c("编号", "要素", "调查人数", "均数", "标准差", "变异系数",
+                   "满分人数", "满分比", "判定")[seq_along(keep)]
+  knitr::kable(show, digits = 2, caption = sprintf("第 %s 轮重要程度", rnd))
+}
+```
+
+**怎么读：** 比较同一条在不同轮的均数，看意见有没有往一起靠。均数达到 `r rules$mean_min` 且变异系数不超过 `r rules$cv_max`，按预先写好的规则纳入。均数不到 `r rules$mean_min`，表示专家整体并不认为它足够重要，即使有一部分人打了满分，也不纳入。满分比高而均数不高，通常是少数人打 5 分、另一些人打得很低，不能只报满分比。
+
+# 各要素的熟悉程度
+
+熟悉程度也用 5 分，但它不决定这条写不写进标准。它用来看专家是不是在自己熟悉的范围内作答。
+
+```{r}
+if (nrow(fam)) {
+  sub <- fam[fam$round == last_round, , drop = FALSE]
+  keep <- intersect(c("item_id", "item_text", "n_valid", "mean", "full_rate"), names(sub))
+  show <- sub[, keep, drop = FALSE]
+  if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 42)
+  knitr::kable(show, digits = 2, caption = sprintf("第 %s 轮熟悉程度（不用于纳入判定）", last_round))
+}
+```
+
+**怎么读：** 熟悉程度均数低，表示很多专家觉得这条超出自己的经验。这样的重要程度均数要谨慎看待：人是答了，但把握不大。它不能替代上面的专家级权威系数。
+
+# 协调系数与是否结束
+
+协调系数（Kendall W）看的是：这些专家给各条排出的高低顺序像不像。W 接近 0，顺序各排各的；接近 1，顺序几乎一样。P 值很小，只说明这种一致不像纯属巧合，并不自动等于「已经可以写进标准」。所以结束调查必须同时满足 W、P 和均数变化三条，而且至少已经有两轮 5 分评分。
+
+```{r}
+st <- res$stopping
+if (is.null(st) || is.null(st$by_round) || !nrow(st$by_round)) {
+  cat("评分轮次还不够，暂时不能判断协调程度。")
+} else {
+  knitr::kable(st$by_round, digits = 3, caption = "各评分轮的协调系数与均数变化")
+  cat("\n\n")
+  cat(st$note, "\n")
+}
+```
+
+**怎么读：** 表中「均数变化」是这一轮每条重要程度均数相对上一轮差了多少，再取平均。第一轮评分没有上一轮，所以这里是空的。只有 W 达标、P 达标、均数变化也小于 `r rules$mean_delta_max`，才写「协调程度较好，调查可以结束」。如果已经做满 `r p$stability$max_rounds` 轮仍未同时达标，就如实写未达到预设协调程度，不能把 0.50 改成刚好能过的数字。
+
+# 纳入与未纳入的要素
+
+```{r}
+keep_cols <- intersect(c("item_id", "item_text", "n_valid", "mean", "cv", "full_rate", "class_zh", "action"), names(last_imp))
+fin <- last_imp[, keep_cols, drop = FALSE]
+if ("item_text" %in% names(fin)) fin$item_text <- substr(fin$item_text, 1, 48)
+knitr::kable(fin, digits = 2, caption = sprintf("第 %s 轮按均数作出的判定", last_round))
+```
+
+**怎么读：** 「纳入核心技术要素」表示这条同时满足均数和变异系数两条预设规则。「未纳入」表示没有同时满足。未纳入不是计算错误，应当写进报告，说明专家没有把它看成必须写入标准的技术要素。熟悉程度不出现在这张判定表里。
+
+# 附录：核心技术要素的确定方法及结果
+
+下表对应标准附录中德尔菲结果的呈现方式。每一行是一条最终纳入的要素：标准内容、方法、调查人数、均值、满分比。未纳入的要素不列入此表，已在上一节说明。
+
+```{r}
+app <- delphir::appendix_b_table(res, round = last_round)
+if (!nrow(app)) {
+  cat("按当前锁定规则，没有要素达到纳入标准。")
+} else {
+  show <- data.frame(
+    标准内容 = app$standard_text,
+    确定方法 = app$method,
+    调查人数 = app$n_respondents,
+    均值 = app$mean,
+    满分比 = sprintf("%.0f%%", app$full_rate),
+    stringsAsFactors = FALSE
+  )
+  knitr::kable(show, digits = 2, caption = "附录 B  核心技术要素来源及依据中的德尔菲结果")
+}
+```
+
+**怎么读：** 「调查人数」是这条要素上给出有效重要程度分数的人数，可因「无法判断」或未回复而少于受邀人数。「均值」就是纳入时使用的重要程度均数。「满分比」是打 5 分的百分比。三列要同时看：人数过少时，很高的均数也只代表少数人；均数达标但满分比不高，表示多数人认为重要，但不是人人都给了最高分。
+
+# 起草阶段可摘入的结果
+
+审查材料可在每条核心技术要素下摘录上表中的调查人数、均值和满分比，并注明方法为德尔菲法。摘录时请使用终稿轮次。若本文件仍是中间报告，请不要把表中数字写入标准送审稿。
+
+```{r extended-metrics, results='asis'}
+delphir::report_extended_section(res)
+delphir::report_rounds_section(res)
+delphir::report_sensitivity_section(res)
+```
+
+# 声明
+
+本报告由 delphir 按调查前锁定的规则生成。教学或模拟数据不能当作真实的标准条款。权威系数和积极系数都不改变各条的均数。协调系数未达到预设时，应继续规定轮次内的调查或如实报告分歧，而不能事后放宽界值。

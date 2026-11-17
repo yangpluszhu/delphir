@@ -348,6 +348,73 @@ expert_authority <- function(panel, threshold = 0.70) {
   out
 }
 
+.protocol_authority_scale <- function(protocol) {
+  sc <- if (is.null(protocol)) NULL else protocol$authority_scale
+  if (is.null(sc)) return(authority_scales())
+  sc
+}
+
+.as_authority_scale <- function(x) {
+  if (is.null(x)) return(authority_scales())
+  .stop_if(
+    !is.list(x) || is.null(x$cs) || is.null(x$ca),
+    "authority_scale \u5fc5\u987b\u662f authority_scales() \u7684\u8fd4\u56de\u503c\u3002"
+  )
+  .stop_if(
+    any(grepl("[;=|]", names(x$cs))),
+    "\u719f\u6089\u7a0b\u5ea6\u6807\u7b7e\u4e0d\u80fd\u5305\u542b ; = | \u3002"
+  )
+  authority_scales(cs = x$cs, ca = x$ca)
+}
+
+.encode_authority_scale <- function(scales) {
+  scales <- .as_authority_scale(scales)
+  cs <- paste(sprintf("%s=%s", names(scales$cs), sprintf("%.4f", unname(scales$cs))), collapse = ";")
+  ca <- scales$ca
+  .stop_if(any(grepl("[;=|]", ca$source) | grepl("[;=|]", ca$key)),
+           "\u5224\u65ad\u4f9d\u636e\u540d\u79f0\u4e0d\u80fd\u5305\u542b ; = | \u3002")
+  ca_txt <- paste(sprintf(
+    "%s|%s=%s/%s/%s",
+    ca$key, ca$source,
+    sprintf("%.4f", ca$large),
+    sprintf("%.4f", ca$medium),
+    sprintf("%.4f", ca$small)
+  ), collapse = ";")
+  c(authority_cs = cs, authority_ca = ca_txt)
+}
+
+.decode_authority_scale <- function(cs_txt, ca_txt) {
+  .stop_if(!nzchar(cs_txt %||% "") || !nzchar(ca_txt %||% ""), "\u8d4b\u5206\u8868\u6587\u672c\u4e3a\u7a7a\u3002")
+  cs_parts <- strsplit(cs_txt, ";", fixed = TRUE)[[1]]
+  cs_vals <- numeric(length(cs_parts))
+  cs_names <- character(length(cs_parts))
+  for (i in seq_along(cs_parts)) {
+    bits <- strsplit(cs_parts[i], "=", fixed = TRUE)[[1]]
+    .stop_if(length(bits) != 2L, "\u65e0\u6cd5\u8bfb\u53d6\u719f\u6089\u7a0b\u5ea6\u8d4b\u5206\u8868\u3002")
+    cs_names[i] <- bits[1]
+    cs_vals[i] <- as.numeric(bits[2])
+  }
+  names(cs_vals) <- cs_names
+  ca_parts <- strsplit(ca_txt, ";", fixed = TRUE)[[1]]
+  rows <- lapply(ca_parts, function(p) {
+    lr <- strsplit(p, "=", fixed = TRUE)[[1]]
+    .stop_if(length(lr) != 2L, "\u65e0\u6cd5\u8bfb\u53d6\u5224\u65ad\u4f9d\u636e\u8d4b\u5206\u8868\u3002")
+    ks <- strsplit(lr[1], "|", fixed = TRUE)[[1]]
+    nums <- as.numeric(strsplit(lr[2], "/", fixed = TRUE)[[1]])
+    .stop_if(length(ks) != 2L || length(nums) != 3L, "\u5224\u65ad\u4f9d\u636e\u8d4b\u5206\u8868\u683c\u5f0f\u4e0d\u5bf9\u3002")
+    data.frame(
+      source = ks[2], key = ks[1],
+      large = nums[1], medium = nums[2], small = nums[3],
+      stringsAsFactors = FALSE
+    )
+  })
+  authority_scales(cs = cs_vals, ca = do.call(rbind, rows))
+}
+
+.authority_scale_same <- function(a, b) {
+  identical(unname(.encode_authority_scale(a)), unname(.encode_authority_scale(b)))
+}
+
 .lookup_ca <- function(tab, key, influence) {
   inf <- .map_influence(influence)
   if (is.na(inf)) return(NA_real_)

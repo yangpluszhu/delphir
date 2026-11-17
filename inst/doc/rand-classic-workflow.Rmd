@@ -1,0 +1,227 @@
+---
+title: "教学文档 9：经典 RAND 两轮适宜性，从问卷到 docx 报告"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 9：经典 RAND 两轮适宜性，从问卷到 docx 报告}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5,
+                      message = FALSE, warning = FALSE)
+```
+
+# 1. 这次要完成什么
+
+经典 RAND/UCLA 适宜性方法（RAM，Fitch 等，2001）不是把专家意见收敛成一条共识。它回答的是：在某个临床情境里，做某项干预，预期获益是否超过预期危害。
+
+标准结构是两轮：
+
+1. 第 1 轮独立评分，专家之间不讨论；
+2. 第 2 轮先看匿名反馈，面对面会议讨论后，再独立评分。
+
+讨论不能代替评分。第 2 轮之后仍然不确定或存在分歧的条目，要作为正式结果写进报告，而不是再加一轮把分歧涂掉。
+
+本教程使用固定模拟数据 `ram_classic_demo`（与 `simulate_ram_classic()` 相同）：9 名专家，4 个情境 × 2 种干预，两轮 1–9 分。分数是事先排好的，用来同时出现适宜、不适宜、中位数居中的不确定，以及因分歧导致的不确定。它不是真实指南。
+
+```{r}
+library(delphir)
+ram <- simulate_ram_classic()
+ram
+ram$meta$objective
+```
+
+**解读：** 场景是 `rand_ucla`。目的写的是判断是否适宜，不是强迫形成单一结论。安装后也可以 `data(ram_classic_demo)` 取出同一份数据。
+
+# 2. 先锁定方案，再看问卷
+
+方案必须在发第 1 轮问卷之前写定。分析函数不会根据结果把规则改宽松。
+
+```{r}
+protocol <- ram$protocol
+protocol
+protocol$rand
+protocol$stability$max_rounds
+```
+
+**解读：**
+
+- `rule = table4` 是手册默认：用这一条的实际应答人数查表，不是用邀请人数，也不是旧版的 `ceiling(n/3)`。
+- `round2_mode = in_person` 表示第 2 轮是面对面会议后的再次独立评分。若实际是线上会议或再次函询，要改成 `online` 或 `mail`，并在报告里说明这是变通。
+- `necessity = FALSE`：本教程不做必要性。必要性是另一张量表，不是第 3 轮适宜性评分。
+- `max_rounds = 2`：经典适宜性到第 2 轮为止。
+- `boundary = uncertain`：中位数若正好是 3.5 或 6.5，归入不确定，不偷偷归进适宜或不适宜。
+- `iprr = 2.35`、`cfa = 1.5`、`qtype = 7` 是 IPRAS 的标准常数。本方案的主规则不是 IPRAS，但报告和敏感性分析仍会算出这些数，便于对照。
+
+```{r}
+tab <- protocol_table(protocol)
+tab[tab$parameter %in% c("rand_disagreement", "rand_round2_mode", "max_rounds", "rand_boundary"), ]
+```
+
+**解读：** `modified` 为 FALSE 表示没有偏离该场景的预设。若把规则改成 `ipras` 或 `percent` 而不写 `rationale`，方案会警告，报告会标成偏离预设。
+
+# 3. 第 1 轮问卷：docx 与 xlsx
+
+第 1 轮不展示任何组内分布。锚点是：1 表示预期危害远大于获益，5 表示大致相当或无法判断，9 表示预期获益远大于危害。无法判断不填 5 分，也不进入中位数和分歧的分母。
+
+```{r}
+qdir <- tempfile("ram-q1-")
+dir.create(qdir)
+q1 <- rand_questionnaire(ram, round = 1, format = "both", file = qdir)
+q1
+```
+
+**解读：** `format = "both"` 同时写出 Word 和 Excel。Word 发给专家填写或打印；Excel 的「评分」表回收后用 `read_survey_xlsx()` 读回。两份文件覆盖全部 8 个指征。权威系数表如果出现，只是国内发表时的可选补充，不参与适宜性判定。
+
+条目必须写成「何种患者 + 何种干预」，不能只写病名。
+
+```{r}
+ram$items[, c("item_id", "indication", "procedure", "evidence_level", "pattern")]
+```
+
+**解读：** `evidence_level` 是会前发给专家的证据准备，不是适宜性分类。`pattern` 只是教学数据的构造标签，真实研究不要靠它判定。同一情境下的介入和搭桥是两条独立条目。
+
+# 4. 第 1 轮评了什么
+
+下面用样本里已经填好的第 1 轮分数，代替「专家寄回 Excel」这一步。真实项目应 `read_survey_xlsx()` 后 `update_delphi_study()`。
+
+```{r}
+cls1 <- classify_rand(ram, round = 1)
+cls1[, c("item_id", "n_valid", "median", "n_low", "n_mid", "n_high", "n_out",
+         "agreement_status", "class", "class_zh")]
+```
+
+**解读，逐列：**
+
+- `n_valid = 9`：9 人都给出了 1–9 分。阈值按 9 人查表 4：区外不超过 2 人算一致；1–3 与 7–9 两端都至少 3 人才算分歧。
+- `median` 是分类的第一依据，不是均数。
+- `n_low` / `n_mid` / `n_high` 是落在 1–3、4–6、7–9 的人数。
+- `n_out` 是落在「包含中位数的那个三分区」之外的人数。中位数为 8 时，这个区是 7–9。
+- `agreement_status` 有三种：agreement（一致）、indeterminate（既非一致也非分歧）、disagreement（分歧）。先判分歧，再判一致。
+- `class` 只有适宜、不确定、不适宜。`class_zh` 把不确定拆开，因为「大家都觉得获益和危害差不多」和「小组裂成两派」不是一回事。
+
+对照构造：
+
+- IND01 中位数在 7–9，两端没有同时达到 3 人，适宜。
+- IND02、IND06 中位数在 1–3 且无分歧，不适宜。
+- IND03 中位数在 4–6 且无分歧，是「不确定（中位数 4–6，无分歧）」。
+- IND04 中位数可以很高，但 1–3 与 7–9 都至少有 3 人，表 4 判分歧，最终仍是不确定。这就是 RAM 和「只看中位数」的差别。
+- IND05 第 1 轮还在中区，第 2 轮才会移到适宜。会议的作用是让专家看到分布后再评，不是保证它变适宜。
+
+```{r}
+plot_rand_heatmap(ram, round = 1)
+```
+
+**解读：** 纵轴是临床情境，横轴是干预。颜色是适宜性，不是证据等级。格子里的点表示该条存在分歧。一张图同时看见「情境 × 干预」，避免把不同手术当成同一条意见。
+
+# 5. 第 2 轮问卷：反馈后复评全部条目
+
+第 2 轮给每位专家三样东西：自己上一轮的分数、组内三个区间的人数、中位数和分歧标记，以及匿名意见。其他专家的姓名不出现。
+
+和 Delphi 不同：已经判为适宜或不适宜的条目**仍然要评**。RAM 不是「过线就退出」。
+
+```{r}
+q2 <- rand_questionnaire(ram, round = 2, format = "both",
+                         file = tempfile("ram-q2-"))
+basename(q2)
+raw2 <- openxlsx::read.xlsx(q2[grepl("xlsx", q2)][1], sheet = "\u8bc4\u5206")
+length(unique(raw2$item_id))
+head(raw2[, intersect(c("expert_id", "item_id", "own_prev", "class_zh"), names(raw2))], 3)
+```
+
+**解读：** 8 个条目都在。`own_prev` 是该专家自己的上轮分数，不是组均数。`class_zh` 是上轮的组结论，供讨论，不是要求专家改成和多数人一样。问卷说明里写明第 2 轮是面对面会议后的再次独立评分。
+
+# 6. 末轮全流程
+
+`run_rand()` 对最后一轮适宜性做完分类、轮次比较和规则敏感性。`report = FALSE` 时只把结果留在 R 里。
+
+```{r}
+res <- run_rand(ram, report = FALSE, loo = TRUE)
+res$last_round
+res$rand_meta
+table(res$last_classification$class_detail)
+```
+
+**解读：**
+
+- `last_round = 2` 是最后一轮适宜性，不是「还有一轮没做」。
+- `deviation = FALSE`：适宜性没有超过 2 轮，没有偏离经典流程。
+- `modified_ram = FALSE`：用的是 1–9 分和表 4，不是百分比修改版。
+- `supplement` 提醒：若报告里出现权威系数或 Kendall's W，它们不取代中位数和分歧。
+- 末轮四类都还在。IND04、IND08 仍是「不确定（存在分歧）」。这是结果，不是失败。
+
+```{r}
+res$last_classification[, c("item_id", "median", "n_low", "n_high", "ipr", "ipras",
+                            "di", "table4_disagreement", "ipras_disagreement", "class_zh")]
+```
+
+**解读：** `ipr` 是第 70 与第 30 百分位数之差，`ipras` 是按分布是否对称放宽后的分歧阈值，`di = ipr / ipras`。本方案锁定的是表 4，所以 `table4_disagreement` 决定分类。`ipras_disagreement` 列出来是为了让读者看到两种规则是否一致。IND04 就是反例：表 4 认为两端各有至少 3 人，是分歧；IPRAS 因为分布整体偏高，不判分歧。既然方案写的是表 4，分类按表 4，不能事后改用 IPRAS 把它变成适宜。
+
+# 7. 轮次变了没有
+
+```{r}
+cmp <- res$round_comparison
+cmp$group
+cmp$items[, c("item_id", "median_from", "median_to", "class_zh_from", "class_zh_to", "changed", "wilcoxon_p")]
+cmp$note
+```
+
+**解读：**
+
+- `group` 给出每一轮有多少条适宜、不适宜，以及两种不确定，还有该轮 IPR 的均数。IPR 均数下降只能说明分数更集中，不能单独作为停止调查的理由。经典 RAM 本来就停在第 2 轮。
+- `changed` 为 TRUE 的条目，分类在两轮之间变了。IND05 从不确定变为适宜，应在正文里写「会议后复评改变了分类」，并同时给出两轮的中位数。
+- `wilcoxon_p` 是同一批专家前后分数的探索性比较。P 值小不表示「达成适宜」，P 值大也不表示「应该再开一轮」。分类只看中位数和分歧。
+
+```{r}
+plot_rand_progress(ram)
+plot_round_shift(ram)
+```
+
+**解读：** 进度图的纵轴是各类所占比例。不确定比例下降，不表示方法成功；若下降是因为把分歧条目反复送回评分直到表面一致，反而不符合 RAM。斜率图看的是各条目中位数是否移动，适合放进附录。
+
+# 8. 规则换一套，结论还在不在
+
+```{r}
+sens <- res$sensitivity
+sens$kappa
+sens$loo
+sens$note
+plot_rand_sensitivity(sens)
+```
+
+**解读：**
+
+- κ 比较的是两套规则给出的适宜 / 不确定 / 不适宜是否相同。κ 低，说明「事先写哪条规则」会改变指南附表，所以规则必须锁在第 1 轮之前。
+- 表 4 和 IPRAS 在这份数据上不会完全一致，IND04 就是原因。这不是程序错误。
+- `loo` 是每次拿掉一名专家后，有几条的分类翻转。翻转多的条目，结论依赖个别专家，讨论时要说明，但不要因为某人不合群就删掉他，除非方案事先定义了剔除规则。
+- 9 人严格/宽松定义只适用于 9 人。人数不是 9 时，软件仍可按字面计算，但会警告；正式分析应使用表 4。
+
+```{r}
+plot_rand_deviation(ram, round = 2)
+```
+
+**解读：** 每个箱子是一名匿名专家在各条目上「自己的分数 − 该条目中位数」。整组偏在 0 的一侧，表示这个人系统性更严或更松。编号是 P01 这种匿名号。反馈材料和报告里不要出现姓名。
+
+# 9. 写出 docx 报告
+
+是否写报告由 `report` 决定。格式至少要能得到 docx。下面把文件写到临时目录；真实使用时把 `file` 换成你的文件夹。
+
+```{r}
+report_file <- tempfile("ram-report-", fileext = ".docx")
+reported <- run_rand(ram, report = TRUE, format = "docx", file = report_file, loo = FALSE)
+attr(reported, "report_file")
+file.exists(attr(reported, "report_file"))
+```
+
+**解读：** 报告按锁定规则写成。里面应能找到：表 4 的文献依据、第 2 轮是面对面会议、P30/P70/IPR/IPRAS/DI、两类不确定、分歧清单（作为正式结果）、轮次变化、规则之间的 κ、末轮清单，以及「权威系数和 Kendall's W 不替代 RAM」的说明。选择 `format = "html"` 时仍会额外写一份 docx。
+
+不确定和分歧条目要放进清单，不要只导出适宜的那几条。适宜也不等于强推荐：证据等级和面板判断分列，诊疗推荐仍要回到系统评价。
+
+# 10. 和真实项目的差别
+
+样本没有缺失，也没有人中途退出。真实数据里，某条只有 6 个人作答时，软件会警告人数不足 7，并仍给出描述性分类。7 人沿用 8–10 人的阈值。超过 16 人会外推，报告里必须写明手册没有正式列出该档。
+
+第 2 轮若因条件限制改为线上或再次函询，把 `rand_round2_mode` 设成 `online` 或 `mail`，不要假装开过面对面会议。

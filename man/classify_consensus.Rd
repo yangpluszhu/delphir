@@ -29,6 +29,8 @@ classify_consensus(summary, protocol = NULL, study = NULL)
 \item 定义共识：默认 P(高区)≥80\% 且 IQR≤2。
 \item 指标体系：高区达基本阈值且 IQR、CV 可接受则保留。
 \item Policy：不判定“必须共识”，只描述分布。
+\item 核心技术要素：重要程度均数达到 \code{mean_min} 且 CV 不超过 \code{cv_max} 则纳入。
+熟悉程度只作描述，不决定去留。满分比不单独作为剔除线。
 }
 }
 

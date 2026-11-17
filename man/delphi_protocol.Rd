@@ -5,8 +5,8 @@
 \title{创建并锁定 Delphi 统计分析方案}
 \usage{
 delphi_protocol(
-  scenario = c("clinical_consensus", "comet_cos", "rand_ucla", "indicator", "ranking",
-    "definition", "policy"),
+  scenario = c("clinical_consensus", "comet_cos", "rand_ucla", "delphi_ram", "indicator",
+    "ranking", "definition", "policy", "standard_element"),
   scale_min = 1,
   scale_max = 9,
   low_range = c(1, 3),
@@ -21,8 +21,18 @@ delphi_protocol(
   comet_in_low_max = 0.15,
   comet_out_low = 0.7,
   comet_out_high_max = 0.15,
-  rand_disagreement = c("both", "classic", "ipras"),
+  rand_disagreement = c("table4", "ipras", "classic_relaxed", "classic_strict",
+    "percent", "both", "classic"),
   rand_di_threshold = 1,
+  rand_round2_mode = c("in_person", "online", "mail"),
+  rand_necessity = FALSE,
+  rand_boundary = c("uncertain", "round_half_down", "round_half_up"),
+  rand_iprr = 2.35,
+  rand_cfa = 1.5,
+  rand_qtype = 7L,
+  rand_percent_high = 0.7,
+  rand_percent_low = 0.15,
+  rand_purpose = c("appropriateness", "recommendation"),
   max_rounds = 3,
   stability_class_pct = 0.8,
   stability_median_delta = 1,
@@ -30,88 +40,256 @@ delphi_protocol(
   polarization_threshold = 0.25,
   cv_max = 0.25,
   ranking_topk = 5,
+  mean_min = NA_real_,
+  w_min = NA_real_,
+  w_p_max = 0.05,
+  mean_delta_max = NA_real_,
+  min_experts = NA_real_,
+  response_rate_min = 0.7,
+  cr_min = 0.7,
+  authority_scale = NULL,
+  allow_new = NULL,
+  min_independent = NULL,
+  allow_single_with_evidence = NULL,
+  max_suggestions = NULL,
+  require_iteration = NULL,
+  review_panel = NULL,
+  open_first = FALSE,
   rationale = NULL,
   locked = TRUE
 )
 }
 \arguments{
-\item{scenario}{场景标识。可选 \code{"clinical_consensus"}、\code{"comet_cos"}、
-\code{"rand_ucla"}、\code{"indicator"}、\code{"ranking"}、\code{"definition"}、\code{"policy"}。}
+\item{scenario}{场景标识。决定\strong{哪一套规则真正被分类函数使用}，其余阈值
+仍会写入对象（便于报告完整打印），但可能不参与判定。
+\itemize{
+\item clinical_consensus：医学专家共识（Modified Delphi）。使用复合标准：
+高区比例 + Median + IQR。这是最常用的预设。
+\item comet_cos：COMET 核心结局集。使用 70/15 纳入/排除规则，而不是
+high_pct 复合标准。
+\item rand_ucla：适宜性评价。默认按手册表 4（应答人数查表）加中位数分类，
+\strong{不强迫共识}。也可改用 IPRAS、9 人严格/宽松定义或百分比规则。
+high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
+\item delphi_ram：改良德尔菲结合 RAM。匿名多轮函询，默认最多 3 轮，
+每轮复评全部条目。主规则只能是 \code{table4}、\code{ipras} 或 \code{percent}。
+临床 \code{high_pct} 会写入对象供对照，但不参与分类。请用
+\code{\link[=delphi_ram_protocol]{delphi_ram_protocol()}} 与 \code{\link[=run_delphi_ram]{run_delphi_ram()}}，不要用 \code{\link[=run_delphi]{run_delphi()}}
+或 \code{\link[=run_rand]{run_rand()}}。
+\item indicator：指标体系筛选。在基本共识之外还要求 CV 不超过 cv_max。
+\item ranking：优先级排序。不判定必须共识，配合 \code{\link[=rank_priorities]{rank_priorities()}} /
+\code{\link[=kendall_w]{kendall_w()}} 使用。
+\item definition：定义或诊断标准。默认要求高区比例至少 0.80 且 IQR 不超过 2。
+\item policy：Policy Delphi。描述分布、呈现分歧，不把「达成共识」当作成功标准。
+\item standard_element：标准起草中的核心技术要素。5 分量表；重要性看均数；
+附录报告调查人数、均值、满分比；轮次宜 2–4，按协调系数决定是否结束。
+}}
 
-\item{scale_min, scale_max}{评分尺度端点，默认 1 与 9。}
+\item{scale_min, scale_max}{评分尺度端点。除 \code{standard_element} 外默认 1 与 9。
+\code{standard_element} 默认 1 与 5。须满足 \code{scale_min < scale_max}。
+Likert 通常为整数；分析时非整数会警告。
+改成其他量表时，必须同步改 \code{low_range}/\code{mid_range}/\code{high_range}，
+否则区间端点会对不上。}
 
-\item{low_range, mid_range, high_range}{长度为 2 的数值向量，分别表示低、中、高区。}
+\item{low_range, mid_range, high_range}{长度为 2 的数值向量，闭区间。
+默认 1-9 量表下低 1-3、中 4-6、高 7-9。p_high / p_low 的分母是有效
+Likert 评分（「无法判断」不进入）。区间应覆盖整个量表且不宜重叠。}
 
-\item{high_pct}{高度共识所需的高区比例下限（0–1），默认 0.80。}
+\item{high_pct}{高度共识所需的\strong{高区比例下限}（0–1），临床预设 0.80。
+仅当同时满足 Median ≥ \code{median_min} 且 IQR ≤ \code{iqr_max} 才判为高度共识。
+Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{第一轮前写明}，
+而不是事后改到「刚好能过」。}
 
-\item{basic_pct}{基本共识所需的高区比例下限（0–1），默认 0.75。}
+\item{basic_pct}{基本共识所需的高区比例下限（0–1），临床预设 0.75。
+应不大于 high_pct。落在 basic_pct 与 high_pct 之间且 Median 达标时为基本共识
+（可保留，但报告中应与高度共识分列）。}
 
-\item{median_min}{共识所需的中位数下限，默认 7。}
+\item{median_min}{共识所需的中位数下限，默认 7（即高区下沿）。
+单独把百分比调高但把中位数降到 5，会把「意见集中在中区」误判为共识。}
 
-\item{iqr_max}{高度共识允许的最大四分位距，默认 2。}
+\item{iqr_max}{高度共识允许的最大四分位距，默认 2。IQR 大表示两端仍拉开；
+即使 0.80 的评分落在 7–9，若少数人打 1 分把 IQR 拉到 3，按预设不能叫高度共识。}
 
-\item{reject_pct}{倾向排除所需的低区比例下限，默认 0.75。}
+\item{reject_pct}{倾向排除所需的低区比例下限，默认 0.75。
+与高度共识对称：多数人明确反对时标记为排除，而不是「没过线就删」。}
 
-\item{comet_in_high}{COMET 纳入规则：高区比例下限，默认 0.70。}
+\item{comet_in_high}{COMET 纳入：高区比例下限，默认 0.70。仅 \code{comet_cos} 使用。}
 
-\item{comet_in_low_max}{COMET 纳入规则：低区比例上限，默认 0.15。}
+\item{comet_in_low_max}{COMET 纳入：低区比例上限，默认 0.15。
+「高区至少 0.70 \strong{且} 低区不到 0.15」才能纳入核心结局集。}
 
-\item{comet_out_low}{COMET 排除规则：低区比例下限，默认 0.70。}
+\item{comet_out_low}{COMET 排除：低区比例下限，默认 0.70。}
 
-\item{comet_out_high_max}{COMET 排除规则：高区比例上限，默认 0.15。}
+\item{comet_out_high_max}{COMET 排除：高区比例上限，默认 0.15。
+两套 70/15 都不满足的条目进入下一轮或共识会议，而不是自动删除。}
 
-\item{rand_disagreement}{RAND 分歧定义：\code{"both"}（同时报告经典规则与 IPRAS）、
-\code{"classic"} 或 \code{"ipras"}。}
+\item{rand_disagreement}{RAND 分歧定义，仅 \code{rand_ucla} 进入 \code{\link[=classify_rand]{classify_rand()}}。
+\code{"table4"}（默认）按 Fitch 等（2001）表 4 用实际应答人数查表。
+\code{"ipras"} 为 IPRAS（IPR 严格大于 IPRAS 才算分歧）。
+\code{"classic_relaxed"} / \code{"classic_strict"} 为 9 人小组的手册表 3。
+\code{"percent"} 为百分比共识，属于 RAM 修改版，用于推荐意见。
+\code{"both"} 为表 4 与 IPRAS 任一判分歧即分歧。
+\code{"classic"} 是旧参数名，现与 \code{"table4"} 相同，不再使用 \code{ceiling(n/3)}。}
 
-\item{rand_di_threshold}{分歧指数阈值，默认 1。}
+\item{rand_di_threshold}{IPRAS 的倍率，默认 1，即 IPR > IPRAS 才算分歧。
+相等不算分歧。}
 
-\item{max_rounds}{最多轮次，默认 3。}
+\item{rand_round2_mode}{第 2 轮形式：\code{"in_person"} 面对面会议后复评，
+\code{"online"} 线上会议后复评，\code{"mail"} 再次函询。后两种须在报告中说明。}
 
-\item{stability_class_pct}{相邻轮分类不变条目的比例阈值，默认 0.80。}
+\item{rand_necessity}{是否计划在适宜且无分歧的条目上另做必要性评分。
+必要性不是第三轮适宜性评分。}
 
-\item{stability_median_delta}{中位数变化不超过该值视为稳定，默认 1。}
+\item{rand_boundary}{中位数为 3.5 或 6.5 时：\code{"uncertain"}（默认）归不确定，
+\code{"round_half_down"} 或 \code{"round_half_up"} 向相邻整数取整后再套三分区。}
 
-\item{stability_high_pct_delta}{高区比例变化不超过该值视为稳定，默认 0.10。}
+\item{rand_iprr, rand_cfa}{IPRAS 常数，默认 2.35 与 1.5。改动后报告标为非标准参数。}
 
-\item{polarization_threshold}{两端比例同时达到该值视为两极分化，默认 0.25。}
+\item{rand_qtype}{分位数算法，默认 7（与手册示例的 R 复算一致）。}
 
-\item{cv_max}{指标体系筛选时允许的最大变异系数，默认 0.25。}
+\item{rand_percent_high, rand_percent_low}{百分比规则的高区下限与低区上限。
+默认 0.70 与 0.15。只在 \code{rand_disagreement = "percent"} 时驱动分类。}
 
-\item{ranking_topk}{优先级分析中的 Top-k，默认 5。}
+\item{rand_purpose}{\code{"appropriateness"}（默认）或 \code{"recommendation"}。
+推荐意见应使用百分比规则，并在报告中标明 RAM 修改版。}
 
-\item{rationale}{若修改了预设阈值，必须说明理由；报告会打印“方案偏离预设”。}
+\item{max_rounds}{计划最多轮次，默认 3。这是\strong{终止规则的上限}，不是「必须跑满」。
+问卷生成超过该值会报错。DCAT 将迭代视为核心特征，至少应有两轮相同量表。}
 
-\item{locked}{是否锁定阈值。默认 \code{TRUE}。}
+\item{stability_class_pct}{相邻轮分类不变条目的比例阈值，默认 0.80。
+刚跨过共识线就停止可能过早；稳定性看的是分类是否还在变。}
+
+\item{stability_median_delta}{中位数变化不超过该值视为稳定，默认 1 分。}
+
+\item{stability_high_pct_delta}{高区比例变化不超过该值视为稳定，默认 0.10
+（即 10 个百分点）。与分类不变、Median 稳定同时满足才建议终止。}
+
+\item{polarization_threshold}{两端比例同时达到该值视为两极分化，默认 0.25。
+均数接近 5 往往不是「大家觉得一般」，而是高区与低区对打。}
+
+\item{cv_max}{指标体系筛选允许的最大变异系数，默认 0.25。仅 \code{indicator}
+使用；CV 是均数的补充，不能代替 Median/IQR。}
+
+\item{ranking_topk}{优先级分析中的 Top-k，默认 5。仅排序场景用于
+\code{\link[=rank_priorities]{rank_priorities()}}，不改变 Likert 共识判定。}
+
+\item{mean_min}{核心技术要素纳入所需的重要程度均数下限。仅
+\code{standard_element} 使用，默认 3.50（5 分量表）。其他场景为 \code{NA}。}
+
+\item{w_min}{结束调查所需的 Kendall 协调系数下限。仅 \code{standard_element}
+使用，默认 0.50。须与 \code{w_p_max}、\code{mean_delta_max} 同时满足。}
+
+\item{w_p_max}{协调系数卡方检验的 P 值上限，默认 0.05。P 值显著只说明
+排序不像纯随机，不能单独当作「协调程度较好」。}
+
+\item{mean_delta_max}{相邻两轮评分中，各条目重要程度均数绝对变化的平均值
+上限。仅 \code{standard_element} 使用，默认 0.25。}
+
+\item{min_experts}{调查对象人数参考下限。\code{standard_element} 默认 30，
+少于该人数时 \code{\link[=panel_compliance]{panel_compliance()}} 给出警告，不中断计算。}
+
+\item{response_rate_min}{积极系数（回收率）的参考下限，默认 0.70。
+只用于报告解读，不加权、不剔除专家。}
+
+\item{cr_min}{权威系数组均数的参考下限，默认 0.70。不用于加权评分。}
+
+\item{authority_scale}{可选，\code{\link[=authority_scales]{authority_scales()}} 的返回值。缺省为曾光表。
+第 1 轮问卷、分析和报告都使用这份表。自定义后应填写 \code{rationale}。
+已有数值 Ca、Cs 时，分析不再按该表重算。}
+
+\item{allow_new}{是否允许第 1 轮结构化补充候选条目。\code{NULL} 时按场景取值：
+医学共识、COMET、定义/诊断标准、指标体系为 \code{TRUE}；适宜性、排序、
+Policy 与 5 分核心技术要素为 \code{FALSE}。}
+
+\item{min_independent}{同一新概念至少由几名专家\strong{独立}提出才走主通道。
+默认 2。同一人重复书写只计 1 人。这不是共识阈值。}
+
+\item{allow_single_with_evidence}{是否保留例外通道：仅 1 名专家提出，
+但有文献、定性访谈、患者证据、指南或重要临床依据时，仍可进入审查。
+默认 \code{TRUE}。}
+
+\item{max_suggestions}{每位专家最多可推荐的新条目数，默认 5。}
+
+\item{require_iteration}{新条目是否必须至少经过两轮评分才能最终纳入。
+默认在允许新增的场景中为 \code{TRUE}。只评过一次时，即使已达共识线，
+也只记为暂时共识。}
+
+\item{review_panel}{条目审查组构成。默认示例为 5 人：中医临床 2、
+方法学 1、统计或 Delphi 方法 1、患者或患者代表 1。软件不代替人工编码。}
+
+\item{open_first}{是否把第 1 轮作为开放式征询（不打分）。
+\code{standard_element} 默认 \code{TRUE}：缺少前期基础时先凝练要素。
+若要素均已有古籍或现代文献基础，设为 \code{FALSE}，此时第 1 轮就是
+技术要求所称的评分调查（文档中的「第 2 轮」）。}
+
+\item{rationale}{若修改了预设阈值，必须说明理由；报告会打印「方案偏离预设」。
+临床/定义场景改了 \code{high_pct} 等、或核心技术要素场景改了均数/协调界值，
+而未填此项时会警告。}
+
+\item{locked}{是否锁定阈值。默认 \code{TRUE}。锁定后分析阶段不得把阈值当参数回改。}
 }
 \value{
-\code{delphi_protocol} 对象。
+带类 \code{"delphi_protocol"} 的列表。主要字段：
+\itemize{
+\item \code{scenario}, \code{scale_min}, \code{scale_max}, \code{low_range}, \code{mid_range}, \code{high_range}
+\item \code{rules}：共识判定阈值（含 COMET、极化、CV、Top-k，以及核心技术要素的
+均数界值、协调系数界值、积极系数与权威系数参考值）
+\item \code{stability}：\code{max_rounds} 与三条稳定性规则
+\item \code{open_first}：第 1 轮是否为开放式征询
+\item \code{new_items}：第一轮新增条目规则（是否允许、独立人数、单人例外、
+每人上限、是否必须再迭代一轮、审查组说明）
+\item \code{authority_scale}：Ca/Cs 赋分表，缺省为曾光表
+\item \code{rand}：规则、第 2 轮形式、必要性、边界中位数、IPRAS 常数与百分比阈值
+\item \code{modified_from_preset}, \code{rationale}, \code{locked}
+}
 }
 \description{
 在第一轮调查开始前规定评分尺度、共识阈值、异议标准、稳定性标准和终止规则。
-分析函数只执行本对象中的规则，不会根据结果回改阈值。
+分析函数只执行本对象中的规则，不会根据结果回改阈值。完整参数解读见
+\strong{Details} 与 \code{\link[=protocol_table]{protocol_table()}}；教学演示见
+\code{vignette("preset-protocol", package = "delphir")}。
 }
 \section{输入输出}{
 
-\strong{输入}均为标量或长度为 2 的数值向量，见参数说明。
+\strong{输入}均为标量或长度为 2 的数值向量，比例类参数必须在 0 与 1 之间。
 
-\strong{输出}是带类 \code{"delphi_protocol"} 的列表，主要字段：
+\strong{输出}供 \code{\link[=delphi_study]{delphi_study()}} / \code{\link[=delphi_blueprint]{delphi_blueprint()}} 在第一轮前锁定。
+\code{\link[=classify_consensus]{classify_consensus()}} \strong{没有}阈值参数，以防止分析阶段静默改规则。
+}
+
+\section{何时改预设、何时不要改}{
+
 \itemize{
-\item \code{scenario}, \code{scale_min}, \code{scale_max}, \code{low_range}, \code{mid_range}, \code{high_range}
-\item \code{rules}：共识判定阈值
-\item \code{stability}：停止规则
-\item \code{rand}：RAND/UCLA 分歧设定
-\item \code{modified_from_preset}, \code{rationale}, \code{locked}
+\item \strong{可以改}：高风险诊疗推荐把 \code{high_pct} 从 0.80 提到 0.85，并写 \code{rationale}。
+\item \strong{不要改}：看见第 1 轮刚好比 0.80 低 2 个百分点，就把阈值改成 0.75「凑共识」。
+\item \strong{不要混用}：把 COMET 的 70/15 套到临床共识，或把临床 0.80 套到 RAND 适宜性。
 }
 }
 
 \examples{
 p <- preset_protocol("clinical_consensus")
 p
+protocol_table(p)[1:8, ]
+
 p2 <- delphi_protocol(
   scenario = "clinical_consensus",
   high_pct = 0.85,
-  rationale = "高风险诊疗推荐，将高度共识阈值提高到 85\%。"
+  rationale = "高风险诊疗推荐，将高度共识阈值提高到 0.85。"
 )
 p2$modified_from_preset
+p2$rationale
 
+# 同一批评分、不同阈值会改变分类（教学数据第 1 轮）
+data(consensus_demo, package = "delphir")
+s <- summarize_items(consensus_demo, rounds = 1)
+tab0 <- table(classify_consensus(s, p)$class_zh)
+p_loose <- preset_protocol("clinical_consensus", high_pct = 0.70,
+                           rationale = "仅用于演示：放宽高度共识阈值。")
+tab1 <- table(classify_consensus(s, p_loose)$class_zh)
+tab0
+tab1
+
+}
+\seealso{
+\code{\link[=preset_protocol]{preset_protocol()}}, \code{\link[=protocol_table]{protocol_table()}}, \code{\link[=classify_consensus]{classify_consensus()}},
+\code{\link[=analyze_delphi]{analyze_delphi()}}, vignette("preset-protocol", package = "delphir")
 }

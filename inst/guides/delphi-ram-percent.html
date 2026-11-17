@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ming Yang" />
+
+<meta name="date" content="2026-10-10" />
+
+<title>教学文档 14：改良德尔菲结合自定义百分比共识</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">教学文档 14：改良德尔菲结合自定义百分比共识</h1>
+<h4 class="author">Ming Yang</h4>
+<h4 class="date">2026-10-10</h4>
+
+
+
+<div id="这次要完成什么" class="section level1">
+<h1>1. 这次要完成什么</h1>
+<p>百分比共识是 RAM 的<strong>修改版</strong>，用来判断推荐意见一类的陈述，不是经典适宜性评价。本教程锁定的规则是：</p>
+<ul>
+<li>赞同共识：中位数在 7–9，高区比例至少 70%，且低区比例低于 15%。</li>
+<li>不赞同共识：中位数在 1–3，低区比例至少 70%，且高区比例低于 15%。</li>
+<li>分歧：低区和高区比例都达到 15%。</li>
+<li>其余情况，包括中位数已经在高区但高区比例没有达到 70%，都是未达成共识。</li>
+</ul>
+<p>70% 和 15% 是默认值，可以在第 1 轮前改成 75% 或 80%，但必须写入方案并说明理由。看到第 1 轮是 68% 再把线降到 65%，不是修改版，是事后改线。</p>
+<p>这条规则<strong>不用</strong>表 4 的人数阈值，也<strong>不套</strong> IPRAS 的 2.35 和 1.5。适宜性列由同一套百分比判定映射而来，并标明修改版。它和 <code>classify_rand()</code> 里旧的百分比标签不是同一件事：旧标签仍只服务 <code>rand_ucla</code> 场景；这里中位数高但比例不够，必须是未达成共识。</p>
+<p>流程仍是改良德尔菲：12 名专家、6 条推荐意见、三轮匿名函询，每轮复评全部条目。样本函数是 <code>simulate_delphi_ram(&quot;percent&quot;)</code>，安装后为 <code>data(delphi_ram_percent_demo)</code>。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_delphi_ram</span>(<span class="st">&quot;percent&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>rule</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;percent&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>purpose</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;recommendation&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>percent_high</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>percent_low</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>modified_from_preset</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>purpose</code> 是 <code>recommendation</code>，提醒读者这不是适宜性专家组。<code>modified_from_preset = TRUE</code>，因为场景默认规则是表 4，百分比是事先声明的偏离。理由在 <code>rationale</code> 里，报告会打印。</p>
+</div>
+<div id="问卷怎么说这套规则" class="section level1">
+<h1>2. 问卷怎么说这套规则</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-percent-&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round1&quot;</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>q1</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\RtmpGKKk7n\\ram-percent-bca8551f38f3/round1.docx&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\RtmpGKKk7n\\ram-percent-bca8551f38f3/round1.xlsx&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 评分维度是「同意程度」：1 为强烈反对，9 为强烈同意。问卷应出现「RAM 修改版」和 70% / 15%，而不是 IPRAS 常数。docx 发放，xlsx 回收。第 2 轮及以后给出本人上轮分数和 1–3 / 4–6 / 7–9 的人数，并要求 6 条全部再评。</p>
+<p>把只含第 1 轮的研究接上预填的第 2 轮，确认读回不会冲掉旧轮：</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>base <span class="ot">&lt;-</span> ram</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>base<span class="sc">$</span>ratings <span class="ot">&lt;-</span> base<span class="sc">$</span>ratings[base<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round2.xlsx&quot;</span>), <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>back <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(q2, <span class="at">study =</span> base)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(back<span class="sc">$</span>ratings<span class="sc">$</span>round))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2</span></span></code></pre></div>
+<p><strong>解读：</strong> 读回后有第 1 轮和第 2 轮。第 2 轮的 12 × 6 条都在，没有按「已经达成共识」删除条目。</p>
+</div>
+<div id="第-1-轮六条分别落在哪里" class="section level1">
+<h1>3. 第 1 轮六条分别落在哪里</h1>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>r1 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>r1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;n_valid&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>, <span class="st">&quot;decision_basis&quot;</span>)]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id median n_low n_high n_valid                         class_zh</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    PC01    8.0     0     12      12               适宜（RAM 修改版）</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    PC02    2.0    12      0      12             不适宜（RAM 修改版）</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    PC03    5.0     0      0      12 不确定（中位数居中，RAM 修改版）</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    PC04    5.5     4      5      12   不确定（存在分歧，RAM 修改版）</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    PC05    7.0     0      8      12 不确定（比例未达标，RAM 修改版）</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    PC06    7.0     0      8      12 不确定（比例未达标，RAM 修改版）</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                   consensus_zh    decision_basis</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                 达成共识（赞同，RAM 修改版） percent_consensus</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2               达成共识（不赞同，RAM 修改版） percent_consensus</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3         未达成共识（中位数居中或比例未过线） percent_consensus</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4           未达成共识（两端比例同时达到下限） percent_consensus</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 未达成共识（中位数在极端区但未达到预设比例） percent_consensus</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 未达成共识（中位数在极端区但未达到预设比例） percent_consensus</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>decision_basis</code> 全部是 <code>percent_consensus</code>。这一列说明主判定不是表 4。</p>
+<ul>
+<li>PC01：12 人全在高区，中位数在高区。达成共识（赞同）。映射到适宜性列时会写成「适宜（RAM 修改版）」，不要把它说成经典 RAM 的适宜。</li>
+<li>PC02：12 人全在低区。达成共识（不赞同）。这是明确的反对共识，不是缺失。</li>
+<li>PC03：中位数在 4–6，两端比例都很低。未达成共识。意见集中在中间，仍然没有过预先写的赞同线。</li>
+<li>PC04：低区和高区都超过 15%。这是两端分歧，不是「中位数 5.5 所以大体中立」。未达成共识（两端比例同时达到下限）。</li>
+<li>PC05：中位数是 7，已经在高区，但 12 人里只有 8 人在 7–9，8/12 约 67%，低于 70%。<strong>必须是未达成共识。</strong> 不能因为中位数到了 7 就写成赞同。</li>
+<li>PC06 在第 1 轮和 PC05 一样，也是 8/12，未达标。</li>
+</ul>
+</div>
+<div id="第-2-轮只允许分数变化不允许改阈值" class="section level1">
+<h1>4. 第 2 轮只允许分数变化，不允许改阈值</h1>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>r2 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">2</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>r2[r2<span class="sc">$</span>item_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;PC05&quot;</span>, <span class="st">&quot;PC06&quot;</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;n_valid&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id median n_high n_valid                                 consensus_zh</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    PC05    7.0      8      12 未达成共识（中位数在极端区但未达到预设比例）</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    PC06    7.5      9      12                 达成共识（赞同，RAM 修改版）</span></span></code></pre></div>
+<p><strong>解读：</strong> PC05 第 2 轮仍是 8/12，继续未达标。PC06 变成 9/12，也就是 75%，跨过了事先写好的 70%，中位数仍在高区，低区为 0，于是成为赞同共识。变化来自专家改了分数，不是软件把 70% 改成 67%。若 PC06 没有跨过 70%，它必须继续留在未达成共识里。</p>
+</div>
+<div id="三轮分析和末轮清单" class="section level1">
+<h1>5. 三轮分析和末轮清单</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>delphi_ram_meta[<span class="fu">c</span>(<span class="st">&quot;rule&quot;</span>, <span class="st">&quot;modified_ram&quot;</span>, <span class="st">&quot;percent_high&quot;</span>, <span class="st">&quot;percent_low&quot;</span>, <span class="st">&quot;deviation&quot;</span>, <span class="st">&quot;supplement&quot;</span>)]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;percent&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $modified_ram</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_high</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_low</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $deviation</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;匿名多轮函询，默认最多 3 轮，不是经典 RAM 的两轮面对面会议。第 3 轮不用来消除分歧。&quot;</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $supplement</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;权威系数与 Kendall&#39;s W 只作补充，不替代中位数、分歧和适宜性或百分比共识分类。&quot;</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>last_classification[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median n_high                         consensus_zh</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13    PC01    8.0     12         达成共识（赞同，RAM 修改版）</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14    PC02    2.0      0       达成共识（不赞同，RAM 修改版）</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15    PC03    5.0      0 未达成共识（中位数居中或比例未过线）</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16    PC04    5.5      5   未达成共识（两端比例同时达到下限）</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17    PC05    7.0      9         达成共识（赞同，RAM 修改版）</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18    PC06    8.0     10         达成共识（赞同，RAM 修改版）</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                            class_zh</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13               适宜（RAM 修改版）</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14             不适宜（RAM 修改版）</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 不确定（中位数居中，RAM 修改版）</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   不确定（存在分歧，RAM 修改版）</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17               适宜（RAM 修改版）</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18               适宜（RAM 修改版）</span></span></code></pre></div>
+<p><strong>解读：</strong></p>
+<ul>
+<li><code>modified_ram = TRUE</code>。报告里不能把这份结果叫作经典适宜性评价。</li>
+<li><code>percent_high</code> 是 0.70，<code>percent_low</code> 是 0.15。这就是锁定值。</li>
+<li><code>deviation</code> 仍然提醒：三轮函询不是经典 RAM 的两轮会议。百分比和「多一轮函询」是两种不同的偏离，都要写。</li>
+<li>末轮 PC05 仍未达标。它和 PC04 的分歧、PC03 的中间意见一起，构成未达成共识清单。只发表 PC01、PC02、PC06 会隐藏规则实际留下的条目。</li>
+</ul>
+</div>
+<div id="和表-4ipras-比是为了说明差异" class="section level1">
+<h1>6. 和表 4、IPRAS 比，是为了说明差异</h1>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   rule_a  rule_b kappa n exploratory</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 table4   ipras     1 6        TRUE</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 table4 percent     1 6        TRUE</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  ipras percent     1 6        TRUE</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>by_item[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;consensus_percent&quot;</span>, <span class="st">&quot;class_table4&quot;</span>, <span class="st">&quot;class_ipras&quot;</span>, <span class="st">&quot;class_percent&quot;</span>)]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id                    consensus_percent  class_table4   class_ipras</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    PC01         达成共识（赞同，RAM 修改版）   appropriate   appropriate</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    PC02       达成共识（不赞同，RAM 修改版） inappropriate inappropriate</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    PC03 未达成共识（中位数居中或比例未过线）     uncertain     uncertain</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    PC04   未达成共识（两端比例同时达到下限）     uncertain     uncertain</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    PC05         达成共识（赞同，RAM 修改版）   appropriate   appropriate</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    PC06         达成共识（赞同，RAM 修改版）   appropriate   appropriate</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   class_percent</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   appropriate</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 inappropriate</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     uncertain</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     uncertain</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   appropriate</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   appropriate</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换已锁定规则。若两套规则结论不同，正式结果仍按第 1 轮前写入方案的那一种。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 百分比列是锁定规则。表 4 或 IPRAS 可能把「中位数在高区、低区很少」的条目判成适宜，即使高区比例不到 70%。那是它们的定义。本方案已经声明不用它们做主判定。κ 如果不是 1，正好说明不能在三种规则之间看完结果再选。敏感性分析的注释写明：不替换已锁定规则。</p>
+</div>
+<div id="稳定性" class="section level1">
+<h1>7. 稳定性</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>chg <span class="ot">&lt;-</span> res<span class="sc">$</span>stability[res<span class="sc">$</span>stability<span class="sc">$</span>item_id <span class="sc">==</span> <span class="st">&quot;PC06&quot;</span> <span class="sc">&amp;</span> res<span class="sc">$</span>stability<span class="sc">$</span>from_round <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>chg[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>, <span class="st">&quot;class_unchanged&quot;</span>, <span class="st">&quot;median_r1&quot;</span>, <span class="st">&quot;median_r2&quot;</span>)]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id  class_r1    class_r2 class_unchanged median_r1 median_r2</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    PC06 uncertain appropriate           FALSE         7       7.5</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stopping<span class="sc">$</span>note</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> PC06 从第 1 轮到第 2 轮，分类由不确定变为适宜（修改版映射）。<code>class_unchanged</code> 为假是诚实的记录。它不表示第 1 轮的 70% 线定错了。停止规则里的 Wilcoxon 说明仍然有效：P 值不能单独定义意见已经稳定。</p>
+</div>
+<div id="写出-docx-报告" class="section level1">
+<h1>8. 写出 docx 报告</h1>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;delphi-ram-percent-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.info</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))<span class="sc">$</span>size</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 17419</span></span></code></pre></div>
+<p><strong>解读：</strong> 报告应同时出现：70% 与 15%、RAM 修改版、三轮函询、PC05 未达标、PC04 两端分歧、三种规则的 κ，以及权威系数和 Kendall’s W 不参与百分比判定。选择 <code>format = &quot;html&quot;</code> 时仍会额外写 docx。</p>
+</div>
+<div id="改百分比时要改在发卷之前" class="section level1">
+<h1>9. 改百分比时要改在发卷之前</h1>
+<p>若项目想用 80% 而不是 70%，应这样锁定，而不是分析完再改：</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>p80 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_protocol</span>(<span class="st">&quot;percent&quot;</span>, <span class="at">percent_high =</span> <span class="fl">0.80</span>, <span class="at">percent_low =</span> <span class="fl">0.15</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">rationale =</span> <span class="st">&quot;高风险推荐，第 1 轮前把赞同共识提高到 80%。&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>p80<span class="sc">$</span>rand<span class="sc">$</span>percent_high</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.8</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>p80<span class="sc">$</span>modified_from_preset</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p><strong>解读：</strong> 0.80 会被标成偏离默认 0.70，理由进入报告。用这套方案重新分类时，9/12 = 75% 的 PC06 将不再算赞同共识。这是阈值的后果，应在招募专家之前就接受，而不是在末轮才发现。</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

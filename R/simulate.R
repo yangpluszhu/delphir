@@ -348,7 +348,7 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
           item_id = items$item_id[j],
           round = rnd,
           score = score,
-          dimension = if (scenario == "clinical") "\u91cd\u8981\u6027" else "overall",
+          dimension = if (scenario == "clinical") "\u91cd\u8981\u6027" else if (scenario == "rand") "\u9002\u5b9c\u6027" else "overall",
           unable = unable,
           stakeholder = st,
           stringsAsFactors = FALSE

@@ -21,39 +21,57 @@ study <- res$study
 p <- study$protocol
 meta <- study$meta
 sc <- p$scenario
+stage <- params$stage %||% "auto"
+if (identical(stage, "auto")) {
+  rnd <- res$last_round %||% max(res$item_summary$round)
+  maxr <- p$stability$max_rounds %||% 3L
+  stage <- if (isTRUE(rnd <= 1)) "round1" else if (isTRUE(rnd < maxr)) sprintf("round%s", rnd) else "final"
+}
+is_final <- identical(stage, "final")
+is_r1 <- identical(stage, "round1")
+cls_all <- res$classification
+rounds_all <- sort(unique(cls_all$round))
+if (is_r1 && "round" %in% names(cls_all)) {
+  cls_show <- cls_all[cls_all$round == min(cls_all$round), , drop = FALSE]
+} else {
+  cls_show <- cls_all
+}
+dim0 <- unique(cls_show$dimension)
+prefer <- intersect(c("重要性", "overall", "适宜性"), dim0)
+if (length(prefer)) cls_show <- cls_show[cls_show$dimension == prefer[1], , drop = FALSE]
+last_show <- if (is_r1) cls_show else res$last_classification
+if (!is_r1 && "dimension" %in% names(last_show) && length(prefer)) {
+  last_show <- last_show[last_show$dimension == prefer[1], , drop = FALSE]
+}
+stage_label <- if (is_r1) "第 1 轮中间报告" else if (!is_final) paste0("第 ", res$last_round, " 轮中间报告") else "终稿"
 ```
 
-# 研究问题与范围
+# 报告性质
+
+`r if (!is_final) paste0("**这是", stage_label, "，不是最终共识。** 阈值已在第 1 轮发放前锁定。最终条目去留须在完成计划轮次（或达到预先规定的稳定性规则）并视需要召开共识会议后确定。") else "**这是按预先锁定方案生成的终稿方法学报告。** 分轮过程表必须保留，不能只报最后一轮。"`
 
 - **场景**：`r delphir:::.scenario_label(sc)`
+- **报告阶段**：`r stage_label`
+- **当前分析轮次**：`r paste(rounds_all, collapse = ", ")`（计划最多 `r p$stability$max_rounds` 轮）
 - **目的**：`r meta$objective %||% "（请在 study$meta$objective 中补充）"`
 - **目标使用者**：`r meta$users %||% "未说明"`
 - **地理范围**：`r meta$geography %||% "未说明"`
 - **条目来源 / 证据准备**：`r meta$evidence_note %||% "未说明"`
 - **匿名**：`r meta$anonymity %||% "评分匿名汇总"`
+- **伦理**：`r meta$ethics %||% "未说明"`
 
 > 方法学提示：ACCORD 要求在报告中明确目标、目标使用者和地理适用范围。Delphi 用于证据不足或不一致时整合判断，**不能替代系统评价或 GRADE**。
 
 # 预先锁定的分析方案
 
+下列参数在第一轮问卷发放前写入 [delphi_protocol()] / [preset_protocol()]，分析阶段不得回改。完整字段见下表。
+
 ```{r}
-knitr::kable(data.frame(
-  项目 = c("量表", "低/中/高区", "高度共识", "基本共识", "排除", "最多轮次", "稳定性"),
-  设定 = c(
-    sprintf("%s–%s", p$scale_min, p$scale_max),
-    sprintf("%s–%s / %s–%s / %s–%s", p$low_range[1], p$low_range[2],
-            p$mid_range[1], p$mid_range[2], p$high_range[1], p$high_range[2]),
-    sprintf("P(高区)≥%.0f%% 且 Median≥%s 且 IQR≤%s", 100*p$rules$high_pct, p$rules$median_min, p$rules$iqr_max),
-    sprintf("P(高区)≥%.0f%% 且 Median≥%s", 100*p$rules$basic_pct, p$rules$median_min),
-    sprintf("P(低区)≥%.0f%%", 100*p$rules$reject_pct),
-    as.character(p$stability$max_rounds),
-    sprintf("分类不变≥%.0f%%；Median 变化≤%s；高区比例变化<%.0f%%",
-            100*p$stability$class_pct, p$stability$median_delta, 100*p$stability$high_pct_delta)
-  )
-), caption = "方案在第一轮前锁定，分析阶段不得回改阈值。")
+pt <- delphir::protocol_table(p)
+knitr::kable(pt, caption = "预设方案全部参数（value 为本研究锁定值，preset 为该场景默认值）")
 ```
 
-`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）")`
+`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）") else "本研究未偏离该场景预设阈值。"`
 
 # 专家构成
 
@@ -67,7 +85,65 @@ if ("stakeholder" %in% names(panel)) {
 
 专家人数 `r nrow(panel)`。比总人数更重要的是构成有没有结构性偏倚。
 
-`r if (!is.null(res$authority)) paste0("面板平均权威系数 Cr = ", round(attr(res$authority, "overall")$mean_cr, 3), "。Cr=(Ca+Cs)/2，按专家评一次，不按条目计算，不用于加权。Cr 不是 DCAT 核心要求，仅供国内发表补充。")`
+# 权威系数 Ca、Cs、Cr
+
+Ca（判断依据）与 Cs（熟悉程度）是专家对**本次咨询主题**的一次自评；\(Cr=(Ca+Cs)/2\)。  
+它们**不是**条目共识指标，**不按条目重复计算**，也**不用于加权** 1–9 分。条目级知识缺口使用「无法判断」（`n_unable`）。DCAT 四个核心特征不包括 Cr；国内发表可把组均数 Cr ≥ 0.70 作为参考。第二轮及以后一般不必重评权威系数。
+
+```{r}
+if (is.null(res$authority)) {
+  cat("本数据未提供 Ca/Cs。若国内投稿需要，请在第 1 轮问卷封面收集熟悉程度与判断依据，用 score_authority() 赋分。")
+} else {
+  ov <- attr(res$authority, "overall")
+  knitr::kable(data.frame(
+    指标 = c("组平均 Ca", "组平均 Cs", "组平均 Cr", "Cr ≥ 界值的专家比例", "参考界值"),
+    结果 = c(
+      round(ov$mean_ca, 3), round(ov$mean_cs, 3), round(ov$mean_cr, 3),
+      sprintf("%.1f%%", ov$pct_ok), ov$threshold
+    )
+  ), caption = "专家组权威系数（专家级，不是条目级）")
+  scs <- attr(res$authority, "scales")
+  if (is.null(scs)) scs <- p$authority_scale
+  if (is.null(scs)) scs <- delphir::authority_scales()
+  if (!is.null(attr(res$authority, "scale_note"))) cat(attr(res$authority, "scale_note"), "\n\n")
+  knitr::kable(data.frame(熟悉程度 = names(scs$cs), Cs = unname(scs$cs)),
+               caption = "熟悉程度赋分表（须预先锁定）")
+  knitr::kable(scs$ca[, c("source", "large", "medium", "small")],
+               col.names = c("判断依据", "大", "中", "小"),
+               caption = "判断依据赋分表（方案锁定，不是条目共识）")
+  cat(ov$note)
+}
+```
+
+# 各轮问卷内容
+
+问卷由锁定方案自动生成：第 1 轮含规则原文、权威系数自评与 Likert；第 2 轮及以后为受控反馈（本人上轮评分 + 组 Median/IQR/高区 + 匿名意见），不再出现 Ca/Cs。
+
+```{r}
+for (rnd in rounds_all) {
+  cat(sprintf("\n## 第 %s 轮问卷结构\n\n", rnd))
+  outline <- delphir:::.questionnaire_round_outline(res, rnd)
+  cat(sprintf("- 评分维度：%s\n", paste(outline$dimensions, collapse = "、")))
+  cat(sprintf("- 条目数（条目池）：%s\n", outline$n_items))
+  cat(sprintf("- 是否含权威系数自评：%s\n", if (isTRUE(outline$includes_authority)) "是（仅第 1 轮）" else "否"))
+  cat("- 已锁定共识规则：\n\n")
+  cat(delphir:::.protocol_rules_md(p))
+  cat("\n\n")
+  if (!is.null(outline$classification) && nrow(outline$classification)) {
+    sub <- outline$classification
+    keep <- intersect(c("item_id", "item_text", "class_zh", "action", "median_iqr", "p_high"), names(sub))
+    show <- sub[, keep, drop = FALSE]
+    if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 40)
+    if (rnd == 1L) {
+      knitr::kable(show, digits = 1, caption = "第 1 轮条目（本轮问卷即对此表中的条目评分）")
+    } else {
+      re <- if ("action" %in% names(sub)) sub$action %in% "discuss" else TRUE
+      knitr::kable(show[re, , drop = FALSE], digits = 1,
+                   caption = sprintf("第 %s 轮建议重评的条目（其余已达共识/排除者可查阅不打分）", rnd))
+    }
+  }
+}
+```
 
 # 参与度与脱落
 
@@ -82,29 +158,32 @@ if (!is.null(res$participation$retention)) {
 if (requireNamespace("ggplot2", quietly = TRUE)) print(delphir::plot_attrition(res))
 ```
 
-# 条目结果（分轮）
+# 逐轮调查结果
 
-Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。
+Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。「无法判断」不进入 1–9 分母。
 
 ```{r}
-cls <- res$classification
-keep <- intersect(c("item_id", "item_text", "round", "dimension", "n_valid", "n_unable",
-                    "median_iqr", "p_high", "p_low", "cv", "class_zh", "di", "disagreement"),
-                  names(cls))
-show <- cls[, keep, drop = FALSE]
-if ("item_text" %in% names(show)) {
-  show$item_text <- substr(show$item_text, 1, 36)
+for (rnd in rounds_all) {
+  cat(sprintf("\n## 第 %s 轮条目结果\n\n", rnd))
+  sub <- cls_all[cls_all$round == rnd, , drop = FALSE]
+  if (length(prefer)) sub <- sub[sub$dimension %in% prefer[1], , drop = FALSE]
+  keep <- intersect(c("item_id", "item_text", "dimension", "n_valid", "n_unable",
+                      "median_iqr", "ipr", "p_high", "p_low", "cv", "full_rate", "class_zh", "action",
+                      "di", "disagreement"), names(sub))
+  show <- sub[, keep, drop = FALSE]
+  if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 36)
+  knitr::kable(show, digits = 1, caption = sprintf("第 %s 轮（过程透明，对应 CREDES/ACCORD）", rnd))
 }
-knitr::kable(show, digits = 1, caption = "逐轮条目结果（过程透明，对应 CREDES/ACCORD 要求）")
 ```
+
+`r if (!is_final) "本轮分类用于决定下一轮问卷：高度/基本共识可考虑不再重评；临界、未达共识、两极分化及根据意见修改过的条目必须带反馈重评。"`
 
 # 证据与共识分列
 
 ```{r}
-last <- res$last_classification
 ev <- "未提供条目级证据等级"
-if ("evidence_level" %in% names(last)) {
-  ev_tab <- last[, intersect(c("item_id", "evidence_level", "class_zh", "p_high"), names(last)), drop = FALSE]
+if ("evidence_level" %in% names(last_show)) {
+  ev_tab <- last_show[, intersect(c("item_id", "evidence_level", "class_zh", "p_high"), names(last_show)), drop = FALSE]
   knitr::kable(ev_tab, digits = 1, caption = "证据等级 vs 共识分类：二者不可互相替代")
 } else {
   cat(ev)
@@ -116,8 +195,8 @@ if ("evidence_level" %in% names(last)) {
 # 稳定性
 
 ```{r}
-if (is.null(res$stability)) {
-  cat("仅一轮，无法评价稳定性。DCAT 将迭代视为核心特征。")
+if (is_r1 || is.null(res$stability)) {
+  cat("第 1 轮无法评价稳定性。DCAT 将迭代视为核心特征；请完成第 2 轮后再判断是否终止。")
 } else {
   knitr::kable(res$stability[, intersect(c("item_id", "dimension", "from_round", "to_round",
                                           "median_r1", "median_r2", "p_high_r1", "p_high_r2",
@@ -129,6 +208,9 @@ if (is.null(res$stability)) {
               if (isTRUE(st$recommend_stop)) "是" else "否",
               100 * st$class_unchanged_pct, 100 * st$median_stable_pct, 100 * st$p_high_stable_pct))
   cat(st$note)
+  if (!is_final && isTRUE(st$recommend_stop)) {
+    cat(" 虽满足稳定性规则，若尚未达到计划轮次，是否提前终止须在方案中预先规定，而不是临时决定。")
+  }
 }
 ```
 
@@ -139,6 +221,7 @@ if (is.null(res$stakeholder)) {
   cat("未做分层或仅有单一利益相关者组。")
 } else {
   st <- res$stakeholder
+  if (is_r1 && "round" %in% names(st)) st <- st[st$round == min(st$round), ]
   keep <- intersect(c("item_id", "group_level", "n_valid", "median", "p_high", "p_low", "class_zh"), names(st))
   knitr::kable(st[, keep, drop = FALSE], digits = 1, caption = "利益相关者分层：总体过线不足以代表各组")
 }
@@ -147,8 +230,8 @@ if (is.null(res$stakeholder)) {
 # 脱落偏倚
 
 ```{r}
-if (is.null(res$dropout)) {
-  cat("无脱落比较。")
+if (is_r1 || is.null(res$dropout)) {
+  cat(if (is_r1) "中间报告尚无跨轮脱落比较。后续轮次须保留第 1 轮全部数据，不可删除脱落者的上轮评分。" else "无脱落比较。")
 } else {
   knitr::kable(res$dropout, digits = 2, caption = "完成者 vs 脱落者在上一轮的评分")
 }
@@ -166,18 +249,88 @@ if (!is.null(qs$by_theme) && nrow(qs$by_theme)) {
 }
 ```
 
-# 共识会议建议
+# 第一轮新增条目
 
-已达高度共识的条目原则上不在会议上重新否决，否则会破坏 Delphi。会议应聚焦：临界条目、无共识、组间相反、仅需改文字的条目。如需表决，建议匿名。
+有人在开放题里写了一句话，只说明这件事被想起来了。它还不是共识，也不能自动变成下一轮的评分条目。提出次数反映的是「被想起来的频率」，不是这条有多重要。下面按事先锁定的规则说明每一条建议去了哪里。
 
 ```{r}
-last <- res$last_classification
-if ("action" %in% names(last)) {
-  knitr::kable(as.data.frame(table(last$action, last$class_zh)),
-               col.names = c("建议动作", "分类", "n"),
-               caption = "末轮条目去向")
+ni <- p$new_items
+if (is.null(ni) || !isTRUE(ni$allow)) {
+  cat("本方案未开启第一轮新增条目。若研究不允许专家补充，应在方案里写明理由。初始条目池不能默认已经完整。")
+} else {
+  cat(sprintf(
+    "规则在见结果前已经锁定：至少 %s 名专家独立提出同一新概念，或仅 1 名专家提出且有文献、访谈、指南或重要临床依据。每人最多推荐 %s 项。同一人写三次只算 1 人。新条目至少经过两轮评分后才能最终纳入。审查组：%s",
+    ni$min_independent, ni$max_suggestions, ni$review_panel
+  ))
+  cat("\n\n怎么读：先看范围，再看是不是已经有的概念，再看它是不是一个可以单独评价的新概念，而不是测量工具、测量时间点或改个说法。人数只在这些都通过之后才起作用。")
 }
 ```
+
+```{r}
+if (!is.null(res$new_item_audit) && nrow(res$new_item_audit)) {
+  knitr::kable(res$new_item_audit, caption = "新增条目过程核对")
+  cat("怎么读：「通过」表示这一步符合预先写好的规则。「警告」需要作者在论文里解释。「不通过」不能用「课题组讨论后觉得有必要」掩盖。")
+}
+```
+
+```{r}
+if (!is.null(res$new_item_review) && nrow(res$new_item_review)) {
+  cols <- intersect(c(
+    "concept_id", "standardized_name", "n_independent", "construct",
+    "channel", "decision_zh", "reason"
+  ), names(res$new_item_review))
+  knitr::kable(res$new_item_review[, cols, drop = FALSE], caption = "概念审查：每条建议都有去向")
+  cat("怎么读：进入下一轮的才是真正的新条目。不进入、合并、转入测量工具或时间点阶段，都要留下理由。人数一列是独立专家数。范围外的建议，即使有两个人以上提出，也不能加入。")
+} else if (!is.null(ni) && isTRUE(ni$allow)) {
+  cat("本次分析没有提交已编码的新增建议。问卷仍应保留结构化开放题。回收后由两名研究者独立编码，不一致时由第三人裁决，再调用 screen_new_items()。软件不会把口语自动改成标准条目。")
+}
+```
+
+```{r}
+if (!is.null(res$item_log) && nrow(res$item_log)) {
+  knitr::kable(res$item_log, caption = "条目变更日志")
+  cat("怎么读：这张表用来追溯谁提出、与哪一条重复、为什么合并或删除、哪一轮加入、最后怎样。发表和编写标准说明书时，应能据此回答「为什么是这些条，而不是那些条」。")
+}
+```
+
+带「暂时」的纳入，只说明这一轮的分数过了预设的线。该条目还没有经历「评分、看到全组结果、再评分」。不能据此写入最终指标集。没有形成共识，也不要写成专家认为不重要。
+
+```{r}
+prov <- res$last_classification
+if (!is.null(prov) && "provisional" %in% names(prov) && any(prov$provisional %in% TRUE)) {
+  keep <- intersect(c("item_id", "class_zh", "action", "n_scoring_rounds", "p_high", "p_low"), names(prov))
+  knitr::kable(prov[prov$provisional %in% TRUE, keep, drop = FALSE], digits = 1,
+               caption = "只完成一次评分、尚未最终纳入的条目")
+}
+```
+
+```{r}
+if (!is.null(res$meeting_agenda) && nrow(res$meeting_agenda)) {
+  knitr::kable(res$meeting_agenda, caption = "共识会议分组")
+  cat("怎么读：A 类原则上直接进入，B 类原则上排除，C 类才拿到会上讨论。iterate 表示还要再做一轮书面评分。floor 是会上临时冒出来的新条目：专家没有提前看到，没有匿名评分，也没有受控反馈，不得当场拍板。若确实重要，应另开一轮书面匿名评价。")
+}
+```
+
+积极系数、权威系数、Kendall 协调系数和变异系数可以描述专家是否回卷、对主题是否熟悉、整体排序是否更一致。它们不能单独决定某一条进不进标准。两条目的平均分可以很接近，一个是大家意见集中，另一个是高低两极对打。所以至少要同时看中位数、四分位距、高分区比例、低分区比例和共识分类。
+
+# 最终结果与共识会议建议
+
+`r if (!is_final) "当前为中间分析：已达高度共识的条目原则上不在会议上重新否决。会议安排在计划轮次完成之后，聚焦临界、无共识、组间相反、仅需改文字的条目。只评过一次的新条目即使过线，也只是暂时共识。"`
+
+```{r}
+if ("action" %in% names(last_show)) {
+  knitr::kable(as.data.frame(table(last_show$action, last_show$class_zh)),
+               col.names = c("建议动作", "分类", "n"),
+               caption = if (!is_final) "当前轮条目去向（供制作下一轮问卷）" else "末轮条目去向")
+  keep <- intersect(c("item_id", "item_text", "class_zh", "action", "median_iqr", "p_high", "p_low"),
+                    names(last_show))
+  fin <- last_show[, keep, drop = FALSE]
+  if ("item_text" %in% names(fin)) fin$item_text <- substr(fin$item_text, 1, 40)
+  knitr::kable(fin, digits = 1, caption = "指定分析轮次的条目级最终分类")
+}
+```
+
+稳定的两极分化应报告为**未形成共识**，而不是加开轮次直到表面一致。
 
 # 补充统计
 
@@ -185,10 +338,20 @@ if ("action" %in% names(last)) {
 if (!is.null(res$kendall$w)) {
   cat(sprintf("Kendall W = %.3f，P = %.4f（评价排序协调性，不是条目级共识）。",
               res$kendall$w, res$kendall$p_value))
+} else if (!is.null(res$kendall$error)) {
+  cat(sprintf("Kendall W 未计算：%s", res$kendall$error))
 }
 ```
 
+```{r extended-metrics, results='asis'}
+delphir::report_extended_section(res)
+delphir::report_rounds_section(res)
+delphir::report_sensitivity_section(res)
+```
+
 # 报告规范对照
+
+`r if (!is_final) "中间报告即可开始对照清单，终稿必须补全 Unsure 项。"`
 
 ## ACCORD（35 条）
 
@@ -208,6 +371,15 @@ knitr::kable(delphir::dcat_checklist(res), caption = "DCAT：核心项否视为�
 knitr::kable(delphir::credes_checklist(res), caption = "CREDES 补充对照")
 ```
 
+# 参考文献
+
+下列文献支撑本报告的方法学选择（共识定义须预先规定、过程透明、不强迫共识、权威系数不加权）。引用本软件请使用 `citation("delphir")`。
+
+```{r}
+knitr::kable(delphir:::.delphi_references(), col.names = c("序号", "文献"),
+             caption = "方法学与报告规范参考文献")
+```
+
 # 声明
 
-本报告由 R 包 delphir 根据预先锁定的方案生成。模拟或教学数据不得当作真实临床推荐。
+本报告由 R 包 delphir 根据预先锁定的方案生成。模拟或教学数据不得当作真实临床推荐。权威系数不能证明专家选择科学，也不能替代匿名、迭代、受控反馈与预先定义的共识规则。
