@@ -355,26 +355,26 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
   rule <- switch(
     s$rule,
     table4 = "\u624b\u518c\u8868 4\uff1a\u6309\u5b9e\u9645\u5e94\u7b54\u4eba\u6570\u67e5\u4e00\u81f4\u4e0e\u5206\u6b67\u9608\u503c\uff08Fitch \u7b49\uff0c2001\uff09\u3002",
-    ipras = sprintf("IPRAS\uff1aIPR = P70 - P30\uff0cIPRAS = %s + %s \u00d7 |5 - IPR \u4e2d\u5fc3|\u3002IPR \u4e25\u683c\u5927\u4e8e IPRAS \u4e3a\u5206\u6b67\u3002\u5206\u4f4d\u6570 type = %s\u3002",
-                     s$iprr, s$cfa, s$qtype),
-    classic_relaxed = "9 \u4eba\u5bbd\u677e\u5b9a\u4e49\uff1a\u4e24\u7aef\u5404\u81f3\u5c11 3 \u4eba\u4e3a\u5206\u6b67\uff1b\u5254\u9664\u4e00\u4e2a\u6700\u9ad8\u5206\u548c\u4e00\u4e2a\u6700\u4f4e\u5206\u540e\uff0c\u5176\u4f59\u5206\u6570\u843d\u5728\u4efb\u610f 3 \u5206\u8de8\u5ea6\u5185\u4e3a\u4e00\u81f4\u3002",
-    classic_strict = "9 \u4eba\u4e25\u683c\u5b9a\u4e49\uff1a\u4e24\u7aef\u5404\u81f3\u5c11 1 \u4eba\u4e3a\u5206\u6b67\uff1b\u5168\u90e8\u8bc4\u5206\u843d\u5728\u4efb\u610f 3 \u5206\u8de8\u5ea6\u5185\u4e3a\u4e00\u81f4\u3002",
+    ipras = .ipras_rule_text(p, s$iprr, s$cfa, s$qtype),
+    classic_relaxed = .classic_agreement_text(p, "relaxed"),
+    classic_strict = .classic_agreement_text(p, "strict"),
     percent = sprintf("\u767e\u5206\u6bd4\u89c4\u5219\uff08RAM \u4fee\u6539\u7248\uff09\uff1a\u9ad8\u533a\u6bd4\u4f8b \u2265 %.0f%% \u4e14\u4f4e\u533a\u6bd4\u4f8b < %.0f%% \u4e3a\u4e00\u81f4\u3002\u4e0d\u5957\u7528 IPRAS \u5e38\u6570\u3002",
                        100 * s$percent_high, 100 * s$percent_low),
     both = "\u540c\u65f6\u8ba1\u7b97\u8868 4 \u4e0e IPRAS\uff0c\u4efb\u4e00\u5224\u4e3a\u5206\u6b67\u5373\u8bb0\u4e3a\u5206\u6b67\u3002",
     s$rule
   )
   bits <- c(
-    sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s\u3002%s", p$scale_min, p$scale_max, .rand_anchor_text(.rand_kind(p))),
+    sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s\u3002%s", p$scale_min, p$scale_max, .rand_anchor_text(.rand_kind(p), p$scale_min, p$scale_max)),
     sprintf("- **\u5206\u6b67\u89c4\u5219\uff1a** %s", rule),
-    "- **\u9002\u5b9c\u6027\uff1a** \u4e2d\u4f4d\u6570 7\u20139 \u4e14\u65e0\u5206\u6b67\u4e3a\u9002\u5b9c\uff1b1\u20133 \u4e14\u65e0\u5206\u6b67\u4e3a\u4e0d\u9002\u5b9c\uff1b\u4e2d\u4f4d\u6570 4\u20136\uff0c\u6216\u4efb\u4f55\u5206\u6b67\uff0c\u4e3a\u4e0d\u786e\u5b9a\u3002\u4e0d\u786e\u5b9a\u4f1a\u533a\u5206\u300c\u4e2d\u4f4d\u6570\u5c45\u4e2d\u300d\u4e0e\u300c\u5b58\u5728\u5206\u6b67\u300d\u3002",
+    .appropriateness_rule_line(p),
     sprintf("- **\u8f6e\u6b21\uff1a** \u7b2c 1 \u8f6e\u72ec\u7acb\u8bc4\u5206\uff1b\u7b2c 2 \u8f6e\u4e3a%s\u3002\u7ecf\u5178\u9002\u5b9c\u6027\u4e0d\u8d85\u8fc7 2 \u8f6e\u3002", mode),
     if (isTRUE(s$necessity)) {
-      "- **\u5fc5\u8981\u6027\uff1a** \u53ea\u8bc4\u4ef7\u9002\u5b9c\u4e14\u65e0\u5206\u6b67\u7684\u6761\u76ee\u3002\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 \u2265 7 \u4e14\u65e0\u5206\u6b67\u4e3a\u5fc5\u8981\uff0c\u5426\u5219\u4e3a\u9002\u5b9c\u4f46\u975e\u5fc5\u8981\u3002"
+      .necessity_rule_line(p)
     } else {
       "- **\u5fc5\u8981\u6027\uff1a** \u672c\u65b9\u6848\u4e0d\u505a\u5fc5\u8981\u6027\u8bc4\u4ef7\u3002"
     },
-    if (isTRUE(p$rand$nonstandard_ipras)) "- **\u975e\u6807\u51c6 IPRAS \u53c2\u6570\uff1a** \u5df2\u504f\u79bb 2.35\u30011.5 \u6216 type 7\uff0c\u62a5\u544a\u4e2d\u6309\u4fee\u6539\u7248\u8bf4\u660e\u3002" else NULL
+    if (isTRUE(p$rand$nonstandard_ipras)) "- **\u975e\u6807\u51c6 IPRAS \u53c2\u6570\uff1a** \u5df2\u504f\u79bb\u8be5\u5206\u5236\u7684\u81ea\u52a8\u5e38\u6570\u6216 type 7\uff0c\u62a5\u544a\u4e2d\u6309\u4fee\u6539\u7248\u8bf4\u660e\u3002" else NULL,
+    .ipras_rescale_note(p)
   )
   paste(bits, collapse = "\n")
 }
@@ -385,13 +385,11 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
   if (identical(p$scenario, "delphi_ram")) return(.protocol_rules_delphi_ram(p))
   if (.is_standard_scenario(p)) {
     return(paste(
-      sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s \u5206\u3002\u91cd\u8981\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u91cd\u8981\uff0c2 \u4e0d\u91cd\u8981\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u91cd\u8981\uff0c5 \u5f88\u91cd\u8981\u3002",
-              p$scale_min, p$scale_max),
-      "\u719f\u6089\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u719f\u6089\uff0c2 \u4e0d\u719f\u6089\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u719f\u6089\uff0c5 \u5f88\u719f\u6089\u3002",
+      .standard_scale_blurb(p),
       sprintf("- **\u7eb3\u5165\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff1a** \u6700\u7ec8\u8f6e\u91cd\u8981\u7a0b\u5ea6\u5747\u6570 \u2265 %s\uff0c\u4e14\u8be5\u6761\u53d8\u5f02\u7cfb\u6570 \u2264 %s\u3002\u6ee1\u5206\u6bd4\u5fc5\u987b\u62a5\u544a\uff0c\u4e0d\u5355\u72ec\u4f5c\u4e3a\u5254\u9664\u7ebf\u3002",
               r$mean_min, r$cv_max),
-      sprintf("- **\u7ed3\u675f\u8c03\u67e5\uff1a** \u81f3\u5c11\u4e24\u8f6e 5 \u5206\u8bc4\u5206\u540e\uff0c\u82e5\u91cd\u8981\u7a0b\u5ea6 Kendall W \u2265 %s\u3001\u5361\u65b9\u68c0\u9a8c P < %s\uff0c\u4e14\u5404\u6761\u76ee\u5747\u6570\u76f8\u5bf9\u4e0a\u8f6e\u7684\u5e73\u5747\u7edd\u5bf9\u53d8\u5316 < %s\uff0c\u5219\u534f\u8c03\u7a0b\u5ea6\u8f83\u597d\uff0c\u8c03\u67e5\u7ed3\u675f\u3002\u6700\u591a %s \u8f6e\u3002",
-              r$w_min, r$w_p_max, r$mean_delta_max, p$stability$max_rounds),
+      sprintf("- **\u7ed3\u675f\u8c03\u67e5\uff1a** \u81f3\u5c11\u4e24\u8f6e %s \u5206\u8bc4\u5206\u540e\uff0c\u82e5\u91cd\u8981\u7a0b\u5ea6 Kendall W \u2265 %s\u3001\u5361\u65b9\u68c0\u9a8c P < %s\uff0c\u4e14\u5404\u6761\u76ee\u5747\u6570\u76f8\u5bf9\u4e0a\u8f6e\u7684\u5e73\u5747\u7edd\u5bf9\u53d8\u5316 < %s\uff0c\u5219\u534f\u8c03\u7a0b\u5ea6\u8f83\u597d\uff0c\u8c03\u67e5\u7ed3\u675f\u3002\u6700\u591a %s \u8f6e\u3002",
+              .likert_point_count(p$scale_min, p$scale_max), r$w_min, r$w_p_max, r$mean_delta_max, p$stability$max_rounds),
       sprintf("- **\u53c2\u8003\u754c\u503c\uff08\u4e0d\u52a0\u6743\uff09\uff1a** \u79ef\u6781\u7cfb\u6570 \u2265 %s%%\uff1b\u7ec4\u5747\u6743\u5a01\u7cfb\u6570 \u2265 %s\u3002",
               round(100 * r$response_rate_min), r$cr_min),
       if (isTRUE(p$open_first)) {
@@ -437,6 +435,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
 
 .scale_anchor <- function(p, label) {
   if (!.is_standard_scenario(p)) return("")
+  if (!isTRUE(all.equal(c(p$scale_min, p$scale_max), c(1, 5)))) return("")
   if (grepl("\u719f\u6089", label)) {
     return("\uff081 \u5f88\u4e0d\u719f\u6089\uff0c2 \u4e0d\u719f\u6089\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u719f\u6089\uff0c5 \u5f88\u719f\u6089\uff09")
   }

@@ -25,16 +25,28 @@
   )
 }
 
-.rand_anchor_text <- function(kind = c("appropriateness", "necessity", "recommendation")) {
+.rand_anchor_text <- function(kind = c("appropriateness", "necessity", "recommendation"),
+                              scale_min = 1, scale_max = 9) {
   kind <- match.arg(kind)
+  lo <- .likert_num(scale_min)
+  hi <- .likert_num(scale_max)
+  md <- .likert_num((as.numeric(scale_min) + as.numeric(scale_max)) / 2)
   switch(
     kind,
-    appropriateness = "1 \u8868\u793a\u9884\u671f\u5371\u5bb3\u8fdc\u5927\u4e8e\u83b7\u76ca\uff0c5 \u8868\u793a\u83b7\u76ca\u4e0e\u5371\u5bb3\u5927\u81f4\u76f8\u5f53\u6216\u65e0\u6cd5\u5224\u65ad\uff0c9 \u8868\u793a\u9884\u671f\u83b7\u76ca\u8fdc\u5927\u4e8e\u5371\u5bb3\u3002",
-    necessity = "\u4ec5\u8bc4\u4ef7\u5df2\u5224\u4e3a\u9002\u5b9c\u4e14\u65e0\u5206\u6b67\u7684\u6761\u76ee\u30021 \u8868\u793a\u663e\u7136\u4e0d\u5fc5\u8981\uff0c9 \u8868\u793a\u663e\u7136\u5fc5\u8981\u3002\u4e0d\u63d0\u4f9b\u8be5\u9879\u63aa\u65bd\u5373\u5c5e\u4e0d\u5f53\u533b\u7597\u3001\u6709\u5408\u7406\u83b7\u76ca\u673a\u4f1a\u3001\u83b7\u76ca\u5e45\u5ea6\u4e0d\u5c0f\uff0c\u662f\u8bc4\u5206\u65f6\u7684\u6982\u5ff5\u6807\u51c6\uff0c\u4e0d\u662f\u7b97\u6cd5\u8f93\u5165\u3002",
-    recommendation = "\u672c\u573a\u666f\u4e3a RAM \u4fee\u6539\u7248\uff1a\u5bf9\u63a8\u8350\u610f\u89c1\u800c\u4e0d\u662f\u6307\u5f81\u00d7\u5e72\u9884\u77e9\u9635\u8bc4\u5206\u30021 \u8868\u793a\u5f3a\u70c8\u53cd\u5bf9\uff0c9 \u8868\u793a\u5f3a\u70c8\u540c\u610f\u3002\u5224\u5b9a\u7528\u9884\u5148\u9501\u5b9a\u7684\u767e\u5206\u6bd4\u89c4\u5219\uff0c\u4e0d\u5957\u7528 IPRAS \u5e38\u6570\u3002"
+    appropriateness = sprintf(
+      "%s 表示预期危害远大于获益，%s 表示获益与危害大致相当或无法判断，%s 表示预期获益远大于危害。",
+      lo, md, hi
+    ),
+    necessity = sprintf(
+      "仅评价已判为适宜且无分歧的条目。%s 表示显然不必要，%s 表示显然必要。不提供该项措施即属不当医疗、有合理获益机会、获益幅度不小，是评分时的概念标准，不是算法输入。",
+      lo, hi
+    ),
+    recommendation = sprintf(
+      "本场景为 RAM 修改版：对推荐意见而不是指征×干预矩阵评分。%s 表示强烈反对，%s 表示强烈同意。判定用预先锁定的百分比规则，不套用 IPRAS 常数。",
+      lo, hi
+    )
   )
 }
-
 #' 必要性分类（Kahan 等，1994）
 #'
 #' 只对最终轮已被判为「适宜且无分歧」的条目做必要性评分。必要性中位数
@@ -114,14 +126,14 @@ classify_necessity <- function(study, appropriateness = NULL,
       nec_class <- NA_character_
       nec_zh <- "\u5c1a\u672a\u8bc4\u5206"
       note <- "\u9002\u5b9c\u4e14\u65e0\u5206\u6b67\uff0c\u4f46\u5c1a\u672a\u505a\u5fc5\u8981\u6027\u8bc4\u5206"
-    } else if (!is.na(d$median) && d$median >= 7 && !isTRUE(d$disagreement)) {
+    } else if (!is.na(d$median) && d$median >= settings$high[1] && !isTRUE(d$disagreement)) {
       nec_class <- "necessary"
       nec_zh <- "\u5fc5\u8981"
-      note <- "\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 \u2265 7 \u4e14\u65e0\u5206\u6b67"
+      note <- sprintf("\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 \u2265 %s \u4e14\u65e0\u5206\u6b67", .likert_num(settings$high[1]))
     } else {
       nec_class <- "appropriate_not_necessary"
       nec_zh <- "\u9002\u5b9c\u4f46\u975e\u5fc5\u8981"
-      note <- "\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 < 7\uff0c\u6216\u5b58\u5728\u5206\u6b67"
+      note <- sprintf("\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 < %s\uff0c\u6216\u5b58\u5728\u5206\u6b67", .likert_num(settings$high[1]))
     }
     data.frame(
       item_id = as.character(item$item_id[1]),
@@ -402,8 +414,8 @@ rand_sensitivity <- function(study, round = NULL,
     "**\u76ee\u6807\u4f7f\u7528\u8005\uff1a** ", meta$users %||% "\u672a\u8bf4\u660e", "\n\n",
     "**\u5730\u7406\u8303\u56f4\uff1a** ", meta$geography %||% "\u672a\u8bf4\u660e", "\n\n",
     "> \u672c\u8f6e\u72ec\u7acb\u3001\u533f\u540d\u5b8c\u6210\uff0c\u4e0d\u8981\u4e0e\u5176\u4ed6\u4e13\u5bb6\u8ba8\u8bba\u3002",
-    .rand_anchor_text(kind),
-    "\u65e0\u6cd5\u5224\u65ad\u8bf7\u52fe\u9009\uff0c\u4e0d\u8981\u586b 5 \u5206\u5145\u6570\u3002\u65e0\u6cd5\u5224\u65ad\u4e0d\u8fdb\u5165\u4e2d\u4f4d\u6570\u548c\u5206\u6b67\u5224\u5b9a\u3002\n\n",
+    .rand_anchor_text(kind, p$scale_min, p$scale_max),
+    sprintf("\u65e0\u6cd5\u5224\u65ad\u8bf7\u52fe\u9009\uff0c\u4e0d\u8981\u586b %s \u5206\u5145\u6570\u3002\u65e0\u6cd5\u5224\u65ad\u4e0d\u8fdb\u5165\u4e2d\u4f4d\u6570\u548c\u5206\u6b67\u5224\u5b9a\u3002\n\n", .likert_num((p$scale_min + p$scale_max) / 2)),
     "## \u5df2\u9501\u5b9a\u7684\u5224\u5b9a\u89c4\u5219\n\n",
     .protocol_rules_md(p), "\n\n",
     "**\u4e0d\u786e\u5b9a\u548c\u5206\u6b67\u90fd\u662f\u6b63\u5f0f\u7ed3\u679c\uff0c\u4e0d\u662f\u8c03\u67e5\u5931\u8d25\u3002** \u89c4\u5219\u4e0d\u4f1a\u6839\u636e\u7ed3\u679c\u56de\u6539\u3002\n\n",
@@ -443,7 +455,7 @@ rand_sensitivity <- function(study, round = NULL,
       paste0(
         "### ", iid, "\n\n",
         .rand_item_heading(study$items, iid),
-        sprintf("| \u60a8\u7684\u4e0a\u8f6e\u8bc4\u5206 | \u4e2d\u4f4d\u6570 | 1\u20133 | 4\u20136 | 7\u20139 | \u5206\u6b67 | \u5206\u7c7b |\n"),
+        .likert_feedback_header(p),
         "|---|---|---|---|---|---|---|\n",
         sprintf("| %s | %s | %s | %s | %s | %s | %s |\n\n",
                 own_txt,
@@ -463,7 +475,7 @@ rand_sensitivity <- function(study, round = NULL,
       .rand_round2_text(settings$round2_mode), "\n\n",
       "\u4e0b\u8868\u53ea\u663e\u793a\u7ec4\u5185\u5206\u5e03\u548c\u60a8\u672c\u4eba\u7684\u4e0a\u8f6e\u8bc4\u5206\uff0c\u4e0d\u51fa\u73b0\u5176\u4ed6\u4e13\u5bb6\u59d3\u540d\u3002",
       "\u8bf7\u5bf9**\u5168\u90e8**\u6761\u76ee\u518d\u6b21\u72ec\u7acb\u8bc4\u5206\u3002\u5df2\u5224\u4e3a\u9002\u5b9c\u6216\u4e0d\u9002\u5b9c\u7684\u6761\u76ee\u4e5f\u8981\u590d\u8bc4\uff0c\u4e0d\u50cf Delphi \u90a3\u6837\u5254\u9664\u3002\n\n",
-      .rand_anchor_text(.rand_kind(p, FALSE)), "\n\n",
+      .rand_anchor_text(.rand_kind(p, FALSE), p$scale_min, p$scale_max), "\n\n",
       paste(blocks, collapse = "\n")
     )
   }, character(1))
@@ -492,7 +504,7 @@ rand_sensitivity <- function(study, round = NULL,
       "# \u5fc5\u8981\u6027\u8bc4\u4ef7\uff08\u4e0d\u662f\u7b2c\u4e09\u8f6e\u9002\u5b9c\u6027\u8bc4\u5206\uff09\n\n",
       "**\u7814\u7a76\u9898\u76ee\uff1a** ", study$meta$title %||% "RAND/UCLA", "\n\n",
       "**\u672c\u5377\u4e13\u5bb6\u7f16\u53f7\uff1a** ", eid, "\n\n",
-      .rand_anchor_text("necessity"), "\n\n",
+      .rand_anchor_text("necessity", p$scale_min, p$scale_max), "\n\n",
       "\u672a\u5217\u5165\u672c\u5377\u7684\u6761\u76ee\u4e0d\u662f\u9057\u6f0f\uff1a\u5b83\u4eec\u672a\u8fbe\u5230\u9002\u5b9c\u4e14\u65e0\u5206\u6b67\uff0c\u6309 Kahan \u7b49\uff081994\uff09\u4e0d\u505a\u5fc5\u8981\u6027\u5224\u5b9a\u3002\n\n",
       paste(blocks, collapse = "\n")
     )
@@ -611,6 +623,7 @@ rand_questionnaire <- function(study, round = 1,
     modified_ram = identical(s$rule, "percent") || isTRUE(p$rand$nonstandard_ipras) ||
       !isTRUE(all.equal(s$scale, c(1, 9))),
     nonstandard_ipras = isTRUE(p$rand$nonstandard_ipras),
+    ipras_rescaled = isTRUE(p$rand$ipras_rescaled),
     supplement = "\u6743\u5a01\u7cfb\u6570\u4e0e Kendall's W \u53ea\u4f5c\u8865\u5145\uff0c\u4e0d\u66ff\u4ee3\u4e2d\u4f4d\u6570\u3001\u5206\u6b67\u548c\u9002\u5b9c\u6027\u5206\u7c7b\u3002"
   )
 }

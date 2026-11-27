@@ -4,7 +4,13 @@
 \alias{simulate_rand_ucla}
 \title{模拟 RAND/UCLA 适宜性评价数据}
 \usage{
-simulate_rand_ucla(n_experts = 9, n_items = 24, n_rounds = 2, seed = 2026)
+simulate_rand_ucla(
+  n_experts = 9,
+  n_items = 24,
+  n_rounds = 2,
+  seed = 2026,
+  points = 9
+)
 }
 \arguments{
 \item{n_experts}{面板人数，默认 9。}
@@ -14,6 +20,8 @@ simulate_rand_ucla(n_experts = 9, n_items = 24, n_rounds = 2, seed = 2026)
 \item{n_rounds}{轮次数，默认 2。}
 
 \item{seed}{随机种子。}
+
+\item{points}{李克特点数，只能是 5、7 或 9。默认 9。}
 }
 \value{
 \code{\link[=delphi_study]{delphi_study()}} 对象，场景为 \code{rand_ucla}。

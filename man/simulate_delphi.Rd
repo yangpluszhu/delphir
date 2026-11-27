@@ -9,7 +9,8 @@ simulate_delphi(
   n_items = 20,
   n_rounds = 2,
   seed = 2026,
-  include_authority = TRUE
+  include_authority = TRUE,
+  points = 9
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ simulate_delphi(
 \item{seed}{随机种子，保证可复现。}
 
 \item{include_authority}{是否生成熟悉程度/判断依据原始勾选及 Ca/Cs，默认 \code{TRUE}。}
+
+\item{points}{李克特点数，只能是 5、7 或 9。默认 9。方案阈值随点数自动锁定。}
 }
 \value{
 \code{\link[=delphi_study]{delphi_study()}} 对象，\code{meta} 中含条目原型说明。

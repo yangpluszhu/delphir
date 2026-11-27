@@ -10,7 +10,8 @@ simulate_cos(
   n_researchers = 15,
   n_items = 25,
   n_rounds = 2,
-  seed = 2026
+  seed = 2026,
+  points = 9
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ simulate_cos(
 \item{n_rounds}{轮次数，默认 2。}
 
 \item{seed}{随机种子。}
+
+\item{points}{李克特点数，只能是 5、7 或 9。默认 9。}
 }
 \value{
 \code{\link[=delphi_study]{delphi_study()}} 对象，场景为 \code{comet_cos}。

@@ -38,7 +38,7 @@ plot_item_distribution <- function(study, item_id = NULL, round = NULL,
     ggplot2::ggplot(r, ggplot2::aes(.data$score)) +
       ggplot2::geom_bar(width = 0.7, fill = "#3C6E71") +
       ggplot2::facet_wrap(~item_id, scales = "free_y") +
-      ggplot2::scale_x_continuous(breaks = 1:9) +
+      ggplot2::scale_x_continuous(breaks = .plot_scale_breaks(study)) +
       ggplot2::labs(title = "\u6761\u76ee\u8bc4\u5206\u5206\u5e03", x = "\u8bc4\u5206", y = "\u4eba\u6570") +
       .theme_delphi()
   } else {
@@ -130,10 +130,11 @@ plot_rand_panel <- function(study, round = NULL) {
     d <- classify_rand(study, round = round)
   }
   d$item_id <- factor(d$item_id, levels = rev(unique(d$item_id)))
+  axis <- .plot_scale_axis(study)
   ggplot2::ggplot(d, ggplot2::aes(.data$median, .data$item_id, colour = .data$class_zh)) +
-    ggplot2::geom_vline(xintercept = c(3.5, 6.5), linetype = "dashed", colour = "grey60") +
+    ggplot2::geom_vline(xintercept = axis$bounds, linetype = "dashed", colour = "grey60") +
     ggplot2::geom_point(ggplot2::aes(size = pmax(d$di, 0.05))) +
-    ggplot2::scale_x_continuous(breaks = 1:9, limits = c(1, 9)) +
+    ggplot2::scale_x_continuous(breaks = axis$breaks, limits = axis$limits) +
     ggplot2::labs(title = "RAND/UCLA \u9002\u5b9c\u6027\uff08\u70b9\u5927\u5c0f\u53cd\u6620 DI\uff09",
                   x = "Median", y = NULL, colour = "\u5206\u7c7b", size = "DI") +
     .theme_delphi()
@@ -162,4 +163,24 @@ plot_attrition <- function(study) {
                        vjust = -0.4, size = 3.5) +
     ggplot2::labs(title = "\u5404\u8f6e\u5e94\u7b54\u4eba\u6570\u4e0e\u56de\u6536\u7387", x = "\u8f6e\u6b21", y = "\u5e94\u7b54\u4eba\u6570") +
     .theme_delphi()
+}
+
+.plot_protocol <- function(study) {
+  tryCatch(.match_protocol(study), error = function(e) NULL)
+}
+
+.plot_scale_axis <- function(study) {
+  proto <- .plot_protocol(study)
+  if (is.null(proto)) {
+    return(list(breaks = 1:9, limits = c(1, 9), bounds = c(3.5, 6.5)))
+  }
+  list(
+    breaks = seq(proto$scale_min, proto$scale_max),
+    limits = c(proto$scale_min, proto$scale_max),
+    bounds = c(proto$low_range[2] + 0.5, proto$high_range[1] - 0.5)
+  )
+}
+
+.plot_scale_breaks <- function(study) {
+  .plot_scale_axis(study)$breaks
 }

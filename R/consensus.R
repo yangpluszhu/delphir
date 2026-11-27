@@ -47,7 +47,7 @@ classify_consensus <- function(summary, protocol = NULL, study = NULL) {
     rand_ucla = {
       warning("RAND/UCLA \u8bf7\u4f7f\u7528 classify_rand()\u3002\u6b64\u5904\u6309 Median \u533a\u95f4\u7ed9\u51fa\u521d\u6b65\u6807\u7b7e\uff0c\u672a\u7eb3\u5165\u5206\u6b67\u3002",
               call. = FALSE)
-      .class_rand_median_only(summary)
+      .class_rand_median_only(summary, protocol)
     },
     .class_clinical(summary, protocol)
   )
@@ -147,9 +147,11 @@ classify_consensus <- function(summary, protocol = NULL, study = NULL) {
   list(class = rep("no_consensus", nrow(s)), action = rep("discuss", nrow(s)))
 }
 
-.class_rand_median_only <- function(s) {
+.class_rand_median_only <- function(s, protocol = NULL) {
+  low_cut <- if (is.null(protocol)) 3 else protocol$low_range[2]
+  high_cut <- if (is.null(protocol)) 7 else protocol$high_range[1]
   class <- ifelse(is.na(s$median), NA_character_,
-                  ifelse(s$median <= 3, "inappropriate",
-                         ifelse(s$median >= 7, "appropriate", "uncertain")))
+                  ifelse(s$median <= low_cut, "inappropriate",
+                         ifelse(s$median >= high_cut, "appropriate", "uncertain")))
   list(class = class, action = rep("discuss", nrow(s)))
 }

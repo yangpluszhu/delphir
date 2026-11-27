@@ -12,7 +12,8 @@ preset_protocol(scenario = "clinical_consensus", ...)
 
 \item{...}{覆盖预设的参数（必须是 \code{\link[=delphi_protocol]{delphi_protocol()}} 的形参名）。
 若改变共识或分歧阈值，请同时提供 \code{rationale}。未出现在 \code{...} 中的参数
-保持该场景默认值。}
+保持该场景默认值。\code{points = 5} 或 \code{7}，以及 \code{scale_max = 5} 或 \code{7}，
+会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。只改分制不算偏离预设。}
 }
 \value{
 \code{delphi_protocol} 对象，字段与 \code{\link[=delphi_protocol]{delphi_protocol()}} 相同。

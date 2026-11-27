@@ -73,17 +73,16 @@ vapply(
 
 默认 1–9：低 1–3、中 4–6、高 7–9。`p_high` 的分母是有效整数评分，「无法判断」不进入。
 
-若改成 1–5 分，必须同步改 `high_range` 和 `median_min`，否则「高区」仍按 7–9 切，所有条目的 `p_high` 都会是 0。
+5 分和 7 分不用逐个手写区间。`points = 5` 或 `scale_max = 5` 会把低/中/高区改成 1–2 / 3 / 4–5，并把 `median_min` 改成 4、`iqr_max` 改成 1。7 分对应 1–2 / 3–5 / 6–7，`median_min` 为 6，`iqr_max` 为 1.5。比例阈值（如 0.80）不随点数改变。显式写出的区间或阈值仍以你写的为准。
 
 ```{r}
-wrong <- delphi_protocol(
-  scenario = "clinical_consensus",
-  scale_max = 5,
-  high_pct = 0.80,
-  rationale = "错误示范：改了量表端点却没改高区。"
-)
-c(scale = paste(wrong$scale_min, wrong$scale_max, sep = "-"),
-  high_range = paste(wrong$high_range, collapse = "-"))
+p5 <- preset_protocol("clinical_consensus", points = 5)
+p7 <- preset_protocol("clinical_consensus", scale_max = 7)
+c(scale5 = paste(p5$scale_min, p5$scale_max, sep = "-"),
+  high5 = paste(p5$high_range, collapse = "-"),
+  median5 = p5$rules$median_min,
+  high7 = paste(p7$high_range, collapse = "-"),
+  median7 = p7$rules$median_min)
 ```
 
 # 5. 临床复合标准：`high_pct`、`basic_pct`、`median_min`、`iqr_max`、`reject_pct`

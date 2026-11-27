@@ -30,8 +30,12 @@
 #' @param scale_min,scale_max 评分尺度端点。除 `standard_element` 外默认 1 与 9。
 #'   `standard_element` 默认 1 与 5。须满足 `scale_min < scale_max`。
 #'   Likert 通常为整数；分析时非整数会警告。
-#'   改成其他量表时，必须同步改 `low_range`/`mid_range`/`high_range`，
-#'   否则区间端点会对不上。
+#'   5 分与 7 分不必手写区间：传入 `points = 5` 或 `points = 7`，
+#'   或只把 `scale_max` 改成 5 或 7（`scale_min` 仍为 1），低/中/高区、
+#'   `median_min`、`iqr_max`、稳定性中位数变化和 IPRAS 常数会按该分制自动填入。
+#'   显式传入的区间或阈值覆盖自动值。其他点数不会自动换算。
+#' @param points 可选。李克特点数，只能是 5、7 或 9。等价于 `scale_min = 1`、
+#'   `scale_max = points`，并触发该分制的自动预设。与端点同时给出时点数必须一致。
 #' @param low_range,mid_range,high_range 长度为 2 的数值向量，闭区间。
 #'   默认 1-9 量表下低 1-3、中 4-6、高 7-9。p_high / p_low 的分母是有效
 #'   Likert 评分（「无法判断」不进入）。区间应覆盖整个量表且不宜重叠。
@@ -42,7 +46,7 @@
 #' @param basic_pct 基本共识所需的高区比例下限（0–1），临床预设 0.75。
 #'   应不大于 high_pct。落在 basic_pct 与 high_pct 之间且 Median 达标时为基本共识
 #'   （可保留，但报告中应与高度共识分列）。
-#' @param median_min 共识所需的中位数下限，默认 7（即高区下沿）。
+#' @param median_min 共识所需的中位数下限。9 分默认 7，即高区下沿；5 分自动为 4，7 分自动为 6。
 #'   单独把百分比调高但把中位数降到 5，会把「意见集中在中区」误判为共识。
 #' @param iqr_max 高度共识允许的最大四分位距，默认 2。IQR 大表示两端仍拉开；
 #'   即使 0.80 的评分落在 7–9，若少数人打 1 分把 IQR 拉到 3，按预设不能叫高度共识。
@@ -234,7 +238,8 @@ delphi_protocol <- function(
     review_panel = NULL,
     open_first = FALSE,
     rationale = NULL,
-    locked = TRUE
+    locked = TRUE,
+    points = NULL
 ) {
   scenario <- match.arg(scenario)
   rand_disagreement <- match.arg(rand_disagreement)
@@ -281,24 +286,31 @@ delphi_protocol <- function(
       call. = FALSE
     )
   }
+  user_set_scale <- !missing(scale_min) || !missing(scale_max) ||
+    (!missing(points) && !is.null(points))
+  if (!missing(points) && !is.null(points)) {
+    points <- as.numeric(points)[1]
+    .stop_if(!(points %in% c(5, 7, 9)), "points \u53ea\u80fd\u662f 5\u30017 \u6216 9\u3002")
+    if (missing(scale_min)) scale_min <- 1
+    if (missing(scale_max)) scale_max <- points
+    .stop_if(
+      !isTRUE(all.equal(as.numeric(scale_max) - as.numeric(scale_min) + 1, points)),
+      "points \u4e0e scale_min\u3001scale_max \u4e0d\u4e00\u81f4\u3002"
+    )
+  }
   if (identical(scenario, "standard_element")) {
     ov <- .standard_element_overrides()
-    if (missing(scale_min)) scale_min <- ov$scale_min
-    if (missing(scale_max)) scale_max <- ov$scale_max
-    if (missing(low_range)) low_range <- ov$low_range
-    if (missing(mid_range)) mid_range <- ov$mid_range
-    if (missing(high_range)) high_range <- ov$high_range
+    if (!user_set_scale) {
+      scale_min <- ov$scale_min
+      scale_max <- ov$scale_max
+    }
     if (missing(high_pct)) high_pct <- ov$high_pct
     if (missing(basic_pct)) basic_pct <- ov$basic_pct
-    if (missing(median_min)) median_min <- ov$median_min
-    if (missing(iqr_max)) iqr_max <- ov$iqr_max
     if (missing(reject_pct)) reject_pct <- ov$reject_pct
     if (missing(cv_max)) cv_max <- ov$cv_max
     if (missing(max_rounds)) max_rounds <- ov$max_rounds
-    if (missing(mean_min)) mean_min <- ov$mean_min
     if (missing(w_min)) w_min <- ov$w_min
     if (missing(w_p_max)) w_p_max <- ov$w_p_max
-    if (missing(mean_delta_max)) mean_delta_max <- ov$mean_delta_max
     if (missing(min_experts)) min_experts <- ov$min_experts
     if (missing(response_rate_min)) response_rate_min <- ov$response_rate_min
     if (missing(cr_min)) cr_min <- ov$cr_min
@@ -324,11 +336,38 @@ delphi_protocol <- function(
   .stop_if(is.na(min_independent) || min_independent < 1L, "min_independent \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
   .stop_if(is.na(max_suggestions) || max_suggestions < 1L, "max_suggestions \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
   .stop_if(scale_min >= scale_max, "scale_min \u5fc5\u987b\u5c0f\u4e8e scale_max\u3002")
-  .stop_if(length(low_range) != 2L || length(high_range) != 2L, "\u533a\u95f4\u53c2\u6570\u5fc5\u987b\u662f\u957f\u5ea6 2 \u7684\u5411\u91cf\u3002")
+  n_pts <- .likert_point_count(scale_min, scale_max)
+  if (!is.na(n_pts) && n_pts %in% c(5L, 7L, 9L)) {
+    defs <- .preset_defaults(scenario, scale_min, scale_max)
+    if (missing(low_range)) low_range <- defs$low_range
+    if (missing(mid_range)) mid_range <- defs$mid_range
+    if (missing(high_range)) high_range <- defs$high_range
+    if (missing(median_min)) median_min <- defs$median_min
+    if (missing(iqr_max)) iqr_max <- defs$iqr_max
+    if (missing(stability_median_delta)) stability_median_delta <- defs$stability_median_delta
+    if (missing(rand_iprr)) rand_iprr <- defs$rand_iprr
+    if (missing(rand_cfa)) rand_cfa <- defs$rand_cfa
+    if (identical(scenario, "standard_element")) {
+      if (missing(mean_min)) mean_min <- defs$mean_min
+      if (missing(mean_delta_max)) mean_delta_max <- defs$mean_delta_max
+    }
+  } else if (missing(low_range) || missing(mid_range) || missing(high_range)) {
+    warning(
+      "\u91cf\u8868\u4e0d\u662f 5\u30017 \u6216 9 \u5206\uff0c\u4e0d\u4f1a\u81ea\u52a8\u6362\u7b97\u4f4e/\u4e2d/\u9ad8\u533a\u3002\u8bf7\u540c\u65f6\u8bbe\u5b9a\u8fd9\u4e09\u4e2a\u533a\u95f4\u3002",
+      call. = FALSE
+    )
+  }
+  .stop_if(length(low_range) != 2L || length(mid_range) != 2L || length(high_range) != 2L, "\u533a\u95f4\u53c2\u6570\u5fc5\u987b\u662f\u957f\u5ea6 2 \u7684\u5411\u91cf\u3002")
+  .stop_if(
+    any(low_range < scale_min | low_range > scale_max) ||
+      any(mid_range < scale_min | mid_range > scale_max) ||
+      any(high_range < scale_min | high_range > scale_max),
+    "\u4f4e\u533a\u3001\u4e2d\u533a\u548c\u9ad8\u533a\u5fc5\u987b\u843d\u5728\u91cf\u8868\u7aef\u70b9\u4e4b\u5185\u3002"
+  )
   .stop_if(any(c(high_pct, basic_pct, reject_pct) < 0 | c(high_pct, basic_pct, reject_pct) > 1),
            "\u6bd4\u4f8b\u9608\u503c\u5fc5\u987b\u5728 0 \u4e0e 1 \u4e4b\u95f4\u3002")
   if (scenario %in% c("clinical_consensus", "definition") && is.null(rationale)) {
-    defaults <- .preset_defaults(scenario)
+    defaults <- .preset_defaults(scenario, scale_min, scale_max)
     if (!isTRUE(all.equal(high_pct, defaults$high_pct)) ||
         !isTRUE(all.equal(basic_pct, defaults$basic_pct)) ||
         !isTRUE(all.equal(median_min, defaults$median_min)) ||
@@ -346,7 +385,7 @@ delphi_protocol <- function(
     if (missing(reject_pct)) reject_pct <- NA_real_
   }
   if (identical(scenario, "standard_element") && is.null(rationale)) {
-    defaults <- .preset_defaults(scenario)
+    defaults <- .preset_defaults(scenario, scale_min, scale_max)
     if (!isTRUE(all.equal(mean_min, defaults$mean_min)) ||
         !isTRUE(all.equal(w_min, defaults$w_min)) ||
         !isTRUE(all.equal(cv_max, defaults$cv_max)) ||
@@ -358,7 +397,7 @@ delphi_protocol <- function(
     }
   }
 
-  defaults <- .preset_defaults(scenario)
+  defaults <- .preset_defaults(scenario, scale_min, scale_max)
   if (scenario %in% c("rand_ucla", "delphi_ram") && is.null(rationale)) {
     if (!identical(rand_disagreement, defaults$rand_disagreement) ||
         !isTRUE(all.equal(rand_iprr, defaults$rand_iprr)) ||
@@ -417,11 +456,26 @@ delphi_protocol <- function(
     )
   }
 
+  sp_now <- likert_scale_preset(scale_min, scale_max)
+  ipras_match <- isTRUE(sp_now$auto) &&
+    isTRUE(all.equal(as.numeric(rand_iprr), sp_now$rand_iprr)) &&
+    isTRUE(all.equal(as.numeric(rand_cfa), sp_now$rand_cfa)) &&
+    identical(as.integer(rand_qtype), 7L)
+  ipras_rescaled <- isTRUE(sp_now$auto) && !identical(sp_now$points, 9L) && ipras_match
+  nonstandard_ipras <- if (isTRUE(sp_now$auto)) {
+    !ipras_match
+  } else {
+    !isTRUE(all.equal(as.numeric(rand_iprr), 2.35)) ||
+      !isTRUE(all.equal(as.numeric(rand_cfa), 1.5)) ||
+      !identical(as.integer(rand_qtype), 7L)
+  }
+
   structure(
     list(
       scenario = scenario,
       scale_min = as.numeric(scale_min),
       scale_max = as.numeric(scale_max),
+      likert_points = if (isTRUE(sp_now$auto)) sp_now$points else NA_integer_,
       low_range = as.numeric(low_range),
       mid_range = as.numeric(mid_range),
       high_range = as.numeric(high_range),
@@ -475,8 +529,8 @@ delphi_protocol <- function(
         percent_high = rand_percent_high,
         percent_low = rand_percent_low,
         purpose = rand_purpose,
-        nonstandard_ipras = !isTRUE(all.equal(rand_iprr, 2.35)) ||
-          !isTRUE(all.equal(rand_cfa, 1.5)) || !identical(rand_qtype, 7L)
+        ipras_rescaled = ipras_rescaled,
+        nonstandard_ipras = nonstandard_ipras
       ),
       authority_scale = authority_scale,
       rationale = rationale,
@@ -543,7 +597,7 @@ delphi_protocol <- function(
   )
 }
 
-.preset_defaults <- function(scenario) {
+.preset_defaults <- function(scenario, scale_min = 1, scale_max = NULL) {
   thresholds <- switch(
     scenario,
     clinical_consensus = list(
@@ -609,6 +663,26 @@ delphi_protocol <- function(
   if (identical(scenario, "standard_element")) {
     out <- utils::modifyList(out, .standard_element_overrides())
   }
+  if (is.null(scale_max)) scale_max <- out$scale_max
+  scale_min <- as.numeric(scale_min)[1]
+  scale_max <- as.numeric(scale_max)[1]
+  sp <- likert_scale_preset(scale_min, scale_max)
+  out$scale_min <- scale_min
+  out$scale_max <- scale_max
+  if (isTRUE(sp$auto)) {
+    out$low_range <- sp$low_range
+    out$mid_range <- sp$mid_range
+    out$high_range <- sp$high_range
+    if (!is.na(out$median_min)) out$median_min <- sp$median_min
+    if (!is.na(out$iqr_max)) out$iqr_max <- sp$iqr_max
+    out$rand_iprr <- sp$rand_iprr
+    out$rand_cfa <- sp$rand_cfa
+    out$stability_median_delta <- sp$stability_median_delta
+    if (identical(scenario, "standard_element")) {
+      out$mean_min <- sp$mean_min
+      out$mean_delta_max <- sp$mean_delta_max
+    }
+  }
   out
 }
 
@@ -643,7 +717,8 @@ delphi_protocol <- function(
 #'   `"clinical_consensus"`。
 #' @param ... 覆盖预设的参数（必须是 [delphi_protocol()] 的形参名）。
 #'   若改变共识或分歧阈值，请同时提供 `rationale`。未出现在 `...` 中的参数
-#'   保持该场景默认值。
+#'   保持该场景默认值。`points = 5` 或 `7`，以及 `scale_max = 5` 或 `7`，
+#'   会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。只改分制不算偏离预设。
 #'
 #' @return `delphi_protocol` 对象，字段与 [delphi_protocol()] 相同。
 #'
@@ -692,7 +767,31 @@ preset_protocol <- function(scenario = "clinical_consensus", ...) {
       "standard_element")
   )
   dots <- list(...)
-  args <- c(list(scenario = scenario), .preset_defaults(scenario))
+  if ("points" %in% names(dots) && is.null(dots$points)) dots$points <- NULL
+  if (!is.null(dots$points)) {
+    pts <- as.numeric(dots$points)[1]
+    .stop_if(!(pts %in% c(5, 7, 9)), "points \u53ea\u80fd\u662f 5\u30017 \u6216 9\u3002")
+    if (is.null(dots$scale_min)) dots$scale_min <- 1
+    if (is.null(dots$scale_max)) dots$scale_max <- pts
+    .stop_if(
+      !isTRUE(all.equal(as.numeric(dots$scale_max) - as.numeric(dots$scale_min) + 1, pts)),
+      "points \u4e0e scale_min\u3001scale_max \u4e0d\u4e00\u81f4\u3002"
+    )
+  }
+  scale_min <- if (is.null(dots$scale_min)) 1 else as.numeric(dots$scale_min)
+  scale_max <- if (is.null(dots$scale_max)) {
+    if (identical(scenario, "standard_element")) 5 else 9
+  } else {
+    as.numeric(dots$scale_max)
+  }
+  if (!isTRUE(likert_scale_preset(scale_min, scale_max)$auto) &&
+      is.null(dots$low_range) && is.null(dots$mid_range) && is.null(dots$high_range)) {
+    warning(
+      "\u91cf\u8868\u4e0d\u662f 5\u30017 \u6216 9 \u5206\uff0c\u4f4e/\u4e2d/\u9ad8\u533a\u3001median_min\u3001iqr_max \u4e0e IPRAS \u5e38\u6570\u4e0d\u4f1a\u81ea\u52a8\u6362\u7b97\u3002\u8bf7\u540c\u65f6\u8bbe\u5b9a\u8fd9\u4e9b\u53c2\u6570\u3002",
+      call. = FALSE
+    )
+  }
+  args <- c(list(scenario = scenario), .preset_defaults(scenario, scale_min, scale_max))
   if (length(dots)) args[names(dots)] <- dots
   do.call(delphi_protocol, args)
 }
@@ -840,7 +939,7 @@ print.delphi_protocol <- function(x, ...) {
 #' @export
 protocol_table <- function(protocol) {
   .stop_if(!inherits(protocol, "delphi_protocol"), "\u9700\u8981 delphi_protocol \u5bf9\u8c61\u3002")
-  d <- .preset_defaults(protocol$scenario)
+  d <- .preset_defaults(protocol$scenario, protocol$scale_min, protocol$scale_max)
   ni_def <- .new_item_defaults(protocol$scenario)
   recorded_new <- !is.null(protocol$new_items)
   ni <- if (recorded_new) protocol$new_items else ni_def
@@ -901,7 +1000,8 @@ protocol_table <- function(protocol) {
       "\u8ba1\u5212\u6700\u591a\u8f6e\u6b21"),
     c("stability_class_pct", fmt_num(protocol$stability$class_pct), "0.8",
       "\u7a33\u5b9a\u6027\uff1a\u5206\u7c7b\u4e0d\u53d8\u6bd4\u4f8b"),
-    c("stability_median_delta", fmt_num(protocol$stability$median_delta), "1",
+    c("stability_median_delta", fmt_num(protocol$stability$median_delta),
+      fmt_num(d$stability_median_delta %||% 1),
       "\u7a33\u5b9a\u6027\uff1aMedian \u53d8\u5316\u4e0a\u9650"),
     c("stability_high_pct_delta", fmt_num(protocol$stability$high_pct_delta), "0.1",
       "\u7a33\u5b9a\u6027\uff1a\u9ad8\u533a\u6bd4\u4f8b\u53d8\u5316\u4e0a\u9650"),

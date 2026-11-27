@@ -45,7 +45,7 @@ rand_disagreement(
 \item{boundary}{中位数恰为两个三分区的分界（默认 3.5 或 6.5）时如何处理。
 \code{"uncertain"} 归入不确定。}
 
-\item{scale}{量表端点。不是 1–9 时不得套用默认 IPRAS 常数。}
+\item{scale}{量表端点。5 分或 7 分且未另给区间时，自动使用该分制的三分区和换算后的 IPRAS 常数。不是 5、7、9 分时不要沿用 2.35 与 1.5。}
 }
 \value{
 一行数据框。主分类在 \code{class}（appropriate / uncertain / inappropriate）。

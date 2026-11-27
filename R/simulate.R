@@ -8,6 +8,7 @@
 #' @param n_rounds 轮次数，默认 2。
 #' @param seed 随机种子，保证可复现。
 #' @param include_authority 是否生成熟悉程度/判断依据原始勾选及 Ca/Cs，默认 `TRUE`。
+#' @param points 李克特点数，只能是 5、7 或 9。默认 9。方案阈值随点数自动锁定。
 #'
 #' @return [delphi_study()] 对象，`meta` 中含条目原型说明。
 #'
@@ -22,14 +23,15 @@
 #'
 #' @export
 simulate_delphi <- function(n_experts = 40, n_items = 20, n_rounds = 2,
-                            seed = 2026, include_authority = TRUE) {
+                            seed = 2026, include_authority = TRUE, points = 9) {
   set.seed(seed)
   n_experts <- as.integer(n_experts)
   n_items <- as.integer(n_items)
   n_rounds <- as.integer(n_rounds)
   .stop_if(n_experts < 6 || n_items < 4 || n_rounds < 1, "\u6a21\u62df\u89c4\u6a21\u8fc7\u5c0f\u3002")
+  points <- .as_sim_points(points)
 
-  protocol <- preset_protocol("clinical_consensus")
+  protocol <- preset_protocol("clinical_consensus", points = points)
   stakeholders <- c("\u4e34\u5e8a\u533b\u751f", "\u65b9\u6cd5\u5b66\u4e13\u5bb6", "\u836f\u5b66\u4e13\u5bb6", "\u76d1\u7ba1\u4eba\u5458")
   n_st <- c(
     max(2L, round(n_experts * 0.50)),
@@ -75,7 +77,7 @@ simulate_delphi <- function(n_experts = 40, n_items = 20, n_rounds = 2,
     stringsAsFactors = FALSE
   )
 
-  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "clinical")
+  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "clinical", points = points)
   comments <- .simulate_comments(panel, items, ratings)
 
   meta <- list(
@@ -100,6 +102,7 @@ simulate_delphi <- function(n_experts = 40, n_items = 20, n_rounds = 2,
 #' @param n_items 指征数，默认 24。
 #' @param n_rounds 轮次数，默认 2。
 #' @param seed 随机种子。
+#' @param points 李克特点数，只能是 5、7 或 9。默认 9。
 #'
 #' @return [delphi_study()] 对象，场景为 `rand_ucla`。
 #'
@@ -108,11 +111,13 @@ simulate_delphi <- function(n_experts = 40, n_items = 20, n_rounds = 2,
 #' ram$protocol$scenario
 #'
 #' @export
-simulate_rand_ucla <- function(n_experts = 9, n_items = 24, n_rounds = 2, seed = 2026) {
+simulate_rand_ucla <- function(n_experts = 9, n_items = 24, n_rounds = 2, seed = 2026,
+                              points = 9) {
   set.seed(seed)
   n_experts <- as.integer(n_experts)
   n_items <- as.integer(n_items)
-  protocol <- preset_protocol("rand_ucla")
+  points <- .as_sim_points(points)
+  protocol <- preset_protocol("rand_ucla", points = points)
   specs <- c("\u5fc3\u5185\u79d1", "\u5fc3\u810f\u5916\u79d1", "\u5f71\u50cf\u79d1", "\u5168\u79d1", "\u65b9\u6cd5\u5b66")
   panel <- data.frame(
     expert_id = sprintf("P%d", seq_len(n_experts)),
@@ -135,7 +140,7 @@ simulate_rand_ucla <- function(n_experts = 9, n_items = 24, n_rounds = 2, seed =
     pattern = patterns,
     stringsAsFactors = FALSE
   )
-  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "rand")
+  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "rand", points = points)
   comments <- .simulate_comments(panel, items, ratings, ram = TRUE)
   meta <- list(
     title = "\u7a33\u5b9a\u578b\u51a0\u5fc3\u75c5\u8840\u8fd0\u91cd\u5efa\u9002\u5b9c\u6027\u8bc4\u4ef7\uff08\u6a21\u62df RAND/UCLA \u9762\u677f\uff09",
@@ -158,6 +163,7 @@ simulate_rand_ucla <- function(n_experts = 9, n_items = 24, n_rounds = 2, seed =
 #' @param n_items 结局数，默认 25。
 #' @param n_rounds 轮次数，默认 2。
 #' @param seed 随机种子。
+#' @param points 李克特点数，只能是 5、7 或 9。默认 9。
 #'
 #' @return [delphi_study()] 对象，场景为 `comet_cos`。
 #'
@@ -168,9 +174,10 @@ simulate_rand_ucla <- function(n_experts = 9, n_items = 24, n_rounds = 2, seed =
 #'
 #' @export
 simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
-                         n_items = 25, n_rounds = 2, seed = 2026) {
+                         n_items = 25, n_rounds = 2, seed = 2026, points = 9) {
   set.seed(seed)
-  protocol <- preset_protocol("comet_cos")
+  points <- .as_sim_points(points)
+  protocol <- preset_protocol("comet_cos", points = points)
   n_c <- as.integer(n_clinicians)
   n_p <- as.integer(n_patients)
   n_r <- as.integer(n_researchers)
@@ -201,7 +208,7 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
     pattern = patterns,
     stringsAsFactors = FALSE
   )
-  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "cos")
+  ratings <- .simulate_ratings(panel, items, n_rounds, scenario = "cos", points = points)
   comments <- .simulate_comments(panel, items, ratings, cos = TRUE)
   meta <- list(
     title = "IgA \u80be\u75c5\u4e34\u5e8a\u8bd5\u9a8c\u6838\u5fc3\u7ed3\u5c40\u96c6\uff08\u6a21\u62df COMET Delphi\uff09",
@@ -254,8 +261,14 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
   base[seq_len(n)]
 }
 
+.as_sim_points <- function(points) {
+  points <- as.integer(points)[1]
+  .stop_if(!(points %in% c(5L, 7L, 9L)), "points \u53ea\u80fd\u662f 5\u30017 \u6216 9\u3002")
+  points
+}
+
 .draw_from <- function(n, probs) {
-  sample.int(9, n, replace = TRUE, prob = probs)
+  sample.int(length(probs), n, replace = TRUE, prob = probs)
 }
 
 .pattern_probs <- function(pattern, round, stakeholder = NULL, scenario = "clinical") {
@@ -313,7 +326,7 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
   )
 }
 
-.simulate_ratings <- function(panel, items, n_rounds, scenario = "clinical") {
+.simulate_ratings <- function(panel, items, n_rounds, scenario = "clinical", points = 9L) {
   rows <- list()
   n_experts <- nrow(panel)
   drop_round2 <- if (n_rounds >= 2) sample(panel$expert_id, size = max(1L, floor(n_experts * 0.08))) else character()
@@ -330,7 +343,8 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
       st <- panel$stakeholder[panel$expert_id == eid]
       for (j in seq_len(nrow(items))) {
         pat <- items$pattern[j]
-        probs <- .pattern_probs(pat, rnd, st, scenario)
+        probs9 <- .pattern_probs(pat, rnd, st, scenario)
+        probs <- .collapse_likert_probs(probs9, points)
         score <- .draw_from(1L, probs)
         unable <- FALSE
         if (scenario == "clinical" && identical(st, "\u76d1\u7ba1\u4eba\u5458") &&
@@ -354,9 +368,9 @@ simulate_cos <- function(n_clinicians = 40, n_patients = 25, n_researchers = 15,
           stringsAsFactors = FALSE
         )
         if (scenario == "clinical" && rnd == 1L && runif(1) < 0.85) {
-          feas_probs <- probs
-          feas_shift <- pmax(probs * c(1.1, 1.1, 1.05, 1, 1, 0.95, 0.9, 0.85, 0.8), 0)
+          feas_shift <- pmax(probs9 * c(1.1, 1.1, 1.05, 1, 1, 0.95, 0.9, 0.85, 0.8), 0)
           feas_shift <- feas_shift / sum(feas_shift)
+          feas_shift <- .collapse_likert_probs(feas_shift, points)
           rows[[length(rows) + 1L]] <- data.frame(
             expert_id = eid,
             item_id = items$item_id[j],

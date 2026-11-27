@@ -56,7 +56,8 @@ delphi_protocol(
   review_panel = NULL,
   open_first = FALSE,
   rationale = NULL,
-  locked = TRUE
+  locked = TRUE,
+  points = NULL
 )
 }
 \arguments{
@@ -87,8 +88,10 @@ high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
 \item{scale_min, scale_max}{评分尺度端点。除 \code{standard_element} 外默认 1 与 9。
 \code{standard_element} 默认 1 与 5。须满足 \code{scale_min < scale_max}。
 Likert 通常为整数；分析时非整数会警告。
-改成其他量表时，必须同步改 \code{low_range}/\code{mid_range}/\code{high_range}，
-否则区间端点会对不上。}
+5 分与 7 分不必手写区间：传入 \code{points = 5} 或 \code{points = 7}，
+或只把 \code{scale_max} 改成 5 或 7（\code{scale_min} 仍为 1），低/中/高区、
+\code{median_min}、\code{iqr_max}、稳定性中位数变化和 IPRAS 常数会按该分制自动填入。
+显式传入的区间或阈值覆盖自动值。其他点数不会自动换算。}
 
 \item{low_range, mid_range, high_range}{长度为 2 的数值向量，闭区间。
 默认 1-9 量表下低 1-3、中 4-6、高 7-9。p_high / p_low 的分母是有效
@@ -103,7 +106,7 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 应不大于 high_pct。落在 basic_pct 与 high_pct 之间且 Median 达标时为基本共识
 （可保留，但报告中应与高度共识分列）。}
 
-\item{median_min}{共识所需的中位数下限，默认 7（即高区下沿）。
+\item{median_min}{共识所需的中位数下限。9 分默认 7，即高区下沿；5 分自动为 4，7 分自动为 6。
 单独把百分比调高但把中位数降到 5，会把「意见集中在中区」误判为共识。}
 
 \item{iqr_max}{高度共识允许的最大四分位距，默认 2。IQR 大表示两端仍拉开；
@@ -226,6 +229,9 @@ Policy 与 5 分核心技术要素为 \code{FALSE}。}
 而未填此项时会警告。}
 
 \item{locked}{是否锁定阈值。默认 \code{TRUE}。锁定后分析阶段不得把阈值当参数回改。}
+
+\item{points}{可选。李克特点数，只能是 5、7 或 9。等价于 \code{scale_min = 1}、
+\code{scale_max = points}，并触发该分制的自动预设。与端点同时给出时点数必须一致。}
 }
 \value{
 带类 \code{"delphi_protocol"} 的列表。主要字段：

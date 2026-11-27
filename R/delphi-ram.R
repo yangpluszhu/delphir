@@ -90,10 +90,7 @@
   rule <- switch(
     s$rule,
     table4 = "\u624b\u518c\u8868 4\uff1a\u6309\u8be5\u6761\u76ee\u5b9e\u9645\u5e94\u7b54\u4eba\u6570\u67e5\u4e00\u81f4\u4e0e\u5206\u6b67\u9608\u503c\uff08Fitch \u7b49\uff0c2001\uff09\u3002\u9002\u5b9c\u6027\u770b\u4e2d\u4f4d\u6570\u533a\u95f4\u4e0e\u662f\u5426\u5206\u6b67\uff0c\u4e0d\u628a\u66f4\u4e25\u683c\u7684\u201c\u4e00\u81f4\u201d\u5f53\u6210\u9002\u5b9c\u7684\u5fc5\u8981\u6761\u4ef6\u3002",
-    ipras = sprintf(
-      "IPRAS\uff1aIPR = P70 - P30\uff0cIPRAS = %s + %s \u00d7 |5 - IPR \u4e2d\u5fc3|\u3002IPR \u4e25\u683c\u5927\u4e8e IPRAS \u624d\u7b97\u5206\u6b67\u3002\u5206\u4f4d\u6570 type = %s\u3002\u6807\u51c6\u5e38\u6570\u53ea\u7528\u4e8e 1\u20139 \u5206\u3002",
-      s$iprr, s$cfa, s$qtype
-    ),
+    ipras = .ipras_rule_text(p, s$iprr, s$cfa, s$qtype, ram = TRUE),
     percent = sprintf(
       "\u81ea\u5b9a\u4e49\u767e\u5206\u6bd4\uff08RAM \u4fee\u6539\u7248\uff09\uff1a\u9ad8\u533a\u6bd4\u4f8b \u2265 %.0f%% \u4e14\u4f4e\u533a\u6bd4\u4f8b < %.0f%%\u3001\u4e2d\u4f4d\u6570\u5728\u9ad8\u533a\uff0c\u4e3a\u8d5e\u540c\u5171\u8bc6\uff1b\u4f4e\u533a\u6bd4\u4f8b \u2265 %.0f%% \u4e14\u9ad8\u533a\u6bd4\u4f8b < %.0f%%\u3001\u4e2d\u4f4d\u6570\u5728\u4f4e\u533a\uff0c\u4e3a\u4e0d\u8d5e\u540c\u5171\u8bc6\uff1b\u4e24\u7aef\u6bd4\u4f8b\u90fd \u2265 %.0f%% \u4e3a\u5206\u6b67\u3002\u4e2d\u4f4d\u6570\u5728\u6781\u7aef\u533a\u4f46\u6bd4\u4f8b\u672a\u8fbe\u6807\uff0c\u4ecd\u662f\u672a\u8fbe\u6210\u5171\u8bc6\u3002\u4e0d\u5957\u7528\u8868 4 \u6216 IPRAS \u4f5c\u4e3b\u5224\u5b9a\u3002",
       100 * s$percent_high, 100 * s$percent_low,
@@ -111,16 +108,16 @@
   paste(c(
     sprintf("- **\u6d41\u7a0b\uff1a** \u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\u3002\u533f\u540d\u591a\u8f6e\u51fd\u8be2\uff0c\u4e0d\u662f\u7ecf\u5178\u4e24\u8f6e\u9762\u5bf9\u9762\u9002\u5b9c\u6027\u4e13\u5bb6\u7ec4\u3002\u540e\u7eed\u8f6e\u4e3a%s\u3002", mode),
     sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s\u3002%s", p$scale_min, p$scale_max,
-            if (identical(s$rule, "percent")) {
-              "1 \u8868\u793a\u5f3a\u70c8\u53cd\u5bf9\uff0c9 \u8868\u793a\u5f3a\u70c8\u540c\u610f\u3002"
-            } else {
-              "1 \u8868\u793a\u9884\u671f\u5371\u5bb3\u8fdc\u5927\u4e8e\u83b7\u76ca\uff0c9 \u8868\u793a\u9884\u671f\u83b7\u76ca\u8fdc\u5927\u4e8e\u5371\u5bb3\u3002"
-            }),
+            .rand_anchor_text(
+              if (identical(s$rule, "percent")) "recommendation" else "appropriateness",
+              p$scale_min, p$scale_max
+            )),
     sprintf("- **\u9501\u5b9a\u89c4\u5219\uff1a** %s", rule),
+    .ipras_rescale_note(p),
     if (identical(s$rule, "percent")) {
       "- **\u9002\u5b9c\u6027\u5217\uff1a** \u7531\u540c\u4e00\u5957\u767e\u5206\u6bd4\u5224\u5b9a\u6620\u5c04\u800c\u6765\uff0c\u5e76\u6807\u4e3a RAM \u4fee\u6539\u7248\u3002"
     } else {
-      "- **\u9002\u5b9c\u6027\uff1a** \u4e2d\u4f4d\u6570 7\u20139 \u4e14\u65e0\u5206\u6b67\u4e3a\u9002\u5b9c\uff1b1\u20133 \u4e14\u65e0\u5206\u6b67\u4e3a\u4e0d\u9002\u5b9c\uff1b\u4e2d\u4f4d\u6570 4\u20136\uff0c\u6216\u4efb\u4f55\u5206\u6b67\uff0c\u4e3a\u4e0d\u786e\u5b9a\u3002\u4e2d\u4f4d\u6570 3.5 \u6216 6.5 \u9ed8\u8ba4\u4e3a\u4e0d\u786e\u5b9a\u3002\u5171\u8bc6\u7528\u8bed\u53ea\u662f\u8fd9\u4e9b\u7ed3\u679c\u7684\u62a5\u544a\u540d\u79f0\u3002\u201c\u65e0\u5206\u6b67\u201d\u4e0d\u7b49\u4e8e\u201c\u4e00\u81f4\u201d\u3002"
+      .appropriateness_rule_line(p, ram = TRUE)
     },
     sprintf("- **\u8f6e\u6b21\uff1a** \u6700\u591a %s \u8f6e\u3002\u6bcf\u8f6e\u590d\u8bc4\u5168\u90e8\u6761\u76ee\u3002\u5206\u6b67\u53ef\u4ee5\u662f\u6700\u7ec8\u7ed3\u679c\uff0c\u4e0d\u9760\u52a0\u8f6e\u628a\u5206\u6b67\u6d82\u6389\u3002", p$stability$max_rounds %||% 3L),
     "- **\u4e0d\u53c2\u4e0e\u5224\u5b9a\uff1a** \u4e34\u5e8a\u5171\u8bc6\u7684 high_pct\u3001\u6743\u5a01\u7cfb\u6570\u548c Kendall's W \u53ea\u4f5c\u8865\u5145\u6216\u5bf9\u7167\u3002"
@@ -403,7 +400,7 @@ delphi_ram_sensitivity <- function(study, round = NULL) {
       paste0(
         "### ", iid, "\n\n",
         "**", study$items$item_text[match(iid, study$items$item_id)], "**\n\n",
-        "| \u60a8\u7684\u4e0a\u8f6e\u8bc4\u5206 | \u4e2d\u4f4d\u6570 | 1\u20133 | 4\u20136 | 7\u20139 | \u5206\u6b67 | \u5206\u7c7b |\n",
+        .likert_feedback_header(p),
         "|---|---|---|---|---|---|---|\n",
         sprintf("| %s | %s | %s | %s | %s | %s | %s |\n\n",
                 own_txt,
@@ -545,7 +542,8 @@ next_delphi_ram_questionnaire <- function(result, format = "both", file = NULL, 
     max_rounds = p$stability$max_rounds %||% 3L,
     percent_high = s$percent_high,
     percent_low = s$percent_low,
-    modified_ram = identical(s$rule, "percent") || isTRUE(p$rand$nonstandard_ipras),
+    modified_ram = identical(s$rule, "percent") || isTRUE(p$rand$nonstandard_ipras) || isTRUE(p$rand$ipras_rescaled) || !isTRUE(.scale_is_19(p$scale_min, p$scale_max)),
+    ipras_rescaled = isTRUE(p$rand$ipras_rescaled),
     deviation = "\u533f\u540d\u591a\u8f6e\u51fd\u8be2\uff0c\u9ed8\u8ba4\u6700\u591a 3 \u8f6e\uff0c\u4e0d\u662f\u7ecf\u5178 RAM \u7684\u4e24\u8f6e\u9762\u5bf9\u9762\u4f1a\u8bae\u3002\u7b2c 3 \u8f6e\u4e0d\u7528\u6765\u6d88\u9664\u5206\u6b67\u3002",
     supplement = "\u6743\u5a01\u7cfb\u6570\u4e0e Kendall's W \u53ea\u4f5c\u8865\u5145\uff0c\u4e0d\u66ff\u4ee3\u4e2d\u4f4d\u6570\u3001\u5206\u6b67\u548c\u9002\u5b9c\u6027\u6216\u767e\u5206\u6bd4\u5171\u8bc6\u5206\u7c7b\u3002"
   )

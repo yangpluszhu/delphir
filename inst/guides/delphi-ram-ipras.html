@@ -12,32 +12,45 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-10" />
+<meta name="date" content="2026-11-25" />
 
 <title>教学文档 13：改良德尔菲结合 IPRAS</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -53,55 +66,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -135,7 +147,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -149,182 +341,230 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 13：改良德尔菲结合 IPRAS</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-10</h4>
+<h4 class="date">2026-11-25</h4>
 
 
 
 <div id="这次要完成什么" class="section level1">
 <h1>1. 这次要完成什么</h1>
-<p>IPRAS 是 RAM 手册附录里的另一套分歧定义，不是表 4 的别名。计算是：</p>
+<p>IPRAS 是 RAM 手册附录里的另一套分歧定义，不是表 4
+的别名。计算是：</p>
 <ul>
-<li>IPR = 第 70 百分位数 − 第 30 百分位数。本包用 R 的分位数 <code>type = 7</code>。</li>
+<li>IPR = 第 70 百分位数 − 第 30 百分位数。本包用 R 的分位数
+<code>type = 7</code>。</li>
 <li>IPR 的中心 IPRCP = (P30 + P70) / 2。</li>
 <li>非对称指数 AI = |5 − IPRCP|。</li>
 <li>IPRAS = 2.35 + 1.5 × AI。</li>
 <li><strong>IPR 严格大于 IPRAS</strong> 才算分歧。相等不算。</li>
 </ul>
-<p>分布整体偏高或偏低时，AI 变大，IPRAS 阈值放宽。所以同一组分数，表 4 可以判分歧，IPRAS 可以不判。必须在第 1 轮前选定一种，不能两种都算完再挑好看的。</p>
-<p>流程仍是改良德尔菲：匿名函询，默认 3 轮，每轮复评全部条目。2.35 和 1.5 只适用于 1–9 分。其他量表不能套用这两常数，应改用百分比规则，或事先写明非标准常数和理由。</p>
-<p>样本是 <code>simulate_delphi_ram(&quot;ipras&quot;)</code>，安装后为 <code>data(delphi_ram_ipras_demo)</code>。9 名专家、6 条陈述、三轮。分数与表 4 教程相同，方便看出<strong>唯一被规则改变的那一条</strong>。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_delphi_ram</span>(<span class="st">&quot;ipras&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>rule</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ipras&quot;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>meta<span class="sc">$</span>objective</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;用 IPRAS 判定分歧，再按中位数区间给出适宜性。流程是匿名三轮函询，不是经典两轮面对面专家组。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 规则已经锁成 <code>ipras</code>。目的句写的是 IPRAS，不是表 4，也不是百分比。</p>
+<p>分布整体偏高或偏低时，AI 变大，IPRAS 阈值放宽。所以同一组分数，表 4
+可以判分歧，IPRAS 可以不判。必须在第 1
+轮前选定一种，不能两种都算完再挑好看的。</p>
+<p>流程仍是改良德尔菲：匿名函询，默认 3 轮，每轮复评全部条目。2.35 和
+1.5 只适用于 1–9
+分。其他量表不能套用这两常数，应改用百分比规则，或事先写明非标准常数和理由。</p>
+<p>样本是 <code>simulate_delphi_ram(&quot;ipras&quot;)</code>，安装后为
+<code>data(delphi_ram_ipras_demo)</code>。9 名专家、6
+条陈述、三轮。分数与表 4
+教程相同，方便看出<strong>唯一被规则改变的那一条</strong>。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_delphi_ram</span>(<span class="st">&quot;ipras&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>ram<span class="sc">$</span>protocol<span class="sc">$</span>rand<span class="sc">$</span>rule</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ipras&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>ram<span class="sc">$</span>meta<span class="sc">$</span>objective</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;用 IPRAS 判定分歧，再按中位数区间给出适宜性。流程是匿名三轮函询，不是经典两轮面对面专家组。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 规则已经锁成 <code>ipras</code>。目的句写的是
+IPRAS，不是表 4，也不是百分比。</p>
 </div>
 <div id="方案里哪些数真的会用" class="section level1">
 <h1>2. 方案里哪些数真的会用</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ram<span class="sc">$</span>protocol</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>rand[<span class="fu">c</span>(<span class="st">&quot;rule&quot;</span>, <span class="st">&quot;iprr&quot;</span>, <span class="st">&quot;cfa&quot;</span>, <span class="st">&quot;qtype&quot;</span>, <span class="st">&quot;round2_mode&quot;</span>, <span class="st">&quot;nonstandard_ipras&quot;</span>)]</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ipras&quot;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $iprr</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2.35</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $cfa</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1.5</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $qtype</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 7</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $round2_mode</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $nonstandard_ipras</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>rules<span class="sc">$</span>high_pct</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">protocol_table</span>(p)[<span class="fu">protocol_table</span>(p)<span class="sc">$</span>parameter <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;rand_disagreement&quot;</span>, <span class="st">&quot;rand_iprr&quot;</span>, <span class="st">&quot;rand_cfa&quot;</span>, <span class="st">&quot;rand_qtype&quot;</span>, <span class="st">&quot;max_rounds&quot;</span>), ]</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            parameter value preset modified</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 rand_disagreement ipras table4     TRUE</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21         rand_iprr  2.35   2.35    FALSE</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22          rand_cfa   1.5    1.5    FALSE</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23        rand_qtype     7      7    FALSE</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27        max_rounds     3      3    FALSE</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          meaning</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 RAND 规则：table4 / ipras / classic_relaxed / classic_strict / percent / both</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21                                                  IPRAS 常数 IPRr，标准为 2.35</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22                                              IPRAS 非对称校正 CFA，标准为 1.5</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23                                                     分位数算法，标准为 type 7</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27                                                                  计划最多轮次</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> ram<span class="sc">$</span>protocol</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p<span class="sc">$</span>rand[<span class="fu">c</span>(<span class="st">&quot;rule&quot;</span>, <span class="st">&quot;iprr&quot;</span>, <span class="st">&quot;cfa&quot;</span>, <span class="st">&quot;qtype&quot;</span>, <span class="st">&quot;round2_mode&quot;</span>, <span class="st">&quot;nonstandard_ipras&quot;</span>)]</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ipras&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; $iprr</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; [1] 2.35</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt; $cfa</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] 1.5</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; $qtype</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; [1] 7</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; $round2_mode</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; $nonstandard_ipras</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>p<span class="sc">$</span>rules<span class="sc">$</span>high_pct</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="fu">protocol_table</span>(p)[<span class="fu">protocol_table</span>(p)<span class="sc">$</span>parameter <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;rand_disagreement&quot;</span>, <span class="st">&quot;rand_iprr&quot;</span>, <span class="st">&quot;rand_cfa&quot;</span>, <span class="st">&quot;rand_qtype&quot;</span>, <span class="st">&quot;max_rounds&quot;</span>), ]</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt;            parameter value preset modified</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; 16 rand_disagreement ipras table4     TRUE</span></span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; 21         rand_iprr  2.35   2.35    FALSE</span></span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 22          rand_cfa   1.5    1.5    FALSE</span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 23        rand_qtype     7      7    FALSE</span></span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a><span class="co">#&gt; 27        max_rounds     3      3    FALSE</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a><span class="co">#&gt;                                                                          meaning</span></span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a><span class="co">#&gt; 16 RAND 规则：table4 / ipras / classic_relaxed / classic_strict / percent / both</span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a><span class="co">#&gt; 21                                                  IPRAS 常数 IPRr，标准为 2.35</span></span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="co">#&gt; 22                                              IPRAS 非对称校正 CFA，标准为 1.5</span></span>
+<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; 23                                                     分位数算法，标准为 type 7</span></span>
+<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; 27                                                                  计划最多轮次</span></span></code></pre></div>
 <p><strong>解读：</strong></p>
 <ul>
-<li>IPRr = 2.35，CFA = 1.5，分位数 type = 7。<code>nonstandard_ipras = FALSE</code>，报告不必写成非标准常数。</li>
-<li>函询仍是 <code>mail</code>，最多 3 轮。这和经典两轮面对面专家组不同，和所选的分歧公式是两件事。</li>
-<li><code>high_pct</code> 仍是 <code>NA</code>。不要用 80% 高区比例覆盖 IPRAS。</li>
-<li>因为默认预设是表 4，改成 IPRAS 会标成偏离预设。理由已经写在方案里：这是事先规定的规则，不是看到 ST05 之后才改的。</li>
+<li>IPRr = 2.35，CFA = 1.5，分位数 type =
+7。<code>nonstandard_ipras = FALSE</code>，报告不必写成非标准常数。</li>
+<li>函询仍是 <code>mail</code>，最多 3
+轮。这和经典两轮面对面专家组不同，和所选的分歧公式是两件事。</li>
+<li><code>high_pct</code> 仍是 <code>NA</code>。不要用 80% 高区比例覆盖
+IPRAS。</li>
+<li>因为默认预设是表 4，改成 IPRAS
+会标成偏离预设。理由已经写在方案里：这是事先规定的规则，不是看到 ST05
+之后才改的。</li>
 </ul>
 </div>
 <div id="问卷仍然复评全部条目" class="section level1">
 <h1>3. 问卷仍然复评全部条目</h1>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-ipras-&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round1&quot;</span>))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(q1)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round1.docx&quot; &quot;round1.xlsx&quot;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round3.docx&quot;</span>))</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(q2)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round3.docx&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 第 1 轮 docx 与 xlsx 都有。第 3 轮问卷可以生成，软件不会因为它不是经典 RAM 的第 2 轮而拒绝。问卷文字会说明：这是再次函询，分歧可以保留。第 3 轮仍然列出全部条目。xlsx 可用 <code>read_survey_xlsx()</code> 读回；读回时只传入新的一轮，不要把已经入库的轮次再覆盖一次。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-ipras-&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round1&quot;</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">basename</span>(q1)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round1.docx&quot; &quot;round1.xlsx&quot;</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round3.docx&quot;</span>))</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">basename</span>(q2)</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round3.docx&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 第 1 轮 docx 与 xlsx 都有。第 3
+轮问卷可以生成，软件不会因为它不是经典 RAM 的第 2
+轮而拒绝。问卷文字会说明：这是再次函询，分歧可以保留。第 3
+轮仍然列出全部条目。xlsx 可用 <code>read_survey_xlsx()</code>
+读回；读回时只传入新的一轮，不要把已经入库的轮次再覆盖一次。</p>
 </div>
 <div id="第-1-轮哪一条和表-4-不同" class="section level1">
 <h1>4. 第 1 轮：哪一条和表 4 不同</h1>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>r1 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>r1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;p30&quot;</span>, <span class="st">&quot;p70&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ai&quot;</span>, <span class="st">&quot;ipras&quot;</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;table4_disagreement&quot;</span>, <span class="st">&quot;ipras_disagreement&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id median n_low n_high p30 p70 ipr  ai ipras table4_disagreement</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    ST01      8     0      9 8.0 8.6 0.6 3.3  7.30               FALSE</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    ST02      2     9      0 1.4 2.0 0.6 3.3  7.30               FALSE</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    ST03      5     0      0 5.0 5.0 0.0 0.0  2.35               FALSE</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    ST04      5     4      4 2.4 7.6 5.2 0.0  2.35                TRUE</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    ST05      8     3      6 4.6 8.0 3.4 1.3  4.30                TRUE</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    ST06      7     0      6 6.4 7.6 1.2 2.0  5.35               FALSE</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ipras_disagreement                     class_zh             consensus_zh</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1              FALSE                         适宜                 正向共识</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2              FALSE                       不适宜                 负向共识</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3              FALSE 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4               TRUE           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5              FALSE                         适宜                 正向共识</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6              FALSE                         适宜                 正向共识</span></span></code></pre></div>
-<p><strong>解读：</strong> 主判定看 <code>ipras_disagreement</code>，不看 <code>table4_disagreement</code>。两列都打印，是为了能核对，不是为了事后改规则。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>r1 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>r1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;p30&quot;</span>, <span class="st">&quot;p70&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ai&quot;</span>, <span class="st">&quot;ipras&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>       <span class="st">&quot;table4_disagreement&quot;</span>, <span class="st">&quot;ipras_disagreement&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt;   item_id median n_low n_high p30 p70 ipr  ai ipras table4_disagreement</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; 1    ST01      8     0      9 8.0 8.6 0.6 3.3  7.30               FALSE</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; 2    ST02      2     9      0 1.4 2.0 0.6 3.3  7.30               FALSE</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; 3    ST03      5     0      0 5.0 5.0 0.0 0.0  2.35               FALSE</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 4    ST04      5     4      4 2.4 7.6 5.2 0.0  2.35                TRUE</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 5    ST05      8     3      6 4.6 8.0 3.4 1.3  4.30                TRUE</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 6    ST06      7     0      6 6.4 7.6 1.2 2.0  5.35               FALSE</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;   ipras_disagreement                     class_zh             consensus_zh</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 1              FALSE                         适宜                 正向共识</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 2              FALSE                       不适宜                 负向共识</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 3              FALSE 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 4               TRUE           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 5              FALSE                         适宜                 正向共识</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 6              FALSE                         适宜                 正向共识</span></span></code></pre></div>
+<p><strong>解读：</strong> 主判定看
+<code>ipras_disagreement</code>，不看
+<code>table4_disagreement</code>。两列都打印，是为了能核对，不是为了事后改规则。</p>
 <ul>
 <li>ST01：分数集中在高区。IPR 远小于 IPRAS。适宜，正向共识。</li>
-<li>ST02：分数集中在低区。不适宜，负向共识。IPRAS 并不妨碍「明确不适宜」这个结论。</li>
-<li>ST03：中位数 5，分数挤在中区。IPR 很小，无分歧，但中位数在 4–6，所以是不确定（中位数居中），不是正向共识。</li>
-<li>ST04：两端对拉。P30 低、P70 高，IPR 大于 IPRAS。表 4 和 IPRAS <strong>都</strong>判分歧。不确定（存在分歧）。中位数 5 是两派对拉的结果，不是温和的中间意见。</li>
-<li>ST05：中位数 8，低区有 3 人。表 4 认为这是分歧。IPR 约 3.4，分布中心高于 5，AI 把 IPRAS 抬到约 4.3，因此 IPR 没有超过 IPRAS，IPRAS <strong>不</strong>判分歧。在本方案下，ST05 是适宜、正向共识。若方案锁的是表 4，同一条必须保持不确定。两种写法都合法，但不能在分析完之后互换。</li>
-<li>ST06：低区没有人，IPRAS 无分歧，中位数在高区。适宜。它不是百分比规则下的「70% 高区」问题；那一套规则没有被锁定。</li>
+<li>ST02：分数集中在低区。不适宜，负向共识。IPRAS
+并不妨碍「明确不适宜」这个结论。</li>
+<li>ST03：中位数 5，分数挤在中区。IPR 很小，无分歧，但中位数在
+4–6，所以是不确定（中位数居中），不是正向共识。</li>
+<li>ST04：两端对拉。P30 低、P70 高，IPR 大于 IPRAS。表 4 和 IPRAS
+<strong>都</strong>判分歧。不确定（存在分歧）。中位数 5
+是两派对拉的结果，不是温和的中间意见。</li>
+<li>ST05：中位数 8，低区有 3 人。表 4 认为这是分歧。IPR 约
+3.4，分布中心高于 5，AI 把 IPRAS 抬到约 4.3，因此 IPR 没有超过
+IPRAS，IPRAS <strong>不</strong>判分歧。在本方案下，ST05
+是适宜、正向共识。若方案锁的是表
+4，同一条必须保持不确定。两种写法都合法，但不能在分析完之后互换。</li>
+<li>ST06：低区没有人，IPRAS
+无分歧，中位数在高区。适宜。它不是百分比规则下的「70%
+高区」问题；那一套规则没有被锁定。</li>
 </ul>
 </div>
 <div id="末轮不要只看一个总数" class="section level1">
 <h1>5. 末轮不要只看一个总数</h1>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">table</span>(res<span class="sc">$</span>last_classification<span class="sc">$</span>consensus_zh)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>tab</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 负向共识   未达成共识（存在分歧） 未达成共识（中位数居中） </span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        1                        1                        1 </span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                 正向共识 </span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        3</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>last_classification[res<span class="sc">$</span>last_classification<span class="sc">$</span>item_id <span class="sc">==</span> <span class="st">&quot;ST05&quot;</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ipras&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id ipr ipras        di class_zh consensus_zh</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17    ST05 3.4   4.3 0.7906977     适宜     正向共识</span></span></code></pre></div>
-<p><strong>解读：</strong> <code>di = IPR / IPRAS</code>。ST05 的 DI 小于或等于 1 的一侧（IPR 未超过 IPRAS），所以不是分歧。正向共识在这里的意思是「中位数在高区且 IPRAS 无分歧」，不是「9 个人完全一致」，也不是「高区比例至少 80%」。</p>
-<p>末轮若仍有 ST04 这种分歧，应写入分歧清单。不要再开一轮，直到 DI 降到 1 以下才肯停。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">table</span>(res<span class="sc">$</span>last_classification<span class="sc">$</span>consensus_zh)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>tab</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;                 负向共识   未达成共识（存在分歧） 未达成共识（中位数居中） </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;                        1                        1                        1 </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;                 正向共识 </span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;                        3</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>res<span class="sc">$</span>last_classification[res<span class="sc">$</span>last_classification<span class="sc">$</span>item_id <span class="sc">==</span> <span class="st">&quot;ST05&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ipras&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt;    item_id ipr ipras        di class_zh consensus_zh</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 17    ST05 3.4   4.3 0.7906977     适宜     正向共识</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>di = IPR / IPRAS</code>。ST05 的 DI
+小于或等于 1 的一侧（IPR 未超过
+IPRAS），所以不是分歧。正向共识在这里的意思是「中位数在高区且 IPRAS
+无分歧」，不是「9 个人完全一致」，也不是「高区比例至少 80%」。</p>
+<p>末轮若仍有 ST04 这种分歧，应写入分歧清单。不要再开一轮，直到 DI 降到
+1 以下才肯停。</p>
 </div>
 <div id="敏感性格告诉你什么不能告诉你什么" class="section level1">
 <h1>6. 敏感性格告诉你什么、不能告诉你什么</h1>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   rule_a  rule_b     kappa n exploratory</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 table4   ipras 0.7391304 6        TRUE</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 table4 percent 1.0000000 6        TRUE</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  ipras percent 0.7391304 6        TRUE</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>by_item[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_table4&quot;</span>, <span class="st">&quot;class_ipras&quot;</span>, <span class="st">&quot;class_percent&quot;</span>)]</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id  class_table4   class_ipras class_percent</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    ST01   appropriate   appropriate   appropriate</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    ST02 inappropriate inappropriate inappropriate</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    ST03     uncertain     uncertain     uncertain</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    ST04     uncertain     uncertain     uncertain</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    ST05     uncertain   appropriate     uncertain</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    ST06   appropriate   appropriate   appropriate</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换已锁定规则。若两套规则结论不同，正式结果仍按第 1 轮前写入方案的那一种。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> κ 不是 1，主要因为 ST05：表 4 为不确定，IPRAS 为适宜。百分比列还会把高区比例不足 70% 的条目记成不确定。这些差异证明规则必须事先锁定。<code>note</code> 写的是：敏感性不替换锁定规则。正式报告的分类列使用 IPRAS。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt;   rule_a  rule_b     kappa n exploratory</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; 1 table4   ipras 0.7391304 6        TRUE</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; 2 table4 percent 1.0000000 6        TRUE</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; 3  ipras percent 0.7391304 6        TRUE</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>sens<span class="sc">$</span>by_item[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_table4&quot;</span>, <span class="st">&quot;class_ipras&quot;</span>, <span class="st">&quot;class_percent&quot;</span>)]</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt;   item_id  class_table4   class_ipras class_percent</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; 1    ST01   appropriate   appropriate   appropriate</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; 2    ST02 inappropriate inappropriate inappropriate</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; 3    ST03     uncertain     uncertain     uncertain</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; 4    ST04     uncertain     uncertain     uncertain</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; 5    ST05     uncertain   appropriate     uncertain</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; 6    ST06   appropriate   appropriate   appropriate</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换已锁定规则。若两套规则结论不同，正式结果仍按第 1 轮前写入方案的那一种。本分析是探索性的，不能在看到结果后改规则。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> κ 不是 1，主要因为 ST05：表 4 为不确定，IPRAS
+为适宜。百分比列还会把高区比例不足 70%
+的条目记成不确定。这些差异证明规则必须事先锁定。<code>note</code>
+写的是：敏感性不替换锁定规则。正式报告的分类列使用 IPRAS。</p>
 </div>
 <div id="稳定性只描述变化" class="section level1">
 <h1>7. 稳定性只描述变化</h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span>(res<span class="sc">$</span>stability[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;from_round&quot;</span>, <span class="st">&quot;to_round&quot;</span>, <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>, <span class="st">&quot;class_unchanged&quot;</span>)], <span class="dv">6</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id from_round to_round      class_r1      class_r2 class_unchanged</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7     ST01          2        3   appropriate   appropriate            TRUE</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8     ST02          2        3 inappropriate inappropriate            TRUE</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9     ST03          2        3     uncertain     uncertain            TRUE</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10    ST04          2        3     uncertain     uncertain            TRUE</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11    ST05          2        3   appropriate   appropriate            TRUE</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12    ST06          2        3   appropriate   appropriate            TRUE</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stopping<span class="sc">$</span>recommend_stop</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stopping<span class="sc">$</span>note</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 教学分数在三轮之间分类基本不变。<code>recommend_stop</code> 即使为真，也只是预设的描述性参考。它不表示证据等级提高了，也不表示可以把 ST04 从分歧清单里删掉。Wilcoxon 的 P 值同样不能单独当作停止或继续的标准。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">tail</span>(res<span class="sc">$</span>stability[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;from_round&quot;</span>, <span class="st">&quot;to_round&quot;</span>, <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>, <span class="st">&quot;class_unchanged&quot;</span>)], <span class="dv">6</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;    item_id from_round to_round      class_r1      class_r2 class_unchanged</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; 7     ST01          2        3   appropriate   appropriate            TRUE</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; 8     ST02          2        3 inappropriate inappropriate            TRUE</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; 9     ST03          2        3     uncertain     uncertain            TRUE</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; 10    ST04          2        3     uncertain     uncertain            TRUE</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; 11    ST05          2        3   appropriate   appropriate            TRUE</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; 12    ST06          2        3   appropriate   appropriate            TRUE</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>res<span class="sc">$</span>stopping<span class="sc">$</span>recommend_stop</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>res<span class="sc">$</span>stopping<span class="sc">$</span>note</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong>
+教学分数在三轮之间分类基本不变。<code>recommend_stop</code>
+即使为真，也只是预设的描述性参考。它不表示证据等级提高了，也不表示可以把
+ST04 从分歧清单里删掉。Wilcoxon 的 P
+值同样不能单独当作停止或继续的标准。</p>
 </div>
 <div id="写出-docx-报告" class="section level1">
 <h1>8. 写出 docx 报告</h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;delphi-ram-ipras-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.info</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))<span class="sc">$</span>size</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 17414</span></span></code></pre></div>
-<p><strong>解读：</strong> 报告应写明 IPR、IPRAS、DI、分位数 type 7，以及 IPR 必须<strong>大于</strong> IPRAS。还应写明这是三轮匿名函询，ST05 按 IPRAS 为适宜，若改用表 4 则会不同，但方案没有改。权威系数和 Kendall’s W 若出现，只作为补充。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;delphi-ram-ipras-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">file.info</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))<span class="sc">$</span>size</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 24889</span></span></code></pre></div>
+<p><strong>解读：</strong> 报告应写明 IPR、IPRAS、DI、分位数 type
+7，以及 IPR 必须<strong>大于</strong>
+IPRAS。还应写明这是三轮匿名函询，ST05 按 IPRAS 为适宜，若改用表 4
+则会不同，但方案没有改。权威系数和 Kendall’s W 若出现，只作为补充。</p>
 </div>
 <div id="什么时候不要用-ipras" class="section level1">
 <h1>9. 什么时候不要用 IPRAS</h1>
-<p>人数少于 7 时，分类只供描述。量表不是 1–9，或三分区不是 1–3 / 4–6 / 7–9 时，不要沿用 2.35 和 1.5。把常数改成别的数而又不写理由，报告会标成非标准参数；更稳妥的做法是改用下一篇教程的百分比规则，并把百分比在发问卷前写死。</p>
+<p>人数少于 7 时，分类只供描述。5 分或 7 分不要手写 2.35 和 1.5：用
+<code>points</code> 或 <code>scale_max</code> 锁定方案后，常数会按跨度从
+1–9 的手册值线性换算，中心改为量表中点，并在报告中说明这不是 Fitch
+原值。自己另写常数而又不写理由，仍会标成非标准参数。百分比规则见下一篇，阈值必须在发问卷前写死。</p>
 </div>
 
 

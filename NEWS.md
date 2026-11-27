@@ -1,3 +1,16 @@
+# delphir 0.9.0
+
+* 5 分和 7 分李克特可以自动预设。`preset_protocol()` 与 `delphi_protocol()`
+  接受 `points = 5` 或 `7`，也可以只改 `scale_max`。低/中/高区、`median_min`、
+  `iqr_max`、稳定性中位数变化，以及 IPRAS 常数会按该分制填好。比例阈值不变。
+  显式传入的参数仍然覆盖自动值。只改分制不算偏离预设。
+* 9 分仍是默认，原有区间和 2.35 / 1.5 不变。`standard_element` 不写点数时仍是
+  原来的 5 分方案。
+* 5 分或 7 分上的 IPRAS 常数由 1–9 的手册值按跨度线性换算，中心改为量表中点，
+  并在方案和问卷中标明这不是 Fitch 原值。表 4 的人数阈值不变，计数用新的两端区间。
+* `simulate_delphi()`、`simulate_rand_ucla()` 和 `simulate_cos()` 增加 `points`。
+  问卷、必要性阈值和 RAND 图形跟随锁定的量表。
+
 # delphir 0.8.0
 
 * 全部分析入口补充可选指标：积极系数（回收率及参考线）、方案级 Ca/Cs 赋分表、

@@ -135,7 +135,8 @@ rand_panel_thresholds <- function(n) {
   )
 }
 
-.rand_class_zh <- function(detail, class, method) {
+.rand_class_zh <- function(detail, class, method, mid = c(4, 6)) {
+  equipoise <- sprintf("\u4e0d\u786e\u5b9a\uff08\u4e2d\u4f4d\u6570 %s\uff0c\u65e0\u5206\u6b67\uff09", .likert_band_label(mid))
   if (identical(method, "percent")) {
     return(ifelse(
       class == "appropriate", "\u8fbe\u6210\u5171\u8bc6\uff08RAM \u4fee\u6539\u7248\uff09",
@@ -144,7 +145,7 @@ rand_panel_thresholds <- function(n) {
     ))
   }
   ifelse(
-    detail == "uncertain_equipoise", "\u4e0d\u786e\u5b9a\uff08\u4e2d\u4f4d\u6570 4\u20136\uff0c\u65e0\u5206\u6b67\uff09",
+    detail == "uncertain_equipoise", equipoise,
     ifelse(detail == "uncertain_disagreement", "\u4e0d\u786e\u5b9a\uff08\u5b58\u5728\u5206\u6b67\uff09",
            ifelse(detail == "uncertain_boundary", "\u4e0d\u786e\u5b9a\uff08\u8fb9\u754c\u4e2d\u4f4d\u6570\uff09",
                   .label_zh(class)))
@@ -175,7 +176,7 @@ rand_panel_thresholds <- function(n) {
 #'   且低区比例低于 `percent_low` 才算一致。这是 RAM 修改版。
 #' @param boundary 中位数恰为两个三分区的分界（默认 3.5 或 6.5）时如何处理。
 #'   `"uncertain"` 归入不确定。
-#' @param scale 量表端点。不是 1–9 时不得套用默认 IPRAS 常数。
+#' @param scale 量表端点。5 分或 7 分且未另给区间时，自动使用该分制的三分区和换算后的 IPRAS 常数。不是 5、7、9 分时不要沿用 2.35 与 1.5。
 #'
 #' @return 一行数据框。主分类在 `class`（appropriate / uncertain / inappropriate）。
 #'   `class_detail` 把不确定拆成中位数居中、存在分歧或边界中位数。
@@ -224,21 +225,39 @@ rand_disagreement <- function(scores,
   xs <- as.numeric(scores[!is.na(scores)])
   if (!length(xs)) return(.rand_empty_disagreement())
 
+  sp <- likert_scale_preset(scale[1], scale[2])
+  user_iprr <- !missing(iprr)
+  user_cfa <- !missing(cfa)
+  if (isTRUE(sp$auto)) {
+    if (missing(low)) low <- sp$low_range
+    if (missing(mid)) mid <- sp$mid_range
+    if (missing(high)) high <- sp$high_range
+    if (missing(iprr)) iprr <- sp$rand_iprr
+    if (missing(cfa)) cfa <- sp$rand_cfa
+  }
+  if (isTRUE(warn) && isTRUE(sp$auto) && !identical(sp$points, 9L) &&
+      ((user_iprr && isTRUE(all.equal(iprr, 2.35))) ||
+       (user_cfa && isTRUE(all.equal(cfa, 1.5))))) {
+    warning(
+      "已在非 9 分量表上使用 1–9 的 IPRAS 常数 2.35 与 1.5。这不是该分制的自动换算值。",
+      call. = FALSE
+    )
+  }
+
   standard_19 <- isTRUE(all.equal(scale, c(1, 9))) &&
     isTRUE(all.equal(low, c(1, 3))) &&
     isTRUE(all.equal(mid, c(4, 6))) &&
     isTRUE(all.equal(high, c(7, 9)))
-  nonstandard <- !isTRUE(all.equal(iprr, 2.35)) ||
-    !isTRUE(all.equal(cfa, 1.5)) || !identical(qtype, 7L)
-  if (method %in% c("ipras", "both") && !standard_19 && !nonstandard) {
-    stop(
-      "IPRAS \u5e38\u6570 2.35 \u4e0e 1.5 \u53ea\u9002\u7528\u4e8e 1\u20139 \u5206\u91cf\u8868\u3002\u8bf7\u6539\u7528 percent\uff0c\u6216\u5728\u65b9\u6848\u4e2d\u5199\u660e\u975e\u6807\u51c6\u5e38\u6570\u5e76\u586b\u5199 rationale\u3002",
-      call. = FALSE
-    )
+  constants_match <- if (isTRUE(sp$auto)) {
+    isTRUE(all.equal(iprr, sp$rand_iprr)) && isTRUE(all.equal(cfa, sp$rand_cfa))
+  } else {
+    isTRUE(all.equal(iprr, 2.35)) && isTRUE(all.equal(cfa, 1.5))
   }
+  nonstandard <- !constants_match || !identical(qtype, 7L)
   modified <- identical(method, "percent") || !standard_19 ||
     (method %in% c("ipras", "both") && nonstandard)
-  if (isTRUE(warn) && !standard_19 && method %in% c("table4", "classic_relaxed", "classic_strict", "both")) {
+  bands_match <- isTRUE(sp$auto) && isTRUE(all.equal(low, sp$low_range)) && isTRUE(all.equal(mid, sp$mid_range)) && isTRUE(all.equal(high, sp$high_range))
+  if (isTRUE(warn) && !standard_19 && !bands_match && method %in% c("table4", "classic_relaxed", "classic_strict", "both")) {
     warning(
       "\u91cf\u8868\u4e0d\u662f\u6807\u51c6 1\u20139 \u4e09\u5206\u533a\u3002\u8868 4 / 9 \u4eba\u5b9a\u4e49\u5c06\u6309\u4f60\u7ed9\u51fa\u7684\u533a\u95f4\u8ba1\u7b97\uff0c\u5e76\u6807\u4e3a RAM \u4fee\u6539\u7248\u3002",
       call. = FALSE
@@ -267,7 +286,7 @@ rand_disagreement <- function(scores,
   p70 <- q[2]
   ipr <- p70 - p30
   iprcp <- (p30 + p70) / 2
-  ai <- abs(5 - iprcp)
+  ai <- abs(.ipras_center(scale[1], scale[2]) - iprcp)
   ipras <- iprr + cfa * ai
   di <- if (!is.finite(ipras) || ipras <= 0) Inf else ipr / ipras
   n_low <- sum(.rand_in_band(xs, low))
@@ -283,9 +302,10 @@ rand_disagreement <- function(scores,
   ipras_dis <- is.finite(ipr) && is.finite(ipras) && ipr > ipras * di_threshold
   percent_dis <- (n_low / n) >= percent_low && (n_high / n) >= percent_low
   table4_agr <- !is.na(n_out) && n_out <= thr$agreement_max
-  strict_agr <- (max(xs) - min(xs)) <= 2
+  agree_width <- if (isTRUE(sp$auto)) sp$agree_width else 2 * (as.numeric(scale[2]) - as.numeric(scale[1])) / 8
+  strict_agr <- (max(xs) - min(xs)) <= agree_width + 1e-8
   y <- .drop_one_extreme(xs)
-  relaxed_agr <- length(y) > 0L && (max(y) - min(y)) <= 2
+  relaxed_agr <- length(y) > 0L && (max(y) - min(y)) <= agree_width + 1e-8
   percent_agr <- (n_high / n) >= percent_high && (n_low / n) < percent_low
 
   disagreement <- switch(
@@ -364,7 +384,7 @@ rand_disagreement <- function(scores,
     median_region = region,
     class = class,
     class_detail = detail,
-    class_zh = .rand_class_zh(detail, class, method),
+    class_zh = .rand_class_zh(detail, class, method, mid),
     modified_ram = modified,
     nonstandard_ipras = nonstandard && method %in% c("ipras", "both"),
     rule_used = method,

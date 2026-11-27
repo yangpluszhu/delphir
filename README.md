@@ -67,7 +67,7 @@ remotes::install_github("yangpluszhu/delphir")
 If you have downloaded the source package:
 
 ```r
-install.packages("delphir_0.8.0.tar.gz", repos = NULL, type = "source")
+install.packages("delphir_0.9.0.tar.gz", repos = NULL, type = "source")
 ```
 
 For local development (including vignettes):
@@ -131,7 +131,7 @@ res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 
 | Scenario | Entry point | Highlights |
 |---|---|---|
-| Clinical consensus | `preset_protocol("clinical_consensus")` | 9-point Likert; high/basic consensus, exclusion, polarization |
+| Clinical consensus | `preset_protocol("clinical_consensus")` | 9-point Likert by default; `points = 5` or `7` fills bands and thresholds |
 | RAND/UCLA appropriateness | `simulate_rand_ucla()` / `classify_rand()` | Median intervals + disagreement index; no forced consensus |
 | Modified Delphi + RAM | `delphi_ram_protocol()` / `run_delphi_ram()` | Table 4, IPRAS or custom percent; docx/xlsx questionnaires |
 | COMET core outcome set | `preset_protocol("comet_cos")` | 70/15 rule; stakeholder stratification |
@@ -227,7 +227,7 @@ Before submitting code:
 
 ## Changelog
 
-See [NEWS.md](NEWS.md). Current version: **0.8.0**.
+See [NEWS.md](NEWS.md). Current version: **0.9.0**.
 
 ## License
 

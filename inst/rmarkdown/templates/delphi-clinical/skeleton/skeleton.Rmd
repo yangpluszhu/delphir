@@ -160,7 +160,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) print(delphir::plot_attrition(r
 
 # 逐轮调查结果
 
-Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。「无法判断」不进入 1–9 分母。
+Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。「无法判断」不进入 `r p$scale_min`–`r p$scale_max` 分母。
 
 ```{r}
 for (rnd in rounds_all) {

@@ -114,7 +114,7 @@ if (is.null(res$authority)) {
 
 # 各轮问卷内容
 
-问卷由锁定的 RAND 方案生成。第 1 轮独立评分，不展示他人分数。第 2 轮给出本人上轮分数、1–3/4–6/7–9 频数、中位数和分歧标记，并要求对全部条目复评。已判为适宜或不适宜的条目仍然复评。权威系数若收集，只作补充，不参与适宜性判定。
+问卷由锁定的 RAND 方案生成。第 1 轮独立评分，不展示他人分数。第 2 轮给出本人上轮分数、`r delphir:::.likert_zone_phrase(p)` 频数、中位数和分歧标记，并要求对全部条目复评。已判为适宜或不适宜的条目仍然复评。权威系数若收集，只作补充，不参与适宜性判定。
 
 ```{r}
 for (rnd in rounds_all) {
@@ -157,7 +157,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) print(delphir::plot_attrition(r
 
 # 逐轮调查结果
 
-Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。「无法判断」不进入 1–9 分母。
+Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。「无法判断」不进入 `r p$scale_min`–`r p$scale_max` 分母。
 
 ```{r}
 for (rnd in rounds_all) {
@@ -254,13 +254,14 @@ if (!is.null(qs$by_theme) && nrow(qs$by_theme)) {
 meta_rand <- res$rand_meta
 if (is.null(meta_rand)) meta_rand <- delphir:::.rand_meta(study)
 knitr::kable(data.frame(
-  项目 = c("锁定规则", "第 2 轮形式", "目的", "是否计划必要性评价", "适宜性轮次超过 2", "是否为修改版", "IPRAS 常数是否非标准"),
+  项目 = c("锁定规则", "第 2 轮形式", "目的", "是否计划必要性评价", "适宜性轮次超过 2", "是否为修改版", "IPRAS 常数是否非标准", "IPRAS 常数是否按量表换算"),
   内容 = c(
     meta_rand$rule, meta_rand$round2_mode, meta_rand$purpose,
     if (isTRUE(meta_rand$necessity)) "是" else "否",
     if (isTRUE(meta_rand$deviation)) "是。这是对经典 RAM 的偏离，作者必须说明理由。" else "否",
     if (isTRUE(meta_rand$modified_ram)) "是。百分比规则、非 1–9 量表或非标准 IPRAS 常数均须标明修改版。" else "否",
-    if (isTRUE(meta_rand$nonstandard_ipras)) "是" else "否"
+    if (isTRUE(meta_rand$nonstandard_ipras)) "是" else "否",
+    if (isTRUE(meta_rand$ipras_rescaled)) "是。2.35 与 1.5 已按量表跨度线性换算，中心改为量表中点。这不是 Fitch 手册原值。" else "否"
   )
 ), caption = "RAND 方案执行情况")
 cat(meta_rand$supplement)
@@ -275,7 +276,7 @@ if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 28
 knitr::kable(show, digits = 2, caption = "末轮适宜性：中位数、区间人数、IPR/IPRAS 与分类")
 ```
 
-中位数 7–9 且无分歧为适宜，1–3 且无分歧为不适宜。中位数 4–6 而无分歧，是专家认为获益与危害接近。任何分歧都改为不确定，即使中位数仍在 7–9。两类不确定都保留，不合并成「未达成共识」后删去。
+中位数落在 `r delphir:::.likert_band_label(p$high_range)` 且无分歧为适宜，落在 `r delphir:::.likert_band_label(p$low_range)` 且无分歧为不适宜。中位数落在 `r delphir:::.likert_band_label(p$mid_range)` 而无分歧，是专家认为获益与危害接近。任何分歧都改为不确定，即使中位数仍在高区。两类不确定都保留，不合并成「未达成共识」后删去。
 
 ```{r}
 if ("class_detail" %in% names(last_show)) {
