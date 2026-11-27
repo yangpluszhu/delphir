@@ -68,10 +68,10 @@ stage_label <- if (is_r1) "第 1 轮中间报告" else if (!is_final) paste0("�
 
 ```{r}
 pt <- delphir::protocol_table(p)
-knitr::kable(pt, caption = "预设方案全部参数（value 为本研究锁定值，preset 为该场景默认值）")
+knitr::kable(pt, caption = "方案参数（value 为当前值，preset 为本研究初次锁定值）")
 ```
 
-`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）") else "本研究未偏离该场景预设阈值。"`
+`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离初次锁定。** 理由：", p$rationale %||% "（未填写 rationale）") else "当前参数就是本研究初次锁定的方案，锁定后尚未再修改。"`
 
 # 专家构成
 

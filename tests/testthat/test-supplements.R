@@ -39,18 +39,26 @@ test_that("custom authority scales are locked, rescored, and round-tripped", {
     "很熟悉" = 0.9, "较熟悉" = 0.7, "一般" = 0.5,
     "不太熟悉" = 0.3, "不熟悉" = 0.1
   ))
-  expect_warning(
-    preset_protocol("clinical_consensus", authority_scale = sc),
-    "rationale"
-  )
+  expect_false(isTRUE(
+    preset_protocol("clinical_consensus", authority_scale = sc)$modified_from_preset
+  ))
   p <- preset_protocol(
     "clinical_consensus",
     authority_scale = sc,
     rationale = "教学：改用另一套熟悉程度赋分。"
   )
-  expect_true(p$modified_from_preset)
+  expect_false(isTRUE(p$modified_from_preset))
   tab <- protocol_table(p)
-  expect_true(isTRUE(tab$modified[tab$parameter == "authority_cs"]))
+  expect_false(isTRUE(tab$modified[tab$parameter == "authority_cs"]))
+  sc2 <- authority_scales(cs = c(
+    "很熟悉" = 1, "较熟悉" = 0.8, "一般" = 0.6,
+    "不太熟悉" = 0.4, "不熟悉" = 0.2
+  ))
+  expect_warning(revise_protocol(p, authority_scale = sc2), "rationale")
+  p_rev <- revise_protocol(p, authority_scale = sc2, rationale = "锁定后更换赋分表。")
+  expect_true(isTRUE(p_rev$modified_from_preset))
+  tab_rev <- protocol_table(p_rev)
+  expect_true(isTRUE(tab_rev$modified[tab_rev$parameter == "authority_cs"]))
   p2 <- suppressWarnings(delphir:::.protocol_from_table(tab$parameter, tab$value))
   expect_equal(unname(p2$authority_scale$cs), unname(sc$cs))
 

@@ -26,7 +26,8 @@ delphi_ram_protocol(
 
 \item{round_mode}{\code{"mail"}（默认，再次函询）、\code{"online"} 或 \code{"in_person"}。}
 
-\item{rationale}{偏离预设时的理由。改规则、改百分比或改函询形式而未填写时会警告。}
+\item{rationale}{可选备注。初次锁定时选择表 4、IPRAS 或百分比规则都不表示偏离，
+也不必填写。锁定后若再改规则，用 \code{\link[=revise_protocol]{revise_protocol()}} 并写理由。}
 
 \item{...}{传给 \code{\link[=preset_protocol]{preset_protocol()}} 的其他参数，例如量表端点。不要在这里再传
 \code{rand_disagreement}，规则由 \code{rule} 指定。}

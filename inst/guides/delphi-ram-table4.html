@@ -12,32 +12,45 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-10" />
+<meta name="date" content="2026-11-27" />
 
 <title>教学文档 12：改良德尔菲结合经典 RAM 表 4</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -53,55 +66,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -135,7 +147,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -147,260 +339,330 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">教学文档 12：改良德尔菲结合经典 RAM 表 4</h1>
+<h1 class="title toc-ignore">教学文档 12：改良德尔菲结合经典 RAM 表
+4</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-10</h4>
+<h4 class="date">2026-11-27</h4>
 
 
 
 <div id="这次要完成什么" class="section level1">
 <h1>1. 这次要完成什么</h1>
-<p>这一套流程是<strong>改良德尔菲</strong>，同时用 RAND/UCLA 适宜性方法（RAM）的核心规则判断一致和分歧。它要和另外两条已经存在的流程分开：</p>
+<p>这一套流程是<strong>改良德尔菲</strong>，同时用 RAND/UCLA
+适宜性方法（RAM）的核心规则判断一致和分歧。它要和另外两条已经存在的流程分开：</p>
 <ul>
-<li>普通 Delphi 用高区比例、中位数和四分位距。入口是 <code>run_delphi()</code>。</li>
-<li>经典 RAM 专家组通常是两轮，第 2 轮在面对面会议之后复评。入口是 <code>run_rand()</code>，场景是 <code>rand_ucla</code>。</li>
-<li>本教程的入口是 <code>delphi_ram_protocol(&quot;table4&quot;)</code> 和 <code>run_delphi_ram()</code>。是否走这条路，由你在第 1 轮前选定。选定之后不能再交回 <code>run_delphi()</code> 或 <code>run_rand()</code>。</li>
+<li>普通 Delphi 用高区比例、中位数和四分位距。入口是
+<code>run_delphi()</code>。</li>
+<li>经典 RAM 专家组通常是两轮，第 2 轮在面对面会议之后复评。入口是
+<code>run_rand()</code>，场景是 <code>rand_ucla</code>。</li>
+<li>本教程的入口是 <code>delphi_ram_protocol(&quot;table4&quot;)</code> 和
+<code>run_delphi_ram()</code>。是否走这条路，由你在第 1
+轮前选定。选定之后不能再交回 <code>run_delphi()</code> 或
+<code>run_rand()</code>。</li>
 </ul>
-<p>表 4 来自 Fitch 等（2001）。它按<strong>这一条的实际应答人数</strong>查两个数：包含中位数的 3 分区间以外最多允许多少人，才叫一致；1–3 分和 7–9 分两端至少各有多少人，才叫分歧。9 人属于 8–10 人档：区外不超过 2 人为一致，两端各至少 3 人为分歧。</p>
-<p>适宜性仍是：中位数 7–9 且无分歧为适宜；1–3 且无分歧为不适宜；中位数 4–6，或任何分歧，为不确定。正向共识、负向共识、未达成共识只是这些结果的报告名称。<strong>无分歧不等于一致。</strong> 适宜不要求先达到那个更严格的“一致”。</p>
-<p>样本是 <code>simulate_delphi_ram(&quot;table4&quot;)</code>。安装后同一份数据也可以 <code>data(delphi_ram_table4_demo)</code>。9 名专家、6 条陈述、三轮匿名函询。它不是真实指南。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_delphi_ram</span>(<span class="st">&quot;table4&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ram</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 研究</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   题目: 围术期抗凝改良德尔菲（教学模拟，table4）</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: 改良德尔菲结合 RAM</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   专家: 9 人；条目: 6；轮次: 1, 2, 3</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   评分行数: 162</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>meta<span class="sc">$</span>objective</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;用手册表 4 判定分歧，再按中位数区间给出适宜性。流程是匿名三轮函询，不是经典两轮面对面专家组。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 场景是 <code>delphi_ram</code>。目的写的是用表 4 判断适宜性，流程是三轮函询，不是把专家关在一间会议室里开两轮。</p>
+<p>表 4 来自 Fitch
+等（2001）。它按<strong>这一条的实际应答人数</strong>查两个数：包含中位数的
+3 分区间以外最多允许多少人，才叫一致；1–3 分和 7–9
+分两端至少各有多少人，才叫分歧。9 人属于 8–10 人档：区外不超过 2
+人为一致，两端各至少 3 人为分歧。</p>
+<p>适宜性仍是：中位数 7–9 且无分歧为适宜；1–3 且无分歧为不适宜；中位数
+4–6，或任何分歧，为不确定。正向共识、负向共识、未达成共识只是这些结果的报告名称。<strong>无分歧不等于一致。</strong>
+适宜不要求先达到那个更严格的“一致”。</p>
+<p>样本是
+<code>simulate_delphi_ram(&quot;table4&quot;)</code>。安装后同一份数据也可以
+<code>data(delphi_ram_table4_demo)</code>。9 名专家、6
+条陈述、三轮匿名函询。它不是真实指南。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_delphi_ram</span>(<span class="st">&quot;table4&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>ram</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; Delphi 研究</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt;   题目: 围术期抗凝改良德尔菲（教学模拟，table4）</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt;   场景: 改良德尔菲结合 RAM</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt;   专家: 9 人；条目: 6；轮次: 1, 2, 3</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt;   评分行数: 162</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>ram<span class="sc">$</span>meta<span class="sc">$</span>objective</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;用手册表 4 判定分歧，再按中位数区间给出适宜性。流程是匿名三轮函询，不是经典两轮面对面专家组。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 场景是
+<code>delphi_ram</code>。目的写的是用表 4
+判断适宜性，流程是三轮函询，不是把专家关在一间会议室里开两轮。</p>
 </div>
 <div id="先锁定方案再发问卷" class="section level1">
 <h1>2. 先锁定方案，再发问卷</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> ram<span class="sc">$</span>protocol</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>p</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: delphi_ram (改良德尔菲结合 RAM)</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   结合 RAM: 是；规则: table4；函询: mail；最多 3 轮</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   临床 high_pct 不参与本场景分类。</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>combine_ram</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>rand<span class="sc">$</span>rule</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>rand<span class="sc">$</span>round2_mode</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>stability<span class="sc">$</span>max_rounds</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>p<span class="sc">$</span>rules<span class="sc">$</span>high_pct</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> ram<span class="sc">$</span>protocol</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>p</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt;   场景: delphi_ram (改良德尔菲结合 RAM)</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;   结合 RAM: 是；规则: table4；函询: mail；最多 3 轮</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;   临床 high_pct 不参与本场景分类。</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>p<span class="sc">$</span>combine_ram</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>p<span class="sc">$</span>rand<span class="sc">$</span>rule</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>p<span class="sc">$</span>rand<span class="sc">$</span>round2_mode</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>p<span class="sc">$</span>stability<span class="sc">$</span>max_rounds</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>p<span class="sc">$</span>rules<span class="sc">$</span>high_pct</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span></code></pre></div>
 <p><strong>解读：</strong></p>
 <ul>
-<li><code>combine_ram = TRUE</code> 表示这是独立的改良德尔菲结合 RAM，不是在普通共识阈值上临时加一个开关。</li>
-<li>规则是 <code>table4</code>。函询形式是 <code>mail</code>：再次寄送问卷，没有面对面会议。这是对经典 RAM 的流程偏离，报告里会写明。</li>
+<li><code>combine_ram = TRUE</code> 表示这是独立的改良德尔菲结合
+RAM，不是在普通共识阈值上临时加一个开关。</li>
+<li>规则是 <code>table4</code>。函询形式是
+<code>mail</code>：再次寄送问卷，没有面对面会议。这是对经典 RAM
+的流程偏离，报告里会写明。</li>
 <li>最多 3 轮。第 3 轮可以存在，但不是用来把分歧投票掉。</li>
-<li><code>high_pct</code> 是 <code>NA</code>。临床共识的 80% 高区比例写在对象里只是为了对照，<strong>不参与分类</strong>。看见结果接近某条线，再把阈值改掉，是不允许的。</li>
+<li><code>high_pct</code> 是 <code>NA</code>。临床共识的 80%
+高区比例写在对象里只是为了对照，<strong>不参与分类</strong>。看见结果接近某条线，再把阈值改掉，是不允许的。</li>
 </ul>
 <p>若有人把这种研究交给普通入口，软件会停下来：</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(<span class="fu">run_delphi</span>(ram), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e))</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;这是改良德尔菲结合 RAM。请使用 run_delphi_ram()，不要使用 run_delphi()。&quot;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tryCatch</span>(<span class="fu">run_rand</span>(ram), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;这是改良德尔菲结合 RAM。请使用 run_delphi_ram()，不要使用 run_rand()。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 两条错误信息都指向 <code>run_delphi_ram()</code>。这样不会把表 4 的分歧悄悄换成高区比例，也不会把三轮函询当成经典两轮专家组。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">tryCatch</span>(<span class="fu">run_delphi</span>(ram), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;这是改良德尔菲结合 RAM。请使用 run_delphi_ram()，不要使用 run_delphi()。&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">tryCatch</span>(<span class="fu">run_rand</span>(ram), <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">conditionMessage</span>(e))</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;这是改良德尔菲结合 RAM。请使用 run_delphi_ram()，不要使用 run_rand()。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 两条错误信息都指向
+<code>run_delphi_ram()</code>。这样不会把表 4
+的分歧悄悄换成高区比例，也不会把三轮函询当成经典两轮专家组。</p>
 </div>
 <div id="第-1-轮问卷" class="section level1">
 <h1>3. 第 1 轮问卷</h1>
-<p>第 1 轮不展示别人的分数。问卷说明里已经写上锁定规则。docx 用来发放，xlsx 用来回收。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-table4-&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round1&quot;</span>))</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>q1</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\RtmpGKKk7n\\ram-table4-bca8571a14af/round1.docx&quot;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\RtmpGKKk7n\\ram-table4-bca8571a14af/round1.xlsx&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 两个文件都在。评分维度是「适宜性」：1 表示预期危害远大于获益，9 表示预期获益远大于危害。无法判断要单独勾选，不能填 5 分充数，也不进入中位数和分歧的分母。</p>
+<p>第 1 轮不展示别人的分数。问卷说明里已经写上锁定规则。docx
+用来发放，xlsx 用来回收。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-table4-&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round1&quot;</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>q1</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\Rtmpy45UxY\\ram-table4-2ccc6bd76392/round1.docx&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [2] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\Rtmpy45UxY\\ram-table4-2ccc6bd76392/round1.xlsx&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 两个文件都在。评分维度是「适宜性」：1
+表示预期危害远大于获益，9
+表示预期获益远大于危害。无法判断要单独勾选，不能填 5
+分充数，也不进入中位数和分歧的分母。</p>
 </div>
 <div id="把第-2-轮问卷读回来" class="section level1">
 <h1>4. 把第 2 轮问卷读回来</h1>
-<p>真实项目里，专家在 xlsx 里填写后再用 <code>read_survey_xlsx()</code> 读入。这里用已经生成的第 2 轮分数做预填，演示读回后能接上第 1 轮，而不是覆盖第 1 轮。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>base <span class="ot">&lt;-</span> ram</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>base<span class="sc">$</span>ratings <span class="ot">&lt;-</span> base<span class="sc">$</span>ratings[base<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span>, ]</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round2.xlsx&quot;</span>), <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>back <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(q2, <span class="at">study =</span> base)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(back<span class="sc">$</span>ratings<span class="sc">$</span>round))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(back<span class="sc">$</span>ratings)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 108</span></span></code></pre></div>
-<p><strong>解读：</strong> 读回后同时有第 1 轮和第 2 轮。第 1 轮没有被盖掉。空白的新一轮如果和已有轮次重复，软件会拒绝覆盖。第 2 轮问卷仍然包含全部 6 条，不会因为某条在第 1 轮已经适宜就把它拿掉。这是 RAM 的做法，和普通 Delphi 只重评「未决议」条目不同。</p>
+<p>真实项目里，专家在 xlsx 里填写后再用 <code>read_survey_xlsx()</code>
+读入。这里用已经生成的第 2 轮分数做预填，演示读回后能接上第 1
+轮，而不是覆盖第 1 轮。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>base <span class="ot">&lt;-</span> ram</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>base<span class="sc">$</span>ratings <span class="ot">&lt;-</span> base<span class="sc">$</span>ratings[base<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">delphi_ram_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>                               <span class="at">file =</span> <span class="fu">file.path</span>(qdir, <span class="st">&quot;round2.xlsx&quot;</span>), <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>back <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(q2, <span class="at">study =</span> base)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">unique</span>(back<span class="sc">$</span>ratings<span class="sc">$</span>round))</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; [1] 1 2</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="fu">nrow</span>(back<span class="sc">$</span>ratings)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; [1] 108</span></span></code></pre></div>
+<p><strong>解读：</strong> 读回后同时有第 1 轮和第 2 轮。第 1
+轮没有被盖掉。空白的新一轮如果和已有轮次重复，软件会拒绝覆盖。第 2
+轮问卷仍然包含全部 6 条，不会因为某条在第 1 轮已经适宜就把它拿掉。这是
+RAM 的做法，和普通 Delphi 只重评「未决议」条目不同。</p>
 </div>
 <div id="第-1-轮每一条是什么意思" class="section level1">
 <h1>5. 第 1 轮每一条是什么意思</h1>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>r1 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>r1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;n_out&quot;</span>, <span class="st">&quot;agreement_max&quot;</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;disagreement&quot;</span>, <span class="st">&quot;agreement_status&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id median n_low n_high n_out agreement_max disagreement agreement_status</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    ST01      8     0      9     0             2        FALSE        agreement</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    ST02      2     9      0     0             2        FALSE        agreement</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    ST03      5     0      0     0             2        FALSE        agreement</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    ST04      5     4      4     8             2         TRUE     disagreement</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    ST05      8     3      6     3             2         TRUE     disagreement</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    ST06      7     0      6     3             2        FALSE    indeterminate</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       class_zh             consensus_zh</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                         适宜                 正向共识</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                       不适宜                 负向共识</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                         适宜                 正向共识</span></span></code></pre></div>
-<p><strong>解读：</strong> 9 人，<code>agreement_max</code> 是 2，<code>disagreement</code> 用的是两端各至少 3 人。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>r1 <span class="ot">&lt;-</span> <span class="fu">classify_delphi_ram</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>r1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;n_out&quot;</span>, <span class="st">&quot;agreement_max&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>       <span class="st">&quot;disagreement&quot;</span>, <span class="st">&quot;agreement_status&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt;   item_id median n_low n_high n_out agreement_max disagreement agreement_status</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; 1    ST01      8     0      9     0             2        FALSE        agreement</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; 2    ST02      2     9      0     0             2        FALSE        agreement</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; 3    ST03      5     0      0     0             2        FALSE        agreement</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; 4    ST04      5     4      4     8             2         TRUE     disagreement</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; 5    ST05      8     3      6     3             2         TRUE     disagreement</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; 6    ST06      7     0      6     3             2        FALSE    indeterminate</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt;                       class_zh             consensus_zh</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; 1                         适宜                 正向共识</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; 2                       不适宜                 负向共识</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; 3 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; 4           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; 5           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; 6                         适宜                 正向共识</span></span></code></pre></div>
+<p><strong>解读：</strong> 9 人，<code>agreement_max</code> 是
+2，<code>disagreement</code> 用的是两端各至少 3 人。</p>
 <ul>
-<li>ST01：中位数 8，低区 0 人，高区 9 人。无分歧，而且区外人数没有超过 2。适宜，一致，报告用语是正向共识。</li>
-<li>ST02：中位数 2，9 人都在低区。无分歧。不适宜，报告用语是负向共识。负向共识是明确的反对，不是「没填完」。</li>
-<li>ST03：中位数 5，两端都是 0。分数集中在 4–6，所以 <code>agreement_status</code> 可以是 agreement，但适宜性仍是不确定（中位数居中）。共识用语是未达成共识。大家意见接近「不好说」，不是达成了正向共识。</li>
-<li>ST04：中位数 5，是因为 1–3 与 7–9 各有 4 人。这是分歧，不是「中等意见」。未达成共识（存在分歧）。</li>
-<li>ST05：中位数 8，但低区有 3 人。表 4 判分歧。中位数再高，只要存在分歧，分类就是不确定，不能写成适宜。</li>
-<li>ST06：中位数 7，低区 0 人，所以<strong>无分歧</strong>，适宜性是适宜，共识用语是正向共识。但有 3 个 6 分落在 7–9 以外，超过了「区外不超过 2 人」，因此 <code>agreement_status</code> 是 indeterminate，不是 agreement。这就是「无分歧不等于一致」。本方案没有把一致写成适宜的必要条件。</li>
+<li>ST01：中位数 8，低区 0 人，高区 9 人。无分歧，而且区外人数没有超过
+2。适宜，一致，报告用语是正向共识。</li>
+<li>ST02：中位数 2，9
+人都在低区。无分歧。不适宜，报告用语是负向共识。负向共识是明确的反对，不是「没填完」。</li>
+<li>ST03：中位数 5，两端都是 0。分数集中在 4–6，所以
+<code>agreement_status</code> 可以是
+agreement，但适宜性仍是不确定（中位数居中）。共识用语是未达成共识。大家意见接近「不好说」，不是达成了正向共识。</li>
+<li>ST04：中位数 5，是因为 1–3 与 7–9 各有 4
+人。这是分歧，不是「中等意见」。未达成共识（存在分歧）。</li>
+<li>ST05：中位数 8，但低区有 3 人。表 4
+判分歧。中位数再高，只要存在分歧，分类就是不确定，不能写成适宜。</li>
+<li>ST06：中位数 7，低区 0
+人，所以<strong>无分歧</strong>，适宜性是适宜，共识用语是正向共识。但有
+3 个 6 分落在 7–9 以外，超过了「区外不超过 2 人」，因此
+<code>agreement_status</code> 是 indeterminate，不是
+agreement。这就是「无分歧不等于一致」。本方案没有把一致写成适宜的必要条件。</li>
 </ul>
 </div>
 <div id="三轮放在一起看" class="section level1">
 <h1>6. 三轮放在一起看</h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>delphi_ram_meta</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $round_mode</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $purpose</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;appropriateness&quot;</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $max_rounds</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_high</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_low</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $modified_ram</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $deviation</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;匿名多轮函询，默认最多 3 轮，不是经典 RAM 的两轮面对面会议。第 3 轮不用来消除分歧。&quot;</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $supplement</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;权威系数与 Kendall&#39;s W 只作补充，不替代中位数、分歧和适宜性或百分比共识分类。&quot;</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>last_classification[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>, <span class="st">&quot;agreement_status&quot;</span>)]</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median                     class_zh             consensus_zh</span></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13    ST01      8                         适宜                 正向共识</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14    ST02      2                       不适宜                 负向共识</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15    ST03      5 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16    ST04      5           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17    ST05      8           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18    ST06      7                         适宜                 正向共识</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    agreement_status</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13        agreement</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14        agreement</span></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15        agreement</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16     disagreement</span></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17     disagreement</span></span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18        agreement</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>res<span class="sc">$</span>delphi_ram_meta</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; $round_mode</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;mail&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; $purpose</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; [1] &quot;appropriateness&quot;</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; $max_rounds</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; $percent_high</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; $percent_low</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; $modified_ram</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; $ipras_rescaled</span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; $deviation</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; [1] &quot;匿名多轮函询，默认最多 3 轮，不是经典 RAM 的两轮面对面会议。第 3 轮不用来消除分歧。&quot;</span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a><span class="co">#&gt; $supplement</span></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;权威系数与 Kendall&#39;s W 只作补充，不替代中位数、分歧和适宜性或百分比共识分类。&quot;</span></span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>res<span class="sc">$</span>last_classification[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>, <span class="st">&quot;agreement_status&quot;</span>)]</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt;    item_id median                     class_zh             consensus_zh</span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt; 13    ST01      8                         适宜                 正向共识</span></span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; 14    ST02      2                       不适宜                 负向共识</span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt; 15    ST03      5 不确定（中位数 4–6，无分歧） 未达成共识（中位数居中）</span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; 16    ST04      5           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt; 17    ST05      8           不确定（存在分歧）   未达成共识（存在分歧）</span></span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt; 18    ST06      7                         适宜                 正向共识</span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt;    agreement_status</span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; 13        agreement</span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; 14        agreement</span></span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt; 15        agreement</span></span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt; 16     disagreement</span></span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a><span class="co">#&gt; 17     disagreement</span></span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a><span class="co">#&gt; 18        agreement</span></span></code></pre></div>
 <p><strong>解读：</strong></p>
 <ul>
-<li><code>rule</code> 仍是 table4。<code>modified_ram = FALSE</code>，因为用的是标准 1–9 分和表 4，不是百分比修改版。</li>
-<li><code>deviation</code> 写明：匿名多轮函询、最多 3 轮，不是经典两轮面对面会议。</li>
-<li><code>supplement</code> 写明：权威系数和 Kendall’s W 即使出现，也不替代中位数和分歧。</li>
-<li>末轮 ST04、ST05 仍然是未达成共识（存在分歧）。三轮之后分歧还在，这是结果，不是程序没跑完。</li>
+<li><code>rule</code> 仍是
+table4。<code>modified_ram = FALSE</code>，因为用的是标准 1–9 分和表
+4，不是百分比修改版。</li>
+<li><code>deviation</code> 写明：匿名多轮函询、最多 3
+轮，不是经典两轮面对面会议。</li>
+<li><code>supplement</code> 写明：权威系数和 Kendall’s W
+即使出现，也不替代中位数和分歧。</li>
+<li>末轮 ST04、ST05
+仍然是未达成共识（存在分歧）。三轮之后分歧还在，这是结果，不是程序没跑完。</li>
 </ul>
 </div>
 <div id="轮次变了没有" class="section level1">
 <h1>7. 轮次变了没有</h1>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>st <span class="ot">&lt;-</span> res<span class="sc">$</span>stability</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>st[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;from_round&quot;</span>, <span class="st">&quot;to_round&quot;</span>, <span class="st">&quot;median_r1&quot;</span>, <span class="st">&quot;median_r2&quot;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>       <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>, <span class="st">&quot;class_unchanged&quot;</span>)]</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id from_round to_round median_r1 median_r2      class_r1      class_r2</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     ST01          1        2         8         8   appropriate   appropriate</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     ST02          1        2         2         2 inappropriate inappropriate</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     ST03          1        2         5         5     uncertain     uncertain</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     ST04          1        2         5         5     uncertain     uncertain</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     ST05          1        2         8         8     uncertain     uncertain</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     ST06          1        2         7         7   appropriate   appropriate</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7     ST01          2        3         8         8   appropriate   appropriate</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8     ST02          2        3         2         2 inappropriate inappropriate</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9     ST03          2        3         5         5     uncertain     uncertain</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10    ST04          2        3         5         5     uncertain     uncertain</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11    ST05          2        3         8         8     uncertain     uncertain</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12    ST06          2        3         7         7   appropriate   appropriate</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    class_unchanged</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1             TRUE</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2             TRUE</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3             TRUE</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4             TRUE</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5             TRUE</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6             TRUE</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7             TRUE</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8             TRUE</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9             TRUE</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10            TRUE</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11            TRUE</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12            TRUE</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stopping[<span class="fu">c</span>(<span class="st">&quot;recommend_stop&quot;</span>, <span class="st">&quot;class_unchanged_pct&quot;</span>, <span class="st">&quot;note&quot;</span>)]</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $recommend_stop</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $class_unchanged_pct</span></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $note</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
-<p><strong>解读：</strong> 分类不变的比例很高，是因为这份教学分数本来就比较稳定。稳定性只说明「分类还在不在变」。它不能用来把 ST05 的分歧改成适宜，也不能因为 Wilcoxon 的 P 值大或小就再加一轮。P 值依赖人数，不能单独定义稳定。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>st <span class="ot">&lt;-</span> res<span class="sc">$</span>stability</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>st[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;from_round&quot;</span>, <span class="st">&quot;to_round&quot;</span>, <span class="st">&quot;median_r1&quot;</span>, <span class="st">&quot;median_r2&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>       <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>, <span class="st">&quot;class_unchanged&quot;</span>)]</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt;    item_id from_round to_round median_r1 median_r2      class_r1      class_r2</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; 1     ST01          1        2         8         8   appropriate   appropriate</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; 2     ST02          1        2         2         2 inappropriate inappropriate</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; 3     ST03          1        2         5         5     uncertain     uncertain</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 4     ST04          1        2         5         5     uncertain     uncertain</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; 5     ST05          1        2         8         8     uncertain     uncertain</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; 6     ST06          1        2         7         7   appropriate   appropriate</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; 7     ST01          2        3         8         8   appropriate   appropriate</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; 8     ST02          2        3         2         2 inappropriate inappropriate</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; 9     ST03          2        3         5         5     uncertain     uncertain</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; 10    ST04          2        3         5         5     uncertain     uncertain</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; 11    ST05          2        3         8         8     uncertain     uncertain</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; 12    ST06          2        3         7         7   appropriate   appropriate</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt;    class_unchanged</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; 1             TRUE</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt; 2             TRUE</span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt; 3             TRUE</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; 4             TRUE</span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; 5             TRUE</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; 6             TRUE</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; 7             TRUE</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; 8             TRUE</span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; 9             TRUE</span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; 10            TRUE</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; 11            TRUE</span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; 12            TRUE</span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>res<span class="sc">$</span>stopping[<span class="fu">c</span>(<span class="st">&quot;recommend_stop&quot;</span>, <span class="st">&quot;class_unchanged_pct&quot;</span>, <span class="st">&quot;note&quot;</span>)]</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; $recommend_stop</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt; $class_unchanged_pct</span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt; $note</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong>
+分类不变的比例很高，是因为这份教学分数本来就比较稳定。稳定性只说明「分类还在不在变」。它不能用来把
+ST05 的分歧改成适宜，也不能因为 Wilcoxon 的 P 值大或小就再加一轮。P
+值依赖人数，不能单独定义稳定。</p>
 </div>
 <div id="如果当初锁的是另一套规则" class="section level1">
 <h1>8. 如果当初锁的是另一套规则</h1>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>locked_rule</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   rule_a  rule_b     kappa n exploratory</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 table4   ipras 0.7391304 6        TRUE</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 table4 percent 1.0000000 6        TRUE</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  ipras percent 0.7391304 6        TRUE</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>by_item[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_table4&quot;</span>, <span class="st">&quot;class_ipras&quot;</span>, <span class="st">&quot;class_percent&quot;</span>, <span class="st">&quot;matches_locked&quot;</span>)]</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id  class_table4   class_ipras class_percent matches_locked</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    ST01   appropriate   appropriate   appropriate           TRUE</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    ST02 inappropriate inappropriate inappropriate           TRUE</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    ST03     uncertain     uncertain     uncertain           TRUE</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    ST04     uncertain     uncertain     uncertain           TRUE</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    ST05     uncertain   appropriate     uncertain          FALSE</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    ST06   appropriate   appropriate   appropriate           TRUE</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换已锁定规则。若两套规则结论不同，正式结果仍按第 1 轮前写入方案的那一种。&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>sens<span class="sc">$</span>locked_rule</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt;   rule_a  rule_b     kappa n exploratory</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; 1 table4   ipras 0.7391304 6        TRUE</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; 2 table4 percent 1.0000000 6        TRUE</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#&gt; 3  ipras percent 0.7391304 6        TRUE</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>sens<span class="sc">$</span>by_item[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_table4&quot;</span>, <span class="st">&quot;class_ipras&quot;</span>, <span class="st">&quot;class_percent&quot;</span>, <span class="st">&quot;matches_locked&quot;</span>)]</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;   item_id  class_table4   class_ipras class_percent matches_locked</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; 1    ST01   appropriate   appropriate   appropriate           TRUE</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; 2    ST02 inappropriate inappropriate inappropriate           TRUE</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; 3    ST03     uncertain     uncertain     uncertain           TRUE</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; 4    ST04     uncertain     uncertain     uncertain           TRUE</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; 5    ST05     uncertain   appropriate     uncertain          FALSE</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="co">#&gt; 6    ST06   appropriate   appropriate   appropriate           TRUE</span></span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换已锁定规则。若两套规则结论不同，正式结果仍按第 1 轮前写入方案的那一种。本分析是探索性的，不能在看到结果后改规则。&quot;</span></span></code></pre></div>
 <p><strong>解读：</strong></p>
 <ul>
-<li>锁定规则是 table4。κ 比较的是适宜 / 不确定 / 不适宜是否相同，不是比较中文句子。</li>
-<li>ST05 在表 4 下是不确定，在 IPRAS 下是适宜。这不是计算错误。分布整体偏高时，IPRAS 会放宽分歧阈值。既然方案写的是表 4，正式结论保持不确定。</li>
-<li>ST06 在表 4 下是适宜，在百分比规则下是不确定：6/9 约 67% 落在 7–9，没有达到 70%。百分比是另一套修改版规则，这里只作敏感性，不改已经锁定的表 4。</li>
-<li><code>matches_locked = FALSE</code> 的条目，就是「换规则会变」的条目。看到这个结果之后再去改规则，是事后选择。</li>
+<li>锁定规则是 table4。κ 比较的是适宜 / 不确定 /
+不适宜是否相同，不是比较中文句子。</li>
+<li>ST05 在表 4 下是不确定，在 IPRAS
+下是适宜。这不是计算错误。分布整体偏高时，IPRAS
+会放宽分歧阈值。既然方案写的是表 4，正式结论保持不确定。</li>
+<li>ST06 在表 4 下是适宜，在百分比规则下是不确定：6/9 约 67% 落在
+7–9，没有达到
+70%。百分比是另一套修改版规则，这里只作敏感性，不改已经锁定的表 4。</li>
+<li><code>matches_locked = FALSE</code>
+的条目，就是「换规则会变」的条目。看到这个结果之后再去改规则，是事后选择。</li>
 </ul>
 </div>
 <div id="写出-docx-报告" class="section level1">
 <h1>9. 写出 docx 报告</h1>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;delphi-ram-table4-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:/Users/Lenovo/AppData/Local/Temp/RtmpGKKk7n/delphi-ram-table4-bca8499271fb.docx&quot;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p><strong>解读：</strong> 报告里应能找到：表 4 的文献、函询不是面对面会议、<code>high_pct</code> 不参与分类、每一轮的适宜性和共识、ST04 与 ST05 的分歧清单、三种规则的 κ，以及补充指标不能替代 RAM 的说明。选择 html 时仍会另写一份 docx。分歧条目要留在清单里，不要只导出适宜的那几条。</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;delphi-ram-table4-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_delphi_ram</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:/Users/Lenovo/AppData/Local/Temp/Rtmpy45UxY/delphi-ram-table4-2ccce5a2540.docx&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p><strong>解读：</strong> 报告里应能找到：表 4
+的文献、函询不是面对面会议、<code>high_pct</code>
+不参与分类、每一轮的适宜性和共识、ST04 与 ST05 的分歧清单、三种规则的
+κ，以及补充指标不能替代 RAM 的说明。选择 html 时仍会另写一份
+docx。分歧条目要留在清单里，不要只导出适宜的那几条。</p>
 </div>
 <div id="和真实项目的差别" class="section level1">
 <h1>10. 和真实项目的差别</h1>
-<p>这份样本没有人中途退出，也没有「无法判断」。真实数据里，某条只有 6 个人作答时，软件会警告人数不足 7，分类只供描述。7 人沿用 8–10 人的阈值，报告里要写明。超过 16 人的阈值是外推，手册没有正式列出那一档。</p>
-<p>若第 2 轮实际开了会，把 <code>round_mode</code> 写成 <code>in_person</code> 或 <code>online</code>，不要把开过的会写成函询，也不要把函询写成开过会。</p>
+<p>这份样本没有人中途退出，也没有「无法判断」。真实数据里，某条只有 6
+个人作答时，软件会警告人数不足 7，分类只供描述。7 人沿用 8–10
+人的阈值，报告里要写明。超过 16
+人的阈值是外推，手册没有正式列出那一档。</p>
+<p>若第 2 轮实际开了会，把 <code>round_mode</code> 写成
+<code>in_person</code> 或
+<code>online</code>，不要把开过的会写成函询，也不要把函询写成开过会。</p>
 </div>
 
 

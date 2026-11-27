@@ -209,7 +209,7 @@ file.exists(attr(out, "report_file"))
 
 ## 9.2 预设方案参数表
 
-`protocol_table(res3$study$protocol)` 应出现全部阈值。若 `modified_from_preset` 为 TRUE 却没有 rationale，属于方法学缺陷。
+`protocol_table(res3$study$protocol)` 应出现全部阈值。初次锁定时改阈值不必写理由。若锁定之后 `modified_from_preset` 为 TRUE 却没有 rationale，属于方法学缺陷。
 
 ## 9.3 专家构成与权威系数
 

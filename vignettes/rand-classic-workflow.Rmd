@@ -61,7 +61,7 @@ tab <- protocol_table(protocol)
 tab[tab$parameter %in% c("rand_disagreement", "rand_round2_mode", "max_rounds", "rand_boundary"), ]
 ```
 
-**解读：** `modified` 为 FALSE 表示没有偏离该场景的预设。若把规则改成 `ipras` 或 `percent` 而不写 `rationale`，方案会警告，报告会标成偏离预设。
+**解读：** `modified` 为 FALSE 表示当前值就是初次锁定值。发卷前把规则写成 `ipras` 或 `percent`，就是本研究的方案，不必写 `rationale`。锁定之后再改规则而不写 `rationale`，方案会警告，报告会标成偏离初次锁定。
 
 # 3. 第 1 轮问卷：docx 与 xlsx
 

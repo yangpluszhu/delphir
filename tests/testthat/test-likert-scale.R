@@ -65,10 +65,15 @@ test_that("explicit thresholds still override the scale preset", {
   )
   expect_equal(p$rules$median_min, 5)
   expect_equal(p$high_range, c(4, 5))
-  expect_true(isTRUE(p$modified_from_preset))
+  expect_false(isTRUE(p$modified_from_preset))
   tab <- protocol_table(p)
-  expect_true(isTRUE(tab$modified[tab$parameter == "median_min"]))
+  expect_false(isTRUE(tab$modified[tab$parameter == "median_min"]))
   expect_false(isTRUE(tab$modified[tab$parameter == "high_range"]))
+  p2 <- revise_protocol(p, median_min = 4, rationale = "改回该分制的高区下沿。")
+  expect_true(isTRUE(p2$modified_from_preset))
+  tab2 <- protocol_table(p2)
+  expect_true(isTRUE(tab2$modified[tab2$parameter == "median_min"]))
+  expect_false(isTRUE(tab2$modified[tab2$parameter == "high_range"]))
 })
 
 test_that("9-point IPRAS example is unchanged and 5-point constants rescale", {

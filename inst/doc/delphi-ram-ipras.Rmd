@@ -53,7 +53,7 @@ protocol_table(p)[protocol_table(p)$parameter %in% c("rand_disagreement", "rand_
 - IPRr = 2.35，CFA = 1.5，分位数 type = 7。`nonstandard_ipras = FALSE`，报告不必写成非标准常数。
 - 函询仍是 `mail`，最多 3 轮。这和经典两轮面对面专家组不同，和所选的分歧公式是两件事。
 - `high_pct` 仍是 `NA`。不要用 80% 高区比例覆盖 IPRAS。
-- 因为默认预设是表 4，改成 IPRAS 会标成偏离预设。理由已经写在方案里：这是事先规定的规则，不是看到 ST05 之后才改的。
+- 初次选择 IPRAS 就是本研究锁定的规则，`modified_from_preset` 为 FALSE，不必写理由。这是发卷前规定的规则，不是看到 ST05 之后才改的。锁定后再改规则，才用 `revise_protocol()` 并写理由。
 
 # 3. 问卷仍然复评全部条目
 

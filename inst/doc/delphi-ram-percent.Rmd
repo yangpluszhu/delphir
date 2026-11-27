@@ -36,10 +36,10 @@ ram$protocol$rand$rule
 ram$protocol$rand$purpose
 ram$protocol$rand$percent_high
 ram$protocol$rand$percent_low
-ram$protocol$rand$modified_from_preset
+ram$protocol$modified_from_preset
 ```
 
-**解读：** `purpose` 是 `recommendation`，提醒读者这不是适宜性专家组。`modified_from_preset = TRUE`，因为场景默认规则是表 4，百分比是事先声明的偏离。理由在 `rationale` 里，报告会打印。
+**解读：** `purpose` 是 `recommendation`，提醒读者这不是适宜性专家组。百分比规则在分类名称里仍写成 RAM 修改版。`modified_from_preset` 为 FALSE：发卷前选定百分比规则，就是本研究的初次锁定，不是相对软件起始值的偏离。
 
 # 2. 问卷怎么说这套规则
 
@@ -143,10 +143,16 @@ file.info(attr(reported, "report_file"))$size
 若项目想用 80% 而不是 70%，应这样锁定，而不是分析完再改：
 
 ```{r}
-p80 <- delphi_ram_protocol("percent", percent_high = 0.80, percent_low = 0.15,
-                           rationale = "高风险推荐，第 1 轮前把赞同共识提高到 80%。")
+p80 <- delphi_ram_protocol("percent", percent_high = 0.80, percent_low = 0.15)
 p80$rand$percent_high
 p80$modified_from_preset
+
+p_later <- revise_protocol(
+  p80,
+  rand_percent_high = 0.75,
+  rationale = "方案锁定后、看见评分前，把赞同共识从 80% 改回 75%。"
+)
+p_later$modified_from_preset
 ```
 
-**解读：** 0.80 会被标成偏离默认 0.70，理由进入报告。用这套方案重新分类时，9/12 = 75% 的 PC06 将不再算赞同共识。这是阈值的后果，应在招募专家之前就接受，而不是在末轮才发现。
+**解读：** 发卷前写成 0.80，就是本研究的初次锁定，`modified_from_preset` 为 FALSE。锁定后再改，才标成偏离初次锁定，并要写理由。用 0.80 重新分类时，9/12 = 75% 的 PC06 将不再算赞同共识。这是阈值的后果，应在招募专家之前就接受，而不是在末轮才发现。

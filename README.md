@@ -67,7 +67,7 @@ remotes::install_github("yangpluszhu/delphir")
 If you have downloaded the source package:
 
 ```r
-install.packages("delphir_0.9.0.tar.gz", repos = NULL, type = "source")
+install.packages("delphir_0.10.0.tar.gz", repos = NULL, type = "source")
 ```
 
 For local development (including vignettes):
@@ -227,7 +227,7 @@ Before submitting code:
 
 ## Changelog
 
-See [NEWS.md](NEWS.md). Current version: **0.9.0**.
+See [NEWS.md](NEWS.md). Current version: **0.10.0**.
 
 ## License
 

@@ -10,10 +10,11 @@ preset_protocol(scenario = "clinical_consensus", ...)
 \item{scenario}{场景标识，见 \code{\link[=delphi_protocol]{delphi_protocol()}}。默认
 \code{"clinical_consensus"}。}
 
-\item{...}{覆盖预设的参数（必须是 \code{\link[=delphi_protocol]{delphi_protocol()}} 的形参名）。
-若改变共识或分歧阈值，请同时提供 \code{rationale}。未出现在 \code{...} 中的参数
-保持该场景默认值。\code{points = 5} 或 \code{7}，以及 \code{scale_max = 5} 或 \code{7}，
-会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。只改分制不算偏离预设。}
+\item{...}{覆盖该场景起始值的参数（必须是 \code{\link[=delphi_protocol]{delphi_protocol()}} 的形参名）。
+这里写上的值就是本研究的初次锁定，不必提供 \code{rationale}。未出现在 \code{...}
+中的参数保持该场景起始值。\code{points = 5} 或 \code{7}，以及 \code{scale_max = 5} 或 \code{7}，
+会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。锁定后再改参数，
+用 \code{\link[=revise_protocol]{revise_protocol()}}。}
 }
 \value{
 \code{delphi_protocol} 对象，字段与 \code{\link[=delphi_protocol]{delphi_protocol()}} 相同。
@@ -52,15 +53,12 @@ preset_protocol("comet_cos")
 preset_protocol("rand_ucla")
 protocol_table(preset_protocol("indicator"))
 
-# 覆盖单参数必须写理由
-preset_protocol(
-  "clinical_consensus",
-  iqr_max = 3,
-  rationale = "条目表述较长，允许 IQR=3 作为高度共识的离散上限。"
-)
+# 初次锁定可以直接改阈值，不必写理由
+p <- preset_protocol("clinical_consensus", iqr_max = 3)
+p$modified_from_preset
 
 }
 \seealso{
-\code{\link[=delphi_protocol]{delphi_protocol()}}, \code{\link[=protocol_table]{protocol_table()}},
+\code{\link[=delphi_protocol]{delphi_protocol()}}, \code{\link[=revise_protocol]{revise_protocol()}}, \code{\link[=protocol_table]{protocol_table()}},
 vignette("preset-protocol", package = "delphir")
 }

@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-11-25" />
+<meta name="date" content="2026-11-27" />
 
 <title>教学文档 13：改良德尔菲结合 IPRAS</title>
 
@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">教学文档 13：改良德尔菲结合 IPRAS</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-11-25</h4>
+<h4 class="date">2026-11-27</h4>
 
 
 
@@ -401,7 +401,7 @@ IPRAS，不是表 4，也不是百分比。</p>
 <span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
 <span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a><span class="fu">protocol_table</span>(p)[<span class="fu">protocol_table</span>(p)<span class="sc">$</span>parameter <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;rand_disagreement&quot;</span>, <span class="st">&quot;rand_iprr&quot;</span>, <span class="st">&quot;rand_cfa&quot;</span>, <span class="st">&quot;rand_qtype&quot;</span>, <span class="st">&quot;max_rounds&quot;</span>), ]</span>
 <span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a><span class="co">#&gt;            parameter value preset modified</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; 16 rand_disagreement ipras table4     TRUE</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a><span class="co">#&gt; 16 rand_disagreement ipras  ipras    FALSE</span></span>
 <span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a><span class="co">#&gt; 21         rand_iprr  2.35   2.35    FALSE</span></span>
 <span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a><span class="co">#&gt; 22          rand_cfa   1.5    1.5    FALSE</span></span>
 <span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a><span class="co">#&gt; 23        rand_qtype     7      7    FALSE</span></span>
@@ -420,9 +420,11 @@ IPRAS，不是表 4，也不是百分比。</p>
 轮。这和经典两轮面对面专家组不同，和所选的分歧公式是两件事。</li>
 <li><code>high_pct</code> 仍是 <code>NA</code>。不要用 80% 高区比例覆盖
 IPRAS。</li>
-<li>因为默认预设是表 4，改成 IPRAS
-会标成偏离预设。理由已经写在方案里：这是事先规定的规则，不是看到 ST05
-之后才改的。</li>
+<li>初次选择 IPRAS
+就是本研究锁定的规则，<code>modified_from_preset</code> 为
+FALSE，不必写理由。这是发卷前规定的规则，不是看到 ST05
+之后才改的。锁定后再改规则，才用 <code>revise_protocol()</code>
+并写理由。</li>
 </ul>
 </div>
 <div id="问卷仍然复评全部条目" class="section level1">
@@ -488,10 +490,10 @@ IPRAS，IPRAS <strong>不</strong>判分歧。在本方案下，ST05
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">table</span>(res<span class="sc">$</span>last_classification<span class="sc">$</span>consensus_zh)</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>tab</span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;                 负向共识   未达成共识（存在分歧） 未达成共识（中位数居中） </span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;                        1                        1                        1 </span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;                 正向共识 </span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;                        3</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; 未达成共识（中位数居中）   未达成共识（存在分歧）                 正向共识 </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt;                        1                        1                        3 </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;                 负向共识 </span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;                        1</span></span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>res<span class="sc">$</span>last_classification[res<span class="sc">$</span>last_classification<span class="sc">$</span>item_id <span class="sc">==</span> <span class="st">&quot;ST05&quot;</span>,</span>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ipras&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;consensus_zh&quot;</span>)]</span>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt;    item_id ipr ipras        di class_zh consensus_zh</span></span>
@@ -553,7 +555,7 @@ ST04 从分歧清单里删掉。Wilcoxon 的 P
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">file.info</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))<span class="sc">$</span>size</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 24889</span></span></code></pre></div>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 24856</span></span></code></pre></div>
 <p><strong>解读：</strong> 报告应写明 IPR、IPRAS、DI、分位数 type
 7，以及 IPR 必须<strong>大于</strong>
 IPRAS。还应写明这是三轮匿名函询，ST05 按 IPRAS 为适宜，若改用表 4

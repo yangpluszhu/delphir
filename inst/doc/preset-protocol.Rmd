@@ -39,7 +39,7 @@ nrow(tab)
 head(tab, 10)
 ```
 
-**解读：** `value` 是本研究锁定值，`preset` 是该场景默认值，`modified` 为 TRUE 表示偏离预设。报告模板会原样打印这张表，避免只写「采用 Delphi」而不写阈值。
+**解读：** `value` 是当前锁定值，`preset` 是本研究初次锁定的值，`modified` 为 TRUE 表示锁定之后又改过。第一次调用时两者相同。报告模板会原样打印这张表，避免只写「采用 Delphi」而不写阈值。
 
 # 3. 场景 `scenario`：决定哪一套规则真正生效
 
@@ -93,20 +93,18 @@ c(scale5 = paste(p5$scale_min, p5$scale_max, sep = "-"),
 s1 <- summarize_items(consensus_demo, rounds = 1)
 s1 <- s1[s1$dimension == "重要性", ]
 cls80 <- classify_consensus(s1, p)
-p70 <- preset_protocol("clinical_consensus", high_pct = 0.70,
-                       rationale = "仅用于演示：把高度共识从 80% 放到 70%。")
+p70 <- preset_protocol("clinical_consensus", high_pct = 0.70)
 cls70 <- classify_consensus(s1, p70)
 table(cls80$class_zh)
 table(cls70$class_zh)
 ```
 
-**解读：** 放宽 `high_pct` 会把部分「基本共识 / 临界」抬成「高度共识」。这正是事后改阈值的诱惑所在——也是 ACCORD 禁止的做法。真实研究若因高风险把 80% 提到 85%，必须写 `rationale`。
+**解读：** 放宽 `high_pct` 会把部分「基本共识 / 临界」抬成「高度共识」。这正是事后改阈值的诱惑所在——也是 ACCORD 禁止的做法。真实研究若在发卷前就把高度共识写成 70% 或 85%，那就是本研究的初次锁定，不必写 `rationale`。锁定之后再改，才用 `revise_protocol()` 并写理由。
 
 IQR 的作用：即使高区比例达标，离散过大也不能叫高度共识。
 
 ```{r}
-p_iqr <- preset_protocol("clinical_consensus", iqr_max = 1,
-                         rationale = "演示：把 IQR 上限从 2 收到 1。")
+p_iqr <- preset_protocol("clinical_consensus", iqr_max = 1)
 table(classify_consensus(s1, p_iqr)$class_zh)
 ```
 
@@ -155,14 +153,16 @@ pr$rand
 
 - `cv_max`：仅指标体系；CV 是均数补充。
 - `ranking_topk`：仅排序函数的 Top-k。
-- `rationale`：改阈值必填；报告打印「方案偏离预设」。
+- `rationale`：初次锁定不必填。锁定后再改参数时，`revise_protocol()` 必填；报告打印「方案偏离初次锁定」。
 - `locked = TRUE`：分析函数不得把阈值当参数回改。[classify_consensus()] 没有阈值参数，就是为了堵住这条路。
 
 ```{r}
-p2 <- delphi_protocol(
-  scenario = "clinical_consensus",
-  high_pct = 0.85,
-  rationale = "高风险诊疗推荐，将高度共识阈值提高到 85%。"
+p_first <- preset_protocol("clinical_consensus", high_pct = 0.85)
+p_first$modified_from_preset
+p2 <- revise_protocol(
+  p_first,
+  high_pct = 0.90,
+  rationale = "方案锁定后、看见评分前，将高度共识阈值从 0.85 提高到 0.90。"
 )
 c(modified = p2$modified_from_preset, rationale = p2$rationale)
 ```

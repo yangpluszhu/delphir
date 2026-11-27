@@ -75,13 +75,16 @@ protocol <- preset_protocol("clinical_consensus")
 protocol
 ```
 
-如果因高风险推荐把 80% 改成 85%，必须写 `rationale`，报告会打印“方案偏离预设”。
+如果发卷前就把 80% 写成 85%，那是本研究的初次锁定，不必写 `rationale`。锁定之后再改，才用 `revise_protocol()`，报告会打印“方案偏离初次锁定”。
 
 ```{r}
-stricter <- delphi_protocol(
-  scenario = "clinical_consensus",
-  high_pct = 0.85,
-  rationale = "涉及受试者安全的硬性要求，将高度共识提高到 85%。"
+initial <- preset_protocol("clinical_consensus", high_pct = 0.85)
+initial$modified_from_preset
+
+stricter <- revise_protocol(
+  initial,
+  high_pct = 0.90,
+  rationale = "方案锁定后、看见评分前，将高度共识从 85% 提高到 90%。"
 )
 stricter$modified_from_preset
 ```

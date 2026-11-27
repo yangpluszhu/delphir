@@ -74,7 +74,7 @@ knitr::kable(delphir::protocol_table(p), caption = "锁定的方案参数")
 
 **怎么读：** 这次真正用来决定去留的是两句话。第一，最终轮重要程度的平均分至少 `r rules$mean_min` 分，并且大家的分歧不要太大（变异系数不超过 `r rules$cv_max`）。第二，至少做过两轮 5 分评分之后，如果协调系数不低于 `r rules$w_min`、统计检验 P 小于 `r rules$w_p_max`，而且各条平均分比上一轮平均挪动不到 `r rules$mean_delta_max` 分，就可以结束。满分比要写进报告，但不单独用来删掉某一条。积极系数 `r round(100 * rules$response_rate_min)`% 和权威系数 `r rules$cr_min` 只用来描述专家组，不用来给分数加权。
 
-`r if (isTRUE(p$modified_from_preset)) paste0("本方案改过预设界值。理由：", p$rationale %||% "（未填写理由）") else "本方案使用该场景的预设界值，没有在看到结果后改过。"`
+`r if (isTRUE(p$modified_from_preset)) paste0("本方案在初次锁定后又改过参数。理由：", p$rationale %||% "（未填写理由）") else "当前参数就是本研究初次锁定的方案，锁定后尚未再修改。"`
 
 # 调查对象
 

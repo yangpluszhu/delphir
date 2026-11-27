@@ -86,9 +86,13 @@ test_that("protocol_table covers every delphi_protocol argument", {
   expect_true(all(c("high_pct", "comet_in_high", "max_rounds", "locked") %in% tab$parameter))
   p2 <- preset_protocol("clinical_consensus", high_pct = 0.85,
                         rationale = "演示")
-  expect_true(p2$modified_from_preset)
+  expect_false(isTRUE(p2$modified_from_preset))
   tab2 <- protocol_table(p2)
-  expect_true(isTRUE(tab2$modified[tab2$parameter == "high_pct"]))
+  expect_false(isTRUE(tab2$modified[tab2$parameter == "high_pct"]))
+  p3 <- revise_protocol(p2, high_pct = 0.90, rationale = "锁定后再提高。")
+  expect_true(isTRUE(p3$modified_from_preset))
+  tab3 <- protocol_table(p3)
+  expect_true(isTRUE(tab3$modified[tab3$parameter == "high_pct"]))
 })
 
 test_that("blank xlsx cells are not ingested as unable", {

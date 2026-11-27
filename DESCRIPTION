@@ -1,6 +1,6 @@
 Package: delphir
 Title: Structured Delphi and RAND/UCLA Analysis for Consensus Studies
-Version: 0.9.0
+Version: 0.10.0
 Authors@R: c(
     person("Ming", "Yang", email = "yangpluszhu@sina.com",
            role = c("aut", "cre"))

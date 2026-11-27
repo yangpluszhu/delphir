@@ -196,7 +196,8 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 \item{cr_min}{权威系数组均数的参考下限，默认 0.70。不用于加权评分。}
 
 \item{authority_scale}{可选，\code{\link[=authority_scales]{authority_scales()}} 的返回值。缺省为曾光表。
-第 1 轮问卷、分析和报告都使用这份表。自定义后应填写 \code{rationale}。
+第 1 轮问卷、分析和报告都使用这份表。初次锁定时自定义赋分表不必写
+\code{rationale}；锁定后再改，用 \code{\link[=revise_protocol]{revise_protocol()}} 并填写理由。
 已有数值 Ca、Cs 时，分析不再按该表重算。}
 
 \item{allow_new}{是否允许第 1 轮结构化补充候选条目。\code{NULL} 时按场景取值：
@@ -224,9 +225,8 @@ Policy 与 5 分核心技术要素为 \code{FALSE}。}
 若要素均已有古籍或现代文献基础，设为 \code{FALSE}，此时第 1 轮就是
 技术要求所称的评分调查（文档中的「第 2 轮」）。}
 
-\item{rationale}{若修改了预设阈值，必须说明理由；报告会打印「方案偏离预设」。
-临床/定义场景改了 \code{high_pct} 等、或核心技术要素场景改了均数/协调界值，
-而未填此项时会警告。}
+\item{rationale}{可选备注。初次锁定时填写与否都不表示偏离，也不产生警告。
+锁定后再次修改参数时，请改用 \code{\link[=revise_protocol]{revise_protocol()}}，并在那里填写理由。}
 
 \item{locked}{是否锁定阈值。默认 \code{TRUE}。锁定后分析阶段不得把阈值当参数回改。}
 
@@ -245,6 +245,7 @@ Policy 与 5 分核心技术要素为 \code{FALSE}。}
 每人上限、是否必须再迭代一轮、审查组说明）
 \item \code{authority_scale}：Ca/Cs 赋分表，缺省为曾光表
 \item \code{rand}：规则、第 2 轮形式、必要性、边界中位数、IPRAS 常数与百分比阈值
+\item \code{study_preset}：初次锁定时的方案副本。再次修改时与它比较，而不是与软件默认值比较
 \item \code{modified_from_preset}, \code{rationale}, \code{locked}
 }
 }
@@ -265,8 +266,11 @@ Policy 与 5 分核心技术要素为 \code{FALSE}。}
 \section{何时改预设、何时不要改}{
 
 \itemize{
-\item \strong{可以改}：高风险诊疗推荐把 \code{high_pct} 从 0.80 提到 0.85，并写 \code{rationale}。
-\item \strong{不要改}：看见第 1 轮刚好比 0.80 低 2 个百分点，就把阈值改成 0.75「凑共识」。
+\item \strong{初次锁定}：针对本研究把 \code{high_pct} 写成 0.85 即可，不必写 \code{rationale}。
+这时写入的值就是本研究的预设，\code{modified_from_preset} 为 \code{FALSE}。
+\item \strong{锁定后再改}：用 \code{\link[=revise_protocol]{revise_protocol()}}，并写 \code{rationale}。报告会打印
+「方案偏离初次锁定」。
+\item \strong{不要改}：看见第 1 轮刚好比锁定阈值低 2 个百分点，就把阈值改成刚好能过。
 \item \strong{不要混用}：把 COMET 的 70/15 套到临床共识，或把临床 0.80 套到 RAND 适宜性。
 }
 }
@@ -276,26 +280,30 @@ p <- preset_protocol("clinical_consensus")
 p
 protocol_table(p)[1:8, ]
 
-p2 <- delphi_protocol(
-  scenario = "clinical_consensus",
-  high_pct = 0.85,
-  rationale = "高风险诊疗推荐，将高度共识阈值提高到 0.85。"
-)
+# 初次锁定：直接写成本研究的阈值，不必写理由
+p2 <- preset_protocol("clinical_consensus", high_pct = 0.85)
 p2$modified_from_preset
-p2$rationale
+
+# 锁定后再改，才需要理由
+p3 <- revise_protocol(
+  p2, high_pct = 0.90,
+  rationale = "方案锁定后、看见评分前，将高度共识阈值从 0.85 提高到 0.90。"
+)
+p3$modified_from_preset
+p3$rationale
 
 # 同一批评分、不同阈值会改变分类（教学数据第 1 轮）
 data(consensus_demo, package = "delphir")
 s <- summarize_items(consensus_demo, rounds = 1)
 tab0 <- table(classify_consensus(s, p)$class_zh)
-p_loose <- preset_protocol("clinical_consensus", high_pct = 0.70,
-                           rationale = "仅用于演示：放宽高度共识阈值。")
+p_loose <- preset_protocol("clinical_consensus", high_pct = 0.70)
 tab1 <- table(classify_consensus(s, p_loose)$class_zh)
 tab0
 tab1
 
 }
 \seealso{
-\code{\link[=preset_protocol]{preset_protocol()}}, \code{\link[=protocol_table]{protocol_table()}}, \code{\link[=classify_consensus]{classify_consensus()}},
-\code{\link[=analyze_delphi]{analyze_delphi()}}, vignette("preset-protocol", package = "delphir")
+\code{\link[=preset_protocol]{preset_protocol()}}, \code{\link[=revise_protocol]{revise_protocol()}}, \code{\link[=protocol_table]{protocol_table()}},
+\code{\link[=classify_consensus]{classify_consensus()}}, \code{\link[=analyze_delphi]{analyze_delphi()}},
+vignette("preset-protocol", package = "delphir")
 }

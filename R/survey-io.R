@@ -219,8 +219,8 @@
   }
 
   proto <- protocol_table(p)
-  proto_out <- proto[, c("parameter", "value", "meaning")]
-  names(proto_out) <- c("\u53c2\u6570", "\u503c", "\u542b\u4e49")
+  proto_out <- proto[, c("parameter", "value", "preset", "meaning")]
+  names(proto_out) <- c("\u53c2\u6570", "\u503c", "\u521d\u59cb\u9501\u5b9a\u503c", "\u542b\u4e49")
 
   panel_cols <- intersect(
     c("expert_id", "sex", "age", "education", "stakeholder", "specialty",
@@ -506,7 +506,18 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
     nms <- names(kv)
     key_col <- if ("parameter" %in% nms) "parameter" else nms[1]
     val_col <- if ("value" %in% nms) "value" else nms[2]
-    proto <- tryCatch(.protocol_from_table(kv[[key_col]], kv[[val_col]]), error = function(e) NULL)
+    preset_col <- if ("preset" %in% nms) {
+      "preset"
+    } else if ("\u521d\u59cb\u9501\u5b9a\u503c" %in% nms) {
+      "\u521d\u59cb\u9501\u5b9a\u503c"
+    } else {
+      NA_character_
+    }
+    preset <- if (!is.na(preset_col)) kv[[preset_col]] else NULL
+    proto <- tryCatch(
+      .protocol_from_table(kv[[key_col]], kv[[val_col]], preset = preset),
+      error = function(e) NULL
+    )
   }
 
   panel <- read_sh(s_panel)
@@ -656,7 +667,7 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   out
 }
 
-.protocol_from_table <- function(keys, values) {
+.protocol_from_table <- function(keys, values, preset = NULL) {
   getv <- function(nm, default = NULL) {
     w <- which(keys == nm)[1]
     if (is.na(w)) return(default)
@@ -730,7 +741,15 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
       nzchar(as.character(cs_txt)) && nzchar(as.character(ca_txt))) {
     args$authority_scale <- .decode_authority_scale(as.character(cs_txt), as.character(ca_txt))
   }
-  do.call(delphi_protocol, args)
+  proto <- do.call(delphi_protocol, args)
+  if (is.null(preset)) return(proto)
+  base <- .protocol_from_table(keys, preset, preset = NULL)
+  proto$study_preset <- base$study_preset
+  proto$modified_from_preset <- .protocol_differs(proto, proto$study_preset)
+  if (isTRUE(proto$modified_from_preset) && .rationale_missing(proto$rationale)) {
+    .warn_revision_rationale()
+  }
+  proto
 }
 
 .rbind_fill_unique <- function(lst, key) {

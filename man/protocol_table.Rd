@@ -13,8 +13,9 @@ protocol_table(protocol)
 数据框，列：\code{parameter}、\code{value}、\code{preset}、\code{modified}、\code{meaning}。
 }
 \description{
-一行一个参数，含当前值、该场景预设值、是否偏离，以及简要方法学含义。
+一行一个参数，含当前值、本研究初次锁定值、是否在锁定后又改过，以及简要方法学含义。
 供帮助文档、问卷封面和 \code{\link[=delphi_report]{delphi_report()}} 完整打印方案使用。
+\code{preset} 是初次锁定值，不是软件自带的起始值。
 }
 \examples{
 protocol_table(preset_protocol("clinical_consensus"))

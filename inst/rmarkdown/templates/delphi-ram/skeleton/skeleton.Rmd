@@ -60,10 +60,10 @@ stage_label <- if (!is_final) paste0("第 ", res$last_round, " 轮中间报告")
 
 ```{r}
 knitr::kable(delphir::protocol_table(p),
-             caption = "预设方案（value 为锁定值，preset 为该场景默认值）")
+             caption = "方案参数（value 为当前值，preset 为本研究初次锁定值）")
 ```
 
-`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）") else paste0("规则相对该场景默认值未再改写。理由记录：", p$rationale %||% "无")`
+`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离初次锁定。** 理由：", p$rationale %||% "（未填写 rationale）") else "当前参数就是本研究初次锁定的方案，锁定后尚未再修改。"`
 
 文献：Fitch K, Bernstein SJ, Aguilar MD, et al. The RAND/UCLA Appropriateness Method User's Manual. Santa Monica, CA: RAND; 2001. 百分比规则必须标明为 RAM 修改版。
 

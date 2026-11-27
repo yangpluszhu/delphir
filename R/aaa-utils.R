@@ -26,7 +26,7 @@
 }
 
 .pkg_version <- function() {
-  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.9.0")
+  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.10.0")
 }
 
 .need_pkg <- function(pkg) {
@@ -198,7 +198,7 @@
     paste0(
       "\u534f\u8bae\u5df2\u9501\u5b9a\uff0c\u4e0d\u5141\u8bb8\u5728\u5206\u6790\u9636\u6bb5\u4fee\u6539\u5171\u8bc6\u9608\u503c\uff08",
       paste(changed, collapse = ", "),
-      "\uff09\u3002\u8bf7\u5728 delphi_protocol() \u4e2d\u4e8b\u5148\u89c4\u5b9a\u5e76\u586b\u5199 rationale\u3002"
+      "\uff09\u3002\u82e5\u786e\u9700\u4fee\u6539\u5df2\u9501\u5b9a\u65b9\u6848\uff0c\u8bf7\u4f7f\u7528 revise_protocol() \u5e76\u586b\u5199 rationale\u3002"
     )
   )
   invisible(TRUE)

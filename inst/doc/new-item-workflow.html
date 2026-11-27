@@ -12,32 +12,45 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-04" />
+<meta name="date" content="2026-11-27" />
 
 <title>教学文档 8：第一轮新增条目，从问卷到三轮报告</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
 
 <style type="text/css">
-  code{white-space: pre-wrap;}
-  span.smallcaps{font-variant: small-caps;}
-  span.underline{text-decoration: underline;}
-  div.column{display: inline-block; vertical-align: top; width: 50%;}
-  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-  ul.task-list{list-style: none;}
-    </style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
 
 
 
 <style type="text/css">
-  code {
-    white-space: pre;
-  }
-  .sourceCode {
-    overflow: visible;
-  }
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -53,55 +66,54 @@ pre > code.sourceCode { white-space: pre-wrap; }
 pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
-  { counter-reset: source-line 0; }
+{ counter-reset: source-line 0; }
 pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
+{ position: relative; left: -4em; counter-increment: source-line; }
 pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
 div.sourceCode
-  {   }
+{ }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
 </style>
 <script>
 // apply pandoc div.sourceCode style to pre.sourceCode instead
@@ -135,7 +147,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -147,326 +339,395 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<h1 class="title toc-ignore">教学文档 8：第一轮新增条目，从问卷到三轮报告</h1>
+<h1 class="title toc-ignore">教学文档
+8：第一轮新增条目，从问卷到三轮报告</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-04</h4>
+<h4 class="date">2026-11-27</h4>
 
 
 
 <div id="这份文档在做什么" class="section level1">
 <h1>1. 这份文档在做什么</h1>
-<p>改良 Delphi 往往先根据文献、指南和访谈，准备好一份候选条目，再请专家打分。第一轮结束以后，专家仍然可以指出遗漏。高质量的做法不是「写到了就加进去」，而是事先规定：怎样判断它是不是一条新的评价概念，什么情况下可以进入下一轮，以及新条目至少还要再评一轮。</p>
+<p>改良 Delphi
+往往先根据文献、指南和访谈，准备好一份候选条目，再请专家打分。第一轮结束以后，专家仍然可以指出遗漏。高质量的做法不是「写到了就加进去」，而是事先规定：怎样判断它是不是一条新的评价概念，什么情况下可以进入下一轮，以及新条目至少还要再评一轮。</p>
 <p>下面用一个完整、可重复的教学案例走通不少于 3 轮：</p>
 <p>建立适用于中医药治疗成人慢性心力衰竭临床研究的核心疗效指标集。</p>
 <p>要评价的问题是：哪些结局重要到应当进入核心指标集。范围只包括临床疗效，不包括住院费用这类卫生经济学指标。数据是模拟的，用来演示方法，不能当作临床推荐。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>new_items</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $allow</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $min_independent</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $allow_single_with_evidence</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $max_suggestions</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 5</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $require_iteration</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $review_panel</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;条目审查组5人：中医临床专家2名、临床研究方法学专家1名、统计学或Delphi方法专家1名、患者或患者代表1名。先由2名研究者独立编码，不一致时由第3名研究者裁决。&quot;</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 共识规则是 COMET 常用的 70/15。评分 7–9 的人至少占 70%，同时评分 1–3 的人不到 15%，才叫纳入共识。反过来，1–3 分至少 70% 且 7–9 分不到 15%，才叫排除共识。其余是未达共识。这些数字在发问卷之前就锁定了，看到结果以后不能再改。</p>
-<p>新增条目另有一套同样事先锁定的规则：至少 2 名专家各自独立提出，或者只有 1 名专家提出、但已有文献、访谈、指南或重要临床依据。软件只执行这套规则，不会把专家的原话自动改写成条目。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>protocol<span class="sc">$</span>new_items</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co">#&gt; $allow</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co">#&gt; $min_independent</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="co">#&gt; $allow_single_with_evidence</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; $max_suggestions</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="co">#&gt; [1] 5</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co">#&gt; $require_iteration</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co">#&gt; $review_panel</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co">#&gt; [1] &quot;条目审查组5人：中医临床专家2名、临床研究方法学专家1名、统计学或Delphi方法专家1名、患者或患者代表1名。先由2名研究者独立编码，不一致时由第3名研究者裁决。&quot;</span></span></code></pre></div>
+<p><strong>怎么读：</strong> 共识规则是 COMET 常用的 70/15。评分 7–9
+的人至少占 70%，同时评分 1–3 的人不到 15%，才叫纳入共识。反过来，1–3
+分至少 70% 且 7–9 分不到
+15%，才叫排除共识。其余是未达共识。这些数字在发问卷之前就锁定了，看到结果以后不能再改。</p>
+<p>新增条目另有一套同样事先锁定的规则：至少 2
+名专家各自独立提出，或者只有 1
+名专家提出、但已有文献、访谈、指南或重要临床依据。软件只执行这套规则，不会把专家的原话自动改写成条目。</p>
 </div>
 <div id="第-0-步初始候选池和第一轮问卷" class="section level1">
 <h1>2. 第 0 步：初始候选池和第一轮问卷</h1>
-<p>初始池有 26 项，来自前期证据综合。里面已经有「心衰住院」「健康相关生活质量」「中医证候总积分」。还没有「患者总体改善感受」「睡眠质量」「活动后呼吸困难恢复情况」。这三句要等第一轮开放题之后再审查，不能提前放进问卷冒充已有条目。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>round1 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(round1<span class="sc">$</span>items)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 26</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(round1<span class="sc">$</span>items<span class="sc">$</span>domain)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       安全性         功能 患者报告结局     客观指标     临床事件         症状 </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            1            3            1            2            7            8 </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     中医特色 </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            4</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, round1<span class="sc">$</span>panel, round1<span class="sc">$</span>items, round1<span class="sc">$</span>meta)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>dir1 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r1-&quot;</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(dir1)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>files1 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(bp, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> dir1)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(files1)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round1.docx&quot; &quot;round1.xlsx&quot;</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 第 1 轮问卷做两件事。一是请专家对 26 项按 1–9 分评价重要性，不了解就选「无法判断」，不要填成中间的 5 分。二是用结构化开放题询问有没有遗漏：名称、含义、理由、与现有条目的区别、依据，每人最多 5 项。不要只留一句「还有其他意见吗」。</p>
-<p>xlsx 里黄色格子是要填写的。另有一张「新增建议」表。docx 给专家阅读，xlsx 给数据回收。</p>
-<p>下面用已经填好的模拟答卷演示回读。真实研究里，把专家交回的 xlsx 放在同一位置即可。</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>filled <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.xlsx&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(round1, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> filled, <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>got <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(filled)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">nrow</span>(got<span class="sc">$</span>ratings), <span class="fu">nrow</span>(got<span class="sc">$</span>suggestions))</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 780  27</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 评分是长表：一位专家、一条目、一轮、一个维度，占一行。30 人乘 26 项，应当是 780 行。「新增建议」里同一位专家可以把「睡眠」写两次，回读会保留两行；审查时仍只算 1 个人。原始句子的条数，也不等于归并以后的概念个数。</p>
+<p>初始池有 26
+项，来自前期证据综合。里面已经有「心衰住院」「健康相关生活质量」「中医证候总积分」。还没有「患者总体改善感受」「睡眠质量」「活动后呼吸困难恢复情况」。这三句要等第一轮开放题之后再审查，不能提前放进问卷冒充已有条目。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>round1 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">nrow</span>(round1<span class="sc">$</span>items)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; [1] 26</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">table</span>(round1<span class="sc">$</span>items<span class="sc">$</span>domain)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;     中医特色     临床事件         功能       安全性     客观指标 患者报告结局 </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;            4            7            3            1            2            1 </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;         症状 </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;            8</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, round1<span class="sc">$</span>panel, round1<span class="sc">$</span>items, round1<span class="sc">$</span>meta)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>dir1 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r1-&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">dir.create</span>(dir1)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>files1 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(bp, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> dir1)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">basename</span>(files1)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round1.docx&quot; &quot;round1.xlsx&quot;</span></span></code></pre></div>
+<p><strong>怎么读：</strong> 第 1 轮问卷做两件事。一是请专家对 26 项按
+1–9 分评价重要性，不了解就选「无法判断」，不要填成中间的 5
+分。二是用结构化开放题询问有没有遗漏：名称、含义、理由、与现有条目的区别、依据，每人最多
+5 项。不要只留一句「还有其他意见吗」。</p>
+<p>xlsx 里黄色格子是要填写的。另有一张「新增建议」表。docx
+给专家阅读，xlsx 给数据回收。</p>
+<p>下面用已经填好的模拟答卷演示回读。真实研究里，把专家交回的 xlsx
+放在同一位置即可。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>filled <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.xlsx&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(round1, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> filled, <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>got <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(filled)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">nrow</span>(got<span class="sc">$</span>ratings), <span class="fu">nrow</span>(got<span class="sc">$</span>suggestions))</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; [1] 780  27</span></span></code></pre></div>
+<p><strong>怎么读：</strong>
+评分是长表：一位专家、一条目、一轮、一个维度，占一行。30 人乘 26
+项，应当是 780
+行。「新增建议」里同一位专家可以把「睡眠」写两次，回读会保留两行；审查时仍只算
+1 个人。原始句子的条数，也不等于归并以后的概念个数。</p>
 </div>
 <div id="第一轮之后编码五问双通道" class="section level1">
 <h1>3. 第一轮之后：编码、五问、双通道</h1>
 <p>研究组先阅读原始句子，再归并成概念。两名研究者独立编码。不一致时，由第三个人裁决。编码类别是：新条目、重复、上下位概念、原条目修改、测量工具、测量时间点、范围外、无法形成可评价概念。</p>
-<p>本案例归并以后的独立提出人数是：患者总体改善感受 8 人，睡眠质量 1 人，活动后呼吸困难恢复 3 人，舌色 2 人，脉象 2 人，30 日再住院 4 人，医疗费用 2 人，MLHFQ 3 人。另有 1 条只建议把说法改得更顺，用来对照「文字修改」。睡眠质量那一行被同一位患者代表写了两次，人数仍然是 1。</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_new_items</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  round1<span class="sc">$</span>suggestions, round1<span class="sc">$</span>concept_review, round1<span class="sc">$</span>protocol, round1<span class="sc">$</span>items</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>screen<span class="sc">$</span>concepts[, <span class="fu">c</span>(<span class="st">&quot;concept_id&quot;</span>, <span class="st">&quot;standardized_name&quot;</span>, <span class="st">&quot;n_independent&quot;</span>, <span class="st">&quot;channel&quot;</span>, <span class="st">&quot;decision_zh&quot;</span>)]</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   concept_id      standardized_name n_independent channel      decision_zh</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     C-PGIC       患者总体改善感受             8       A       进入下一轮</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    C-SLEEP               睡眠质量             1       B       进入下一轮</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    C-RECOV 活动后呼吸困难恢复情况             3       A       进入下一轮</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   C-TONGUE               舌色改善             2    none     合并，不新增</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    C-PULSE               脉象改善             2    none     合并，不新增</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      C-D30             30日再住院             4    none 转入相应研究阶段</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7     C-COST               医疗费用             2    none           不进入</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    C-MLHFQ                  MLHFQ             3    none 转入相应研究阶段</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9     C-WORD               运动能力             1    none       仅文字修改</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>screen<span class="sc">$</span>n_admitted</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(screen<span class="sc">$</span>n_admitted <span class="sc">==</span> 3L, screen<span class="sc">$</span>disposition_complete)</span></code></pre></div>
+<p>本案例归并以后的独立提出人数是：患者总体改善感受 8 人，睡眠质量 1
+人，活动后呼吸困难恢复 3 人，舌色 2 人，脉象 2 人，30 日再住院 4
+人，医疗费用 2 人，MLHFQ 3 人。另有 1
+条只建议把说法改得更顺，用来对照「文字修改」。睡眠质量那一行被同一位患者代表写了两次，人数仍然是
+1。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_new_items</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  round1<span class="sc">$</span>suggestions, round1<span class="sc">$</span>concept_review, round1<span class="sc">$</span>protocol, round1<span class="sc">$</span>items</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>screen<span class="sc">$</span>concepts[, <span class="fu">c</span>(<span class="st">&quot;concept_id&quot;</span>, <span class="st">&quot;standardized_name&quot;</span>, <span class="st">&quot;n_independent&quot;</span>, <span class="st">&quot;channel&quot;</span>, <span class="st">&quot;decision_zh&quot;</span>)]</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;   concept_id      standardized_name n_independent channel      decision_zh</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; 1     C-PGIC       患者总体改善感受             8       A       进入下一轮</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; 2    C-SLEEP               睡眠质量             1       B       进入下一轮</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 3    C-RECOV 活动后呼吸困难恢复情况             3       A       进入下一轮</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 4   C-TONGUE               舌色改善             2    none     合并，不新增</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 5    C-PULSE               脉象改善             2    none     合并，不新增</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 6      C-D30             30日再住院             4    none 转入相应研究阶段</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 7     C-COST               医疗费用             2    none           不进入</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 8    C-MLHFQ                  MLHFQ             3    none 转入相应研究阶段</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 9     C-WORD               运动能力             1    none       仅文字修改</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>screen<span class="sc">$</span>n_admitted</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="fu">stopifnot</span>(screen<span class="sc">$</span>n_admitted <span class="sc">==</span> <span class="dv">3</span><span class="dt">L</span>, screen<span class="sc">$</span>disposition_complete)</span></code></pre></div>
 <p><strong>怎么读，逐条对应审查结果：</strong></p>
 <ul>
-<li>患者总体改善感受：8 人独立提出，原池里没有同一概念，进入下一轮。这是通道 A。</li>
-<li>活动后呼吸困难恢复情况：有人认为它只是「呼吸困难」的下位概念，另一人认为活动后多久能缓过来是另一个概念。第三人结合患者访谈，裁决为独立概念。3 人提出，进入下一轮。进入评分时的名称是「活动后呼吸困难恢复情况」。</li>
-<li>睡眠质量：只有 1 人提出。若规定「必须至少 2 人」，它会被删掉。前期 20 名患者访谈里有 7 人主动说到夜间憋醒、不能平卧、睡眠受影响，所以走通道 B，仍然进入下一轮。一个人提到的次数少，不等于这件事对患者不重要。</li>
-<li>30 日再住院：4 人提到，但原池已有「心衰住院」。这是测量时间窗，不另设一条结局。</li>
-<li>MLHFQ：3 人提到。它是明尼苏达心衰生活质量量表，是测量工具。对应的结局概念仍然是已有的「健康相关生活质量」。工具留到以后选择「怎么测量」时再用。</li>
-<li>舌色、脉象：各有 2 人提到，但证候评价已经包含舌质、舌苔和脉象。再单列会造成内容重叠，合并进「中医证候总积分」，不新增。</li>
-<li>医疗费用：有 2 人提出，人数够了，可是本研究只做临床疗效，不做卫生经济学。人数不能凌驾于范围。不进入下一轮，理由要保留。</li>
+<li>患者总体改善感受：8
+人独立提出，原池里没有同一概念，进入下一轮。这是通道 A。</li>
+<li>活动后呼吸困难恢复情况：有人认为它只是「呼吸困难」的下位概念，另一人认为活动后多久能缓过来是另一个概念。第三人结合患者访谈，裁决为独立概念。3
+人提出，进入下一轮。进入评分时的名称是「活动后呼吸困难恢复情况」。</li>
+<li>睡眠质量：只有 1 人提出。若规定「必须至少 2 人」，它会被删掉。前期
+20 名患者访谈里有 7 人主动说到夜间憋醒、不能平卧、睡眠受影响，所以走通道
+B，仍然进入下一轮。一个人提到的次数少，不等于这件事对患者不重要。</li>
+<li>30 日再住院：4
+人提到，但原池已有「心衰住院」。这是测量时间窗，不另设一条结局。</li>
+<li>MLHFQ：3
+人提到。它是明尼苏达心衰生活质量量表，是测量工具。对应的结局概念仍然是已有的「健康相关生活质量」。工具留到以后选择「怎么测量」时再用。</li>
+<li>舌色、脉象：各有 2
+人提到，但证候评价已经包含舌质、舌苔和脉象。再单列会造成内容重叠，合并进「中医证候总积分」，不新增。</li>
+<li>医疗费用：有 2
+人提出，人数够了，可是本研究只做临床疗效，不做卫生经济学。人数不能凌驾于范围。不进入下一轮，理由要保留。</li>
 <li>把「运动耐量」说成「运动能力」：只是用语更顺，评价的还是同一个概念。保留原编号，不重新开始计轮次。</li>
 </ul>
-<p>所以第二轮不是 26 加 8 等于 34，而是 26 加 3 等于 29。没有进入的建议也留在审查表和变更日志里。</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pooled <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(round1, <span class="at">items =</span> screen<span class="sc">$</span>admitted)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(pooled<span class="sc">$</span>items)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 29</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(pooled<span class="sc">$</span>items) <span class="sc">==</span> 29L)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>audit1 <span class="ot">&lt;-</span> <span class="fu">audit_new_items</span>(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  pooled<span class="sc">$</span>protocol, screen<span class="sc">$</span>concepts, <span class="at">suggestions =</span> pooled<span class="sc">$</span>suggestions</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>audit1[, <span class="fu">c</span>(<span class="st">&quot;check&quot;</span>, <span class="st">&quot;status&quot;</span>)]</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               check status</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1          允许新增   通过</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      规则事先锁定   通过</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3            双通道   通过</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  避免过严人数门槛   通过</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5          必须迭代   通过</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    每条建议有去向   通过</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7          双人编码   通过</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    不是提到就加入   通过</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    范围优先于人数   通过</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 不用均数代替共识   通过</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11         独立提出   通过</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 「通过」表示这一步符合发问卷之前写好的规则。若出现「警告」或「不通过」，应先改过程或在论文里解释，而不是改阈值去凑结果。</p>
-<p>文字修改和实质性修改可以分开记录。下面用一个很小的对照，不放进 29 项指标池：</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>wording_demo <span class="ot">&lt;-</span> <span class="fu">classify_modification</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">delphi_items</span>(<span class="fu">data.frame</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">item_id =</span> <span class="fu">c</span>(<span class="st">&quot;W&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">item_text =</span> <span class="fu">c</span>(<span class="st">&quot;运动耐量&quot;</span>, <span class="st">&quot;中医症状改善&quot;</span>),</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">introduced_round =</span> <span class="fu">c</span>(1L, 1L),</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  )),</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">item_id =</span> <span class="fu">c</span>(<span class="st">&quot;W&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">modification =</span> <span class="fu">c</span>(<span class="st">&quot;wording&quot;</span>, <span class="st">&quot;substantive&quot;</span>),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_text =</span> <span class="fu">c</span>(<span class="st">&quot;运动能力&quot;</span>, <span class="st">&quot;气虚血瘀证证候积分改善&quot;</span>),</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_item_id =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;S2&quot;</span>),</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">enter_round =</span> <span class="dv">3</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>wording_demo<span class="sc">$</span>log</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id modification new_item_id reset_scoring</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       W      wording           W         FALSE</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       S  substantive          S2          TRUE</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                           note</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 只规范用语，不改变构念，不重新计算评分轮次。</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   改变了评价构念，按新条目重新计算评分轮次。</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 「运动耐量」改成「运动能力」，编号不变，以前的评分仍然算数。「中医症状改善」改成「气虚血瘀证证候积分改善」，评价的内容变了，要当作新版本，从后续轮次重新评分。</p>
+<p>所以第二轮不是 26 加 8 等于 34，而是 26 加 3 等于
+29。没有进入的建议也留在审查表和变更日志里。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>pooled <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(round1, <span class="at">items =</span> screen<span class="sc">$</span>admitted)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">nrow</span>(pooled<span class="sc">$</span>items)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; [1] 29</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(pooled<span class="sc">$</span>items) <span class="sc">==</span> <span class="dv">29</span><span class="dt">L</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>audit1 <span class="ot">&lt;-</span> <span class="fu">audit_new_items</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  pooled<span class="sc">$</span>protocol, screen<span class="sc">$</span>concepts, <span class="at">suggestions =</span> pooled<span class="sc">$</span>suggestions</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>audit1[, <span class="fu">c</span>(<span class="st">&quot;check&quot;</span>, <span class="st">&quot;status&quot;</span>)]</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;               check status</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 1          允许新增   通过</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 2      规则事先锁定   通过</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; 3            双通道   通过</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; 4  避免过严人数门槛   通过</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 5          必须迭代   通过</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 6    每条建议有去向   通过</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 7          双人编码   通过</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; 8    不是提到就加入   通过</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; 9    范围优先于人数   通过</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 10 不用均数代替共识   通过</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; 11         独立提出   通过</span></span></code></pre></div>
+<p><strong>怎么读：</strong>
+「通过」表示这一步符合发问卷之前写好的规则。若出现「警告」或「不通过」，应先改过程或在论文里解释，而不是改阈值去凑结果。</p>
+<p>文字修改和实质性修改可以分开记录。下面用一个很小的对照，不放进 29
+项指标池：</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>wording_demo <span class="ot">&lt;-</span> <span class="fu">classify_modification</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="fu">delphi_items</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    <span class="at">item_id =</span> <span class="fu">c</span>(<span class="st">&quot;W&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="at">item_text =</span> <span class="fu">c</span>(<span class="st">&quot;运动耐量&quot;</span>, <span class="st">&quot;中医症状改善&quot;</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="at">introduced_round =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="dt">L</span>, <span class="dv">1</span><span class="dt">L</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  )),</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    <span class="at">item_id =</span> <span class="fu">c</span>(<span class="st">&quot;W&quot;</span>, <span class="st">&quot;S&quot;</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>    <span class="at">modification =</span> <span class="fu">c</span>(<span class="st">&quot;wording&quot;</span>, <span class="st">&quot;substantive&quot;</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>    <span class="at">new_text =</span> <span class="fu">c</span>(<span class="st">&quot;运动能力&quot;</span>, <span class="st">&quot;气虚血瘀证证候积分改善&quot;</span>),</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>    <span class="at">new_item_id =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;S2&quot;</span>),</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  ),</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="at">enter_round =</span> <span class="dv">3</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>)</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>wording_demo<span class="sc">$</span>log</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt;   item_id modification new_item_id reset_scoring</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; 1       W      wording           W         FALSE</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; 2       S  substantive          S2          TRUE</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt;                                           note</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; 1 只规范用语，不改变构念，不重新计算评分轮次。</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; 2   改变了评价构念，按新条目重新计算评分轮次。</span></span></code></pre></div>
+<p><strong>怎么读：</strong>
+「运动耐量」改成「运动能力」，编号不变，以前的评分仍然算数。「中医症状改善」改成「气虚血瘀证证候积分改善」，评价的内容变了，要当作新版本，从后续轮次重新评分。</p>
 </div>
 <div id="第-1-轮评分说明什么" class="section level1">
 <h1>4. 第 1 轮评分说明什么</h1>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(pooled)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>round1_cls <span class="ot">&lt;-</span> res1<span class="sc">$</span>classification</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>round1_cls <span class="ot">&lt;-</span> round1_cls[round1_cls<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> round1_cls<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(round1_cls<span class="sc">$</span>class_zh)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 纳入共识 排除共识 未达共识 </span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       22        1        3</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 这一轮 26 项里，有的已经达到 70/15，有的还没有，有的多数人打在低分区。这是中间结果。原条目还要在第 2 轮看到全组分布和自己的分数以后再评一次。三个新条目这一轮还没有分数，不能给它们编造中位数或百分比。</p>
-<p>权威系数、回收率和 Kendall 协调系数如果出现在输出里，只说明专家是否回卷、自评是否熟悉、整体排序是否齐。它们不决定某一条进不进核心指标集。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(pooled)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>round1_cls <span class="ot">&lt;-</span> res1<span class="sc">$</span>classification</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>round1_cls <span class="ot">&lt;-</span> round1_cls[round1_cls<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> round1_cls<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">table</span>(round1_cls<span class="sc">$</span>class_zh)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; 排除共识 未达共识 纳入共识 </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt;        1        3       22</span></span></code></pre></div>
+<p><strong>怎么读：</strong> 这一轮 26 项里，有的已经达到
+70/15，有的还没有，有的多数人打在低分区。这是中间结果。原条目还要在第 2
+轮看到全组分布和自己的分数以后再评一次。三个新条目这一轮还没有分数，不能给它们编造中位数或百分比。</p>
+<p>权威系数、回收率和 Kendall
+协调系数如果出现在输出里，只说明专家是否回卷、自评是否熟悉、整体排序是否齐。它们不决定某一条进不进核心指标集。</p>
 </div>
 <div id="第-2-轮原条目看反馈新条目第一次打分" class="section level1">
 <h1>5. 第 2 轮：原条目看反馈，新条目第一次打分</h1>
-<p>第 2 轮对原来的 26 项，给出本人上一轮分数、全组中位数、四分位距、7–9 分比例、1–3 分比例和匿名意见，然后请专家重新评分。对 3 个新条目，问卷写明「本轮为首次评分」，不出现上一轮统计。</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>md2 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">grepl</span>(<span class="st">&quot;首次评分&quot;</span>, md2), <span class="fu">grepl</span>(<span class="st">&quot;NEW-02&quot;</span>, md2))</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dir2 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r2-&quot;</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(dir2)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir2, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> dir2,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(<span class="fu">list.files</span>(dir2))</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round2.docx&quot; &quot;round2.xlsx&quot;</span></span></code></pre></div>
-<p><strong>怎么读：</strong> E01 的问卷里，旧条目有一组统计数字；睡眠质量、患者总体改善感受和活动后恢复只有评分尺。空白不是 0 分，也不是「大家觉得一般」。xlsx 里这些行的 <code>first_scoring</code> 为 TRUE，中位数一列是空的。</p>
-<p>模拟的第 2 轮答卷已经按 30 人能实现的最接近比例生成。文中的 90%、77%、63% 在 30 人里对应 27/30、23/30、19/30。</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>src2 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">2</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>study2 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  pooled,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ratings =</span> src2<span class="sc">$</span>ratings[src2<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">2</span>, ],</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">comments =</span> src2<span class="sc">$</span>comments</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study2)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>show2 <span class="ot">&lt;-</span> res2<span class="sc">$</span>classification</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>show2 <span class="ot">&lt;-</span> show2[show2<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">2</span> <span class="sc">&amp;</span> show2<span class="sc">$</span>item_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NEW-01&quot;</span>, <span class="st">&quot;NEW-02&quot;</span>, <span class="st">&quot;NEW-03&quot;</span>) <span class="sc">&amp;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                 show2<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>show2[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;action&quot;</span>, <span class="st">&quot;n_scoring_rounds&quot;</span>, <span class="st">&quot;provisional&quot;</span>)]</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id   p_high     p_low     class_zh  action n_scoring_rounds provisional</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 53  NEW-01 90.00000  3.333333 暂时纳入共识 rescore                1        TRUE</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 54  NEW-02 76.66667  6.666667 暂时纳入共识 rescore                1        TRUE</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 55  NEW-03 63.33333 10.000000     未达共识 discuss                1       FALSE</span></span></code></pre></div>
+<p>第 2 轮对原来的 26 项，给出本人上一轮分数、全组中位数、四分位距、7–9
+分比例、1–3 分比例和匿名意见，然后请专家重新评分。对 3
+个新条目，问卷写明「本轮为首次评分」，不出现上一轮统计。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>md2 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">grepl</span>(<span class="st">&quot;首次评分&quot;</span>, md2), <span class="fu">grepl</span>(<span class="st">&quot;NEW-02&quot;</span>, md2))</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>dir2 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r2-&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="fu">dir.create</span>(dir2)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir2, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> dir2,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>                     <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="fu">basename</span>(<span class="fu">list.files</span>(dir2))</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round2.docx&quot; &quot;round2.xlsx&quot;</span></span></code></pre></div>
+<p><strong>怎么读：</strong> E01
+的问卷里，旧条目有一组统计数字；睡眠质量、患者总体改善感受和活动后恢复只有评分尺。空白不是
+0 分，也不是「大家觉得一般」。xlsx 里这些行的 <code>first_scoring</code>
+为 TRUE，中位数一列是空的。</p>
+<p>模拟的第 2 轮答卷已经按 30 人能实现的最接近比例生成。文中的
+90%、77%、63% 在 30 人里对应 27/30、23/30、19/30。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>src2 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">2</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>study2 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  pooled,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">ratings =</span> src2<span class="sc">$</span>ratings[src2<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">2</span>, ],</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">comments =</span> src2<span class="sc">$</span>comments</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>res2 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study2)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>show2 <span class="ot">&lt;-</span> res2<span class="sc">$</span>classification</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>show2 <span class="ot">&lt;-</span> show2[show2<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">2</span> <span class="sc">&amp;</span> show2<span class="sc">$</span>item_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NEW-01&quot;</span>, <span class="st">&quot;NEW-02&quot;</span>, <span class="st">&quot;NEW-03&quot;</span>) <span class="sc">&amp;</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>                 show2<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>show2[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;action&quot;</span>, <span class="st">&quot;n_scoring_rounds&quot;</span>, <span class="st">&quot;provisional&quot;</span>)]</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt;    item_id   p_high     p_low     class_zh  action n_scoring_rounds provisional</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; 53  NEW-01 90.00000  3.333333 暂时纳入共识 rescore                1        TRUE</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; 54  NEW-02 76.66667  6.666667 暂时纳入共识 rescore                1        TRUE</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; 55  NEW-03 63.33333 10.000000     未达共识 discuss                1       FALSE</span></span></code></pre></div>
 <p><strong>怎么读：</strong></p>
 <ul>
-<li>患者总体改善感受：7–9 分约 90%，1–3 分约 3%。形式上已经达到纳入线，但分类写成「暂时纳入共识」，动作是再评。它只被打过一次分。</li>
-<li>睡眠质量：7–9 分约 77%，1–3 分约 7%。同样只是暂时纳入。支持意见认为睡眠受夜间呼吸困难影响，是患者能感觉到的获益；反对意见认为睡眠还受焦虑、环境和合并疾病影响，特异性不够。这些匿名意见会写进第 3 轮反馈。</li>
-<li>活动后呼吸困难恢复情况：7–9 分约 63%，没有达到 70%。这是未达共识，不是暂时纳入。</li>
+<li>患者总体改善感受：7–9 分约 90%，1–3 分约
+3%。形式上已经达到纳入线，但分类写成「暂时纳入共识」，动作是再评。它只被打过一次分。</li>
+<li>睡眠质量：7–9 分约 77%，1–3 分约
+7%。同样只是暂时纳入。支持意见认为睡眠受夜间呼吸困难影响，是患者能感觉到的获益；反对意见认为睡眠还受焦虑、环境和合并疾病影响，特异性不够。这些匿名意见会写进第
+3 轮反馈。</li>
+<li>活动后呼吸困难恢复情况：7–9 分约 63%，没有达到
+70%。这是未达共识，不是暂时纳入。</li>
 </ul>
-<p>第 2 轮分数高，不能直接写进核心指标集。Delphi 要的是：评分，看到群体结果，再想一次，再评分。</p>
+<p>第 2 轮分数高，不能直接写进核心指标集。Delphi
+要的是：评分，看到群体结果，再想一次，再评分。</p>
 </div>
 <div id="第-3-轮只再评还没有完成迭代的条目" class="section level1">
 <h1>6. 第 3 轮：只再评还没有完成迭代的条目</h1>
-<p>第 3 轮不再要求所有已经稳定纳入或明确排除的原条目重答。需要再评的是：3 个新条目、仍未达共识的原条目。实质性修改的新版本也会在这里重评；本案例的主池里没有这类新版本。</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>md3 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">grepl</span>(<span class="st">&quot;NEW-01&quot;</span>, md3), <span class="fu">grepl</span>(<span class="st">&quot;CHF-11&quot;</span>, md3))</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>dir3 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r3-&quot;</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(dir3)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir3, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> dir3,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(<span class="fu">list.files</span>(dir3))</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round3.docx&quot; &quot;round3.xlsx&quot;</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 新条目这一次能看到第 2 轮的中位数、区间比例，以及匿名的支持和反对意见。问卷会提醒：上一轮只是第一次评分，过线也还不是最终纳入。已经在第 2 轮明确排除的条目，例如多数人认为不适合进入核心集的「体重增加」，不再拿回来重投，直到表面一致。</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>src3 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">3</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>study3 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  study2,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">ratings =</span> src3<span class="sc">$</span>ratings[src3<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">3</span>, ],</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">comments =</span> src3<span class="sc">$</span>comments[src3<span class="sc">$</span>comments<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">3</span>, ]</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>study3<span class="sc">$</span>floor_items <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">item_id =</span> <span class="st">&quot;FLOOR-01&quot;</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">item_text =</span> <span class="st">&quot;心衰患者照护者负担&quot;</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study3)</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>final_new <span class="ot">&lt;-</span> res3<span class="sc">$</span>last_classification</span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>final_new <span class="ot">&lt;-</span> final_new[final_new<span class="sc">$</span>item_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NEW-01&quot;</span>, <span class="st">&quot;NEW-02&quot;</span>, <span class="st">&quot;NEW-03&quot;</span>, <span class="st">&quot;CHF-11&quot;</span>, <span class="st">&quot;CHF-21&quot;</span>), ]</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>final_new[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;action&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;provisional&quot;</span>)]</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id class_zh  action    p_high     p_low provisional</span></span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47  CHF-21 排除共识    drop  6.666667 76.666667       FALSE</span></span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 56  CHF-11 未达共识 discuss 60.000000 13.333333       FALSE</span></span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 58  NEW-01 纳入共识    keep 93.333333  0.000000       FALSE</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 59  NEW-02 纳入共识    keep 83.333333  6.666667       FALSE</span></span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 60  NEW-03 未达共识 discuss 66.666667 13.333333       FALSE</span></span></code></pre></div>
+<p>第 3
+轮不再要求所有已经稳定纳入或明确排除的原条目重答。需要再评的是：3
+个新条目、仍未达共识的原条目。实质性修改的新版本也会在这里重评；本案例的主池里没有这类新版本。</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>md3 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">grepl</span>(<span class="st">&quot;NEW-01&quot;</span>, md3), <span class="fu">grepl</span>(<span class="st">&quot;CHF-11&quot;</span>, md3))</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>dir3 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r3-&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">dir.create</span>(dir3)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir3, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> dir3,</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>                     <span class="at">expert_id =</span> <span class="st">&quot;E01&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">basename</span>(<span class="fu">list.files</span>(dir3))</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;round3.docx&quot; &quot;round3.xlsx&quot;</span></span></code></pre></div>
+<p><strong>怎么读：</strong> 新条目这一次能看到第 2
+轮的中位数、区间比例，以及匿名的支持和反对意见。问卷会提醒：上一轮只是第一次评分，过线也还不是最终纳入。已经在第
+2
+轮明确排除的条目，例如多数人认为不适合进入核心集的「体重增加」，不再拿回来重投，直到表面一致。</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>src3 <span class="ot">&lt;-</span> <span class="fu">simulate_chf_new_items</span>(<span class="at">up_to_round =</span> <span class="dv">3</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>study3 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  study2,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">ratings =</span> src3<span class="sc">$</span>ratings[src3<span class="sc">$</span>ratings<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">3</span>, ],</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">comments =</span> src3<span class="sc">$</span>comments[src3<span class="sc">$</span>comments<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">3</span>, ]</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>study3<span class="sc">$</span>floor_items <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">item_id =</span> <span class="st">&quot;FLOOR-01&quot;</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">item_text =</span> <span class="st">&quot;心衰患者照护者负担&quot;</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>)</span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>res3 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study3)</span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>final_new <span class="ot">&lt;-</span> res3<span class="sc">$</span>last_classification</span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>final_new <span class="ot">&lt;-</span> final_new[final_new<span class="sc">$</span>item_id <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NEW-01&quot;</span>, <span class="st">&quot;NEW-02&quot;</span>, <span class="st">&quot;NEW-03&quot;</span>, <span class="st">&quot;CHF-11&quot;</span>, <span class="st">&quot;CHF-21&quot;</span>), ]</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>final_new[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;action&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;provisional&quot;</span>)]</span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt;    item_id class_zh  action    p_high     p_low provisional</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; 47  CHF-21 排除共识    drop  6.666667 76.666667       FALSE</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; 56  CHF-11 未达共识 discuss 60.000000 13.333333       FALSE</span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; 58  NEW-01 纳入共识    keep 93.333333  0.000000       FALSE</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; 59  NEW-02 纳入共识    keep 83.333333  6.666667       FALSE</span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; 60  NEW-03 未达共识 discuss 66.666667 13.333333       FALSE</span></span></code></pre></div>
 <p><strong>怎么读：</strong></p>
 <ul>
-<li>患者总体改善感受：第 3 轮 7–9 分约 93%，1–3 分 0。已经有两轮评分，最终为纳入共识，可以进入候选核心指标集。</li>
+<li>患者总体改善感受：第 3 轮 7–9 分约 93%，1–3 分
+0。已经有两轮评分，最终为纳入共识，可以进入候选核心指标集。</li>
 <li>睡眠质量：7–9 分约 83%，1–3 分约 7%。同样最终纳入。</li>
-<li>活动后呼吸困难恢复情况：7–9 分约 67%，1–3 分约 13%。仍未达到预设的 70/15。规范的说法是：未达到预设共识阈值。它不是「专家认为不重要」，也不是「专家反对」。</li>
-<li>仍有个别原条目，例如气虚症状，三轮以后也没有过线。它们进入会议讨论的 C 类，而不是被悄悄删掉。</li>
-<li>第 2 轮已经明确排除的条目保持排除。会议原则上不把 B 类再翻过来。</li>
+<li>活动后呼吸困难恢复情况：7–9 分约 67%，1–3 分约 13%。仍未达到预设的
+70/15。规范的说法是：未达到预设共识阈值。它不是「专家认为不重要」，也不是「专家反对」。</li>
+<li>仍有个别原条目，例如气虚症状，三轮以后也没有过线。它们进入会议讨论的
+C 类，而不是被悄悄删掉。</li>
+<li>第 2 轮已经明确排除的条目保持排除。会议原则上不把 B
+类再翻过来。</li>
 </ul>
-<p>30 人无法刚好得到文中每一个一位小数。23/30 是 76.7%，对应叙述中的 77%；20/30 是 66.7%，对应 67%。过线与否和案例一致。</p>
+<p>30 人无法刚好得到文中每一个一位小数。23/30 是 76.7%，对应叙述中的
+77%；20/30 是 66.7%，对应 67%。过线与否和案例一致。</p>
 </div>
 <div id="变更日志和共识会议" class="section level1">
 <h1>7. 变更日志和共识会议</h1>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">head</span>(res3<span class="sc">$</span>item_log, <span class="dv">8</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     条目         来源    第1轮版本                     专家建议 第1轮处理</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 CHF-01 前期证据综合     全因死亡                            —      保留</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 CHF-02 前期证据综合   心血管死亡                            —      保留</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 CHF-03 前期证据综合     心衰住院 30日再住院：转入相应研究阶段      保留</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 CHF-04 前期证据综合 心衰急性加重                            —      保留</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 CHF-05 前期证据综合     呼吸困难                            —      保留</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 CHF-06 前期证据综合         疲乏                            —      保留</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 CHF-07 前期证据综合         心悸                            —      保留</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8 CHF-08 前期证据综合         水肿                            —      保留</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   进入评分的版本                         第2轮结果 第3轮结果     最终 理由</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       全因死亡 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     心血管死亡 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       心衰住院 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   心衰急性加重 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       呼吸困难 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6           疲乏 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7           心悸 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8           水肿 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>agenda <span class="ot">&lt;-</span> res3<span class="sc">$</span>meeting_agenda</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(agenda<span class="sc">$</span>band)</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     A     B     C floor </span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    25     1     3     1</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>agenda[agenda<span class="sc">$</span>band <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;floor&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;item_text&quot;</span>, <span class="st">&quot;band&quot;</span>)]</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     item_id              item_text  band</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   CHF-11               气虚症状     C</span></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   CHF-23     夜间阵发性呼吸困难     C</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   NEW-03 活动后呼吸困难恢复情况     C</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 FLOOR-01     心衰患者照护者负担 floor</span></span></code></pre></div>
-<p><strong>怎么读：</strong> 变更日志同时留下最终保留的条目，和没有进入评分的建议。医疗费用、MLHFQ、30 日再住院、舌色和脉象都能查到去向。论文、标准说明书和方法学审查要能回答：谁提出，如何编码，与哪一条重复，为什么合并，为什么删除，为什么新增，哪一轮加入，最终结果是什么。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">head</span>(res3<span class="sc">$</span>item_log, <span class="dv">8</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&gt;     条目         来源    第1轮版本                     专家建议 第1轮处理</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt; 1 CHF-01 前期证据综合     全因死亡                            —      保留</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; 2 CHF-02 前期证据综合   心血管死亡                            —      保留</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 3 CHF-03 前期证据综合     心衰住院 30日再住院：转入相应研究阶段      保留</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; 4 CHF-04 前期证据综合 心衰急性加重                            —      保留</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 5 CHF-05 前期证据综合     呼吸困难                            —      保留</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; 6 CHF-06 前期证据综合         疲乏                            —      保留</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; 7 CHF-07 前期证据综合         心悸                            —      保留</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt; 8 CHF-08 前期证据综合         水肿                            —      保留</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt;   进入评分的版本                         第2轮结果 第3轮结果     最终 理由</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; 1       全因死亡 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; 2     心血管死亡 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; 3       心衰住院 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; 4   心衰急性加重 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; 5       呼吸困难 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt; 6           疲乏 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-18"><a href="#cb12-18" tabindex="-1"></a><span class="co">#&gt; 7           心悸 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-19"><a href="#cb12-19" tabindex="-1"></a><span class="co">#&gt; 8           水肿 纳入共识；7–9分 80.0%；1–3分 3.3%         — 纳入共识    —</span></span>
+<span id="cb12-20"><a href="#cb12-20" tabindex="-1"></a>agenda <span class="ot">&lt;-</span> res3<span class="sc">$</span>meeting_agenda</span>
+<span id="cb12-21"><a href="#cb12-21" tabindex="-1"></a><span class="fu">table</span>(agenda<span class="sc">$</span>band)</span>
+<span id="cb12-22"><a href="#cb12-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb12-23"><a href="#cb12-23" tabindex="-1"></a><span class="co">#&gt;     A     B     C floor </span></span>
+<span id="cb12-24"><a href="#cb12-24" tabindex="-1"></a><span class="co">#&gt;    25     1     3     1</span></span>
+<span id="cb12-25"><a href="#cb12-25" tabindex="-1"></a>agenda[agenda<span class="sc">$</span>band <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;C&quot;</span>, <span class="st">&quot;floor&quot;</span>), <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;item_text&quot;</span>, <span class="st">&quot;band&quot;</span>)]</span>
+<span id="cb12-26"><a href="#cb12-26" tabindex="-1"></a><span class="co">#&gt;     item_id              item_text  band</span></span>
+<span id="cb12-27"><a href="#cb12-27" tabindex="-1"></a><span class="co">#&gt; 25   CHF-11               气虚症状     C</span></span>
+<span id="cb12-28"><a href="#cb12-28" tabindex="-1"></a><span class="co">#&gt; 26   CHF-23     夜间阵发性呼吸困难     C</span></span>
+<span id="cb12-29"><a href="#cb12-29" tabindex="-1"></a><span class="co">#&gt; 29   NEW-03 活动后呼吸困难恢复情况     C</span></span>
+<span id="cb12-30"><a href="#cb12-30" tabindex="-1"></a><span class="co">#&gt; 30 FLOOR-01     心衰患者照护者负担 floor</span></span></code></pre></div>
+<p><strong>怎么读：</strong>
+变更日志同时留下最终保留的条目，和没有进入评分的建议。医疗费用、MLHFQ、30
+日再住院、舌色和脉象都能查到去向。论文、标准说明书和方法学审查要能回答：谁提出，如何编码，与哪一条重复，为什么合并，为什么删除，为什么新增，哪一轮加入，最终结果是什么。</p>
 <p>会议分组是：</p>
 <ul>
-<li>A 类：Delphi 已经明确纳入，而且完成了应有的迭代。原则上直接进入。</li>
+<li>A 类：Delphi
+已经明确纳入，而且完成了应有的迭代。原则上直接进入。</li>
 <li>B 类：Delphi 已经明确排除。原则上不再翻案。</li>
 <li>C 类：未达预设阈值。这是会议要讨论的部分。</li>
-<li>会上如果有人临时提出「心衰患者照护者负担」，其他专家觉得有道理，也不能当场举手通过。这条没有提前发给 Delphi 专家，没有匿名评分，也没有受控反馈，容易受现场权威影响。若确实重要，应另开一轮书面匿名评价。</li>
+<li>会上如果有人临时提出「心衰患者照护者负担」，其他专家觉得有道理，也不能当场举手通过。这条没有提前发给
+Delphi
+专家，没有匿名评分，也没有受控反馈，容易受现场权威影响。若确实重要，应另开一轮书面匿名评价。</li>
 </ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>floor <span class="ot">&lt;-</span> agenda[agenda<span class="sc">$</span>band <span class="sc">==</span> <span class="st">&quot;floor&quot;</span>, ]</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(floor) <span class="sc">==</span> 1L)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>floor<span class="sc">$</span>note</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;会上临时提出。专家没有提前看到，没有匿名评分，也没有受控反馈。不得当场拍板。若确实重要，应另开一轮书面匿名评价。&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>floor <span class="ot">&lt;-</span> agenda[agenda<span class="sc">$</span>band <span class="sc">==</span> <span class="st">&quot;floor&quot;</span>, ]</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(floor) <span class="sc">==</span> <span class="dv">1</span><span class="dt">L</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>floor<span class="sc">$</span>note</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;会上临时提出。专家没有提前看到，没有匿名评分，也没有受控反馈。不得当场拍板。若确实重要，应另开一轮书面匿名评价。&quot;</span></span></code></pre></div>
 </div>
 <div id="写出完整报告含-docx" class="section level1">
 <h1>8. 写出完整报告（含 docx）</h1>
-<p>报告按锁定方案生成，包含方案参数、各轮结果、新增条目审查、变更日志、会议分组，以及 ACCORD、DCAT、CREDES 对照。Word 与网页使用同一模板。</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>docx <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">delphi_report</span>(res3, <span class="at">file =</span> docx, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">template =</span> <span class="st">&quot;comet_cos&quot;</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(out)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.info</span>(out)<span class="sc">$</span>size</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 28495</span></span></code></pre></div>
+<p>报告按锁定方案生成，包含方案参数、各轮结果、新增条目审查、变更日志、会议分组，以及
+ACCORD、DCAT、CREDES 对照。Word 与网页使用同一模板。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>docx <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">delphi_report</span>(res3, <span class="at">file =</span> docx, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">template =</span> <span class="st">&quot;comet_cos&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">file.exists</span>(out)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="fu">file.info</span>(out)<span class="sc">$</span>size</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; [1] 39993</span></span></code></pre></div>
 <p><strong>怎么读报告时，建议按这个顺序：</strong></p>
 <ol style="list-style-type: decimal">
 <li>先看目的和范围。本题问的是核心疗效结局，不是所有看起来重要的指标，也不是测量工具或住院费用。</li>
-<li>再看方案表。70/15、至少 2 名独立专家或 1 名加外部证据、新条目必须再迭代一轮，都应当能在表里找到，并且标成发问卷前就锁定。</li>
+<li>再看方案表。70/15、至少 2 名独立专家或 1
+名加外部证据、新条目必须再迭代一轮，都应当能在表里找到，并且标成发问卷前就锁定。</li>
 <li>看概念审查。每一条建议都有去向。进入下一轮的只有 3 条。</li>
-<li>看第 2 轮时，把「暂时纳入共识」读成「第一次评分过线」，不要读成「已经进入核心集」。</li>
+<li>看第 2
+轮时，把「暂时纳入共识」读成「第一次评分过线」，不要读成「已经进入核心集」。</li>
 <li>看第 3 轮时，用最终分类。未达阈值的条目保持「未达共识」。</li>
 <li>看会议分组。C 类可以讨论。会上新冒出来的条目不能当场拍板。</li>
-<li>权威系数、积极系数、Kendall 协调系数和变异系数放在补充位置。它们描述这批专家和整体协调，不代替条目级的中位数、四分位距和高低区比例。平均分高也不等于达成共识。</li>
+<li>权威系数、积极系数、Kendall
+协调系数和变异系数放在补充位置。它们描述这批专家和整体协调，不代替条目级的中位数、四分位距和高低区比例。平均分高也不等于达成共识。</li>
 </ol>
 <p>模拟数据生成的报告不能当作真实心衰核心指标集发布。真实研究还要写明专家如何抽样、伦理、资金和利益冲突，这些清单里会标成需要作者补写的项目。</p>
 </div>
 <div id="换一个研究时最小代码是什么" class="section level1">
 <h1>9. 换一个研究时，最小代码是什么</h1>
-<p>诊断标准、证候标准、疗效评价标准和核心指标集都可以用同一套新增规则。共识阈值随场景变化：核心指标集用 70/15；医学共识预设是高区比例、中位数和四分位距。新增规则不要等到看见开放题以后再写。</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, panel, items, meta)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(bp, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r1&quot;</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 专家交回 xlsx 后：</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>wave1 <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(<span class="st">&quot;r1&quot;</span>, <span class="at">study =</span> bp)</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 研究组编码 concept_review 后：</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_new_items</span>(wave1<span class="sc">$</span>suggestions, concept_review, wave1<span class="sc">$</span>protocol, wave1<span class="sc">$</span>items)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>study <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(wave1, <span class="at">items =</span> screen<span class="sc">$</span>admitted)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r2&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 第 2 轮回收后分析。新条目若只是暂时纳入，第 3 轮继续：</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r3&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study3)</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_report</span>(res, <span class="at">file =</span> <span class="st">&quot;final.docx&quot;</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>)</span></code></pre></div>
-<p>第 2 轮用 <code>items = &quot;all&quot;</code>，让原条目都看到反馈。第 3 轮用 <code>items = &quot;iteration&quot;</code>，只再评新条目、未达共识的条目和实质性修改。若方案规定每一轮都重评全部条目，两轮都用 <code>items = &quot;all&quot;</code> 也可以，只是专家负担更大。</p>
+<p>诊断标准、证候标准、疗效评价标准和核心指标集都可以用同一套新增规则。共识阈值随场景变化：核心指标集用
+70/15；医学共识预设是高区比例、中位数和四分位距。新增规则不要等到看见开放题以后再写。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, panel, items, meta)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(bp, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r1&quot;</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co"># 专家交回 xlsx 后：</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>wave1 <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(<span class="st">&quot;r1&quot;</span>, <span class="at">study =</span> bp)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># 研究组编码 concept_review 后：</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>screen <span class="ot">&lt;-</span> <span class="fu">screen_new_items</span>(wave1<span class="sc">$</span>suggestions, concept_review, wave1<span class="sc">$</span>protocol, wave1<span class="sc">$</span>items)</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>study <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(wave1, <span class="at">items =</span> screen<span class="sc">$</span>admitted)</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>res1 <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study)</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r2&quot;</span>, <span class="at">items =</span> <span class="st">&quot;all&quot;</span>)</span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co"># 第 2 轮回收后分析。新条目若只是暂时纳入，第 3 轮继续：</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(res2, <span class="at">round =</span> <span class="dv">3</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> <span class="st">&quot;r3&quot;</span>, <span class="at">items =</span> <span class="st">&quot;iteration&quot;</span>)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(study3)</span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="fu">delphi_report</span>(res, <span class="at">file =</span> <span class="st">&quot;final.docx&quot;</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>)</span></code></pre></div>
+<p>第 2 轮用 <code>items = &quot;all&quot;</code>，让原条目都看到反馈。第 3 轮用
+<code>items = &quot;iteration&quot;</code>，只再评新条目、未达共识的条目和实质性修改。若方案规定每一轮都重评全部条目，两轮都用
+<code>items = &quot;all&quot;</code> 也可以，只是专家负担更大。</p>
 </div>
 
 

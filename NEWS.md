@@ -1,3 +1,13 @@
+# delphir 0.10.0
+
+* 初次锁定方案不再把软件自带的起始值当成“本研究预设”。`preset_protocol()`、
+  `delphi_protocol()` 和 `delphi_ram_protocol()` 第一次写出的参数就是本研究的
+  方案，不必填写 `rationale`，`modified_from_preset` 为 FALSE。
+* 新增 `revise_protocol()`。只有再次修改已经锁定的方案时才要求 `rationale`，
+  并与初次锁定值比较。报告在此时标记“方案偏离初次锁定”。
+* `protocol_table()` 的 `preset` 列改为初次锁定值。问卷 xlsx 的方案表同时
+  写出该列，读回后仍能识别锁定之后的修改。
+
 # delphir 0.9.0
 
 * 5 分和 7 分李克特可以自动预设。`preset_protocol()` 与 `delphi_protocol()`

@@ -106,7 +106,8 @@
 #'   只用于报告解读，不加权、不剔除专家。
 #' @param cr_min 权威系数组均数的参考下限，默认 0.70。不用于加权评分。
 #' @param authority_scale 可选，[authority_scales()] 的返回值。缺省为曾光表。
-#'   第 1 轮问卷、分析和报告都使用这份表。自定义后应填写 `rationale`。
+#'   第 1 轮问卷、分析和报告都使用这份表。初次锁定时自定义赋分表不必写
+#'   `rationale`；锁定后再改，用 [revise_protocol()] 并填写理由。
 #'   已有数值 Ca、Cs 时，分析不再按该表重算。
 #' @param allow_new 是否允许第 1 轮结构化补充候选条目。`NULL` 时按场景取值：
 #'   医学共识、COMET、定义/诊断标准、指标体系为 `TRUE`；适宜性、排序、
@@ -126,9 +127,8 @@
 #'   `standard_element` 默认 `TRUE`：缺少前期基础时先凝练要素。
 #'   若要素均已有古籍或现代文献基础，设为 `FALSE`，此时第 1 轮就是
 #'   技术要求所称的评分调查（文档中的「第 2 轮」）。
-#' @param rationale 若修改了预设阈值，必须说明理由；报告会打印「方案偏离预设」。
-#'   临床/定义场景改了 `high_pct` 等、或核心技术要素场景改了均数/协调界值，
-#'   而未填此项时会警告。
+#' @param rationale 可选备注。初次锁定时填写与否都不表示偏离，也不产生警告。
+#'   锁定后再次修改参数时，请改用 [revise_protocol()]，并在那里填写理由。
 #' @param locked 是否锁定阈值。默认 `TRUE`。锁定后分析阶段不得把阈值当参数回改。
 #'
 #' @return 带类 `"delphi_protocol"` 的列表。主要字段：
@@ -141,6 +141,7 @@
 #'   每人上限、是否必须再迭代一轮、审查组说明）
 #' * `authority_scale`：Ca/Cs 赋分表，缺省为曾光表
 #' * `rand`：规则、第 2 轮形式、必要性、边界中位数、IPRAS 常数与百分比阈值
+#' * `study_preset`：初次锁定时的方案副本。再次修改时与它比较，而不是与软件默认值比较
 #' * `modified_from_preset`, `rationale`, `locked`
 #'
 #' @section 输入输出:
@@ -150,8 +151,11 @@
 #' [classify_consensus()] **没有**阈值参数，以防止分析阶段静默改规则。
 #'
 #' @section 何时改预设、何时不要改:
-#' * **可以改**：高风险诊疗推荐把 `high_pct` 从 0.80 提到 0.85，并写 `rationale`。
-#' * **不要改**：看见第 1 轮刚好比 0.80 低 2 个百分点，就把阈值改成 0.75「凑共识」。
+#' * **初次锁定**：针对本研究把 `high_pct` 写成 0.85 即可，不必写 `rationale`。
+#'   这时写入的值就是本研究的预设，`modified_from_preset` 为 `FALSE`。
+#' * **锁定后再改**：用 [revise_protocol()]，并写 `rationale`。报告会打印
+#'   「方案偏离初次锁定」。
+#' * **不要改**：看见第 1 轮刚好比锁定阈值低 2 个百分点，就把阈值改成刚好能过。
 #' * **不要混用**：把 COMET 的 70/15 套到临床共识，或把临床 0.80 套到 RAND 适宜性。
 #'
 #' @examples
@@ -159,26 +163,30 @@
 #' p
 #' protocol_table(p)[1:8, ]
 #'
-#' p2 <- delphi_protocol(
-#'   scenario = "clinical_consensus",
-#'   high_pct = 0.85,
-#'   rationale = "高风险诊疗推荐，将高度共识阈值提高到 0.85。"
-#' )
+#' # 初次锁定：直接写成本研究的阈值，不必写理由
+#' p2 <- preset_protocol("clinical_consensus", high_pct = 0.85)
 #' p2$modified_from_preset
-#' p2$rationale
+#'
+#' # 锁定后再改，才需要理由
+#' p3 <- revise_protocol(
+#'   p2, high_pct = 0.90,
+#'   rationale = "方案锁定后、看见评分前，将高度共识阈值从 0.85 提高到 0.90。"
+#' )
+#' p3$modified_from_preset
+#' p3$rationale
 #'
 #' # 同一批评分、不同阈值会改变分类（教学数据第 1 轮）
 #' data(consensus_demo, package = "delphir")
 #' s <- summarize_items(consensus_demo, rounds = 1)
 #' tab0 <- table(classify_consensus(s, p)$class_zh)
-#' p_loose <- preset_protocol("clinical_consensus", high_pct = 0.70,
-#'                            rationale = "仅用于演示：放宽高度共识阈值。")
+#' p_loose <- preset_protocol("clinical_consensus", high_pct = 0.70)
 #' tab1 <- table(classify_consensus(s, p_loose)$class_zh)
 #' tab0
 #' tab1
 #'
-#' @seealso [preset_protocol()], [protocol_table()], [classify_consensus()],
-#'   [analyze_delphi()], vignette("preset-protocol", package = "delphir")
+#' @seealso [preset_protocol()], [revise_protocol()], [protocol_table()],
+#'   [classify_consensus()], [analyze_delphi()],
+#'   vignette("preset-protocol", package = "delphir")
 #'
 #' @export
 delphi_protocol <- function(
@@ -366,95 +374,13 @@ delphi_protocol <- function(
   )
   .stop_if(any(c(high_pct, basic_pct, reject_pct) < 0 | c(high_pct, basic_pct, reject_pct) > 1),
            "\u6bd4\u4f8b\u9608\u503c\u5fc5\u987b\u5728 0 \u4e0e 1 \u4e4b\u95f4\u3002")
-  if (scenario %in% c("clinical_consensus", "definition") && is.null(rationale)) {
-    defaults <- .preset_defaults(scenario, scale_min, scale_max)
-    if (!isTRUE(all.equal(high_pct, defaults$high_pct)) ||
-        !isTRUE(all.equal(basic_pct, defaults$basic_pct)) ||
-        !isTRUE(all.equal(median_min, defaults$median_min)) ||
-        !isTRUE(all.equal(iqr_max, defaults$iqr_max))) {
-      warning(
-        "\u4fee\u6539\u4e86\u9884\u8bbe\u9608\u503c\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
-        call. = FALSE
-      )
-    }
-  }
   if (identical(scenario, "rand_ucla")) {
     if (missing(max_rounds)) max_rounds <- 2L
     if (missing(high_pct)) high_pct <- NA_real_
     if (missing(basic_pct)) basic_pct <- NA_real_
     if (missing(reject_pct)) reject_pct <- NA_real_
   }
-  if (identical(scenario, "standard_element") && is.null(rationale)) {
-    defaults <- .preset_defaults(scenario, scale_min, scale_max)
-    if (!isTRUE(all.equal(mean_min, defaults$mean_min)) ||
-        !isTRUE(all.equal(w_min, defaults$w_min)) ||
-        !isTRUE(all.equal(cv_max, defaults$cv_max)) ||
-        !isTRUE(all.equal(mean_delta_max, defaults$mean_delta_max))) {
-      warning(
-        "\u4fee\u6539\u4e86\u6838\u5fc3\u6280\u672f\u8981\u7d20\u7684\u5747\u6570\u6216\u534f\u8c03\u754c\u503c\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
-        call. = FALSE
-      )
-    }
-  }
-
-  defaults <- .preset_defaults(scenario, scale_min, scale_max)
-  if (scenario %in% c("rand_ucla", "delphi_ram") && is.null(rationale)) {
-    if (!identical(rand_disagreement, defaults$rand_disagreement) ||
-        !isTRUE(all.equal(rand_iprr, defaults$rand_iprr)) ||
-        !isTRUE(all.equal(rand_cfa, defaults$rand_cfa)) ||
-        !identical(as.integer(rand_qtype), as.integer(defaults$rand_qtype)) ||
-        !isTRUE(all.equal(rand_percent_high, defaults$rand_percent_high)) ||
-        !isTRUE(all.equal(rand_percent_low, defaults$rand_percent_low)) ||
-        !identical(rand_purpose, defaults$rand_purpose) ||
-        !identical(rand_round2_mode, defaults$rand_round2_mode) ||
-        !identical(isTRUE(rand_necessity), isTRUE(defaults$rand_necessity)) ||
-        !identical(rand_boundary, defaults$rand_boundary)) {
-      warning(
-        "\u4fee\u6539\u4e86 RAND \u5224\u5b9a\u89c4\u5219\u6216 IPRAS/\u767e\u5206\u6bd4\u53c2\u6570\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
-        call. = FALSE
-      )
-    }
-  }
-  modified <- !isTRUE(all.equal(
-    list(high_pct, basic_pct, median_min, iqr_max, reject_pct,
-         comet_in_high, comet_in_low_max, comet_out_low, comet_out_high_max,
-         rand_di_threshold, rand_disagreement, rand_iprr, rand_cfa, rand_qtype,
-         rand_percent_high, rand_percent_low, rand_purpose, rand_round2_mode,
-         isTRUE(rand_necessity), rand_boundary,
-         cv_max, mean_min, w_min, mean_delta_max,
-         min_experts, open_first, scale_max, max_rounds),
-    list(defaults$high_pct, defaults$basic_pct, defaults$median_min, defaults$iqr_max,
-         defaults$reject_pct, defaults$comet_in_high, defaults$comet_in_low_max,
-         defaults$comet_out_low, defaults$comet_out_high_max,
-         defaults$rand_di_threshold, defaults$rand_disagreement, defaults$rand_iprr,
-         defaults$rand_cfa, defaults$rand_qtype, defaults$rand_percent_high,
-         defaults$rand_percent_low, defaults$rand_purpose, defaults$rand_round2_mode,
-         isTRUE(defaults$rand_necessity), defaults$rand_boundary,
-         defaults$cv_max, defaults$mean_min, defaults$w_min,
-         defaults$mean_delta_max, defaults$min_experts, defaults$open_first,
-         defaults$scale_max, defaults$max_rounds)
-  ))
-  ni_modified <- !identical(allow_new, ni_def$allow) ||
-    !identical(min_independent, as.integer(ni_def$min_independent)) ||
-    !identical(allow_single_with_evidence, isTRUE(ni_def$allow_single_with_evidence)) ||
-    !identical(max_suggestions, as.integer(ni_def$max_suggestions)) ||
-    !identical(require_iteration, isTRUE(ni_def$require_iteration) && isTRUE(ni_def$allow)) ||
-    !identical(review_panel, ni_def$review_panel)
   authority_scale <- .as_authority_scale(authority_scale)
-  scale_modified <- !.authority_scale_same(authority_scale, authority_scales())
-  modified <- isTRUE(modified) || ni_modified || scale_modified
-  if (scale_modified && is.null(rationale)) {
-    warning(
-      "\u4fee\u6539\u4e86\u6743\u5a01\u7cfb\u6570\u8d4b\u5206\u8868\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
-      call. = FALSE
-    )
-  }
-  if (ni_modified && is.null(rationale)) {
-    warning(
-      "\u4fee\u6539\u4e86\u7b2c\u4e00\u8f6e\u65b0\u589e\u6761\u76ee\u89c4\u5219\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
-      call. = FALSE
-    )
-  }
 
   sp_now <- likert_scale_preset(scale_min, scale_max)
   ipras_match <- isTRUE(sp_now$auto) &&
@@ -470,7 +396,7 @@ delphi_protocol <- function(
       !identical(as.integer(rand_qtype), 7L)
   }
 
-  structure(
+  out <- structure(
     list(
       scenario = scenario,
       scale_min = as.numeric(scale_min),
@@ -534,11 +460,208 @@ delphi_protocol <- function(
       ),
       authority_scale = authority_scale,
       rationale = rationale,
-      modified_from_preset = modified,
+      modified_from_preset = FALSE,
+      study_preset = NULL,
       locked = isTRUE(locked),
       combine_ram = identical(scenario, "delphi_ram")
     ),
     class = "delphi_protocol"
+  )
+  out$study_preset <- .capture_study_preset(out)
+  out
+}
+
+.capture_study_preset <- function(protocol) {
+  snap <- protocol
+  snap$study_preset <- NULL
+  snap$modified_from_preset <- FALSE
+  snap
+}
+
+.scalar_num <- function(x) {
+  if (length(x) == 0L) return(NA_real_)
+  unname(as.numeric(x)[1])
+}
+
+.substantive_state <- function(protocol) {
+  ni <- protocol$new_items
+  if (is.null(ni)) ni <- .new_item_defaults(protocol$scenario)
+  rnd <- protocol$rand
+  rule_names <- c(
+    "high_pct", "basic_pct", "median_min", "iqr_max", "reject_pct",
+    "comet_in_high", "comet_in_low_max", "comet_out_low", "comet_out_high_max",
+    "polarization_threshold", "cv_max", "ranking_topk", "mean_min", "w_min",
+    "w_p_max", "mean_delta_max", "min_experts", "response_rate_min", "cr_min"
+  )
+  rules <- lapply(rule_names, function(nm) .scalar_num(protocol$rules[[nm]]))
+  names(rules) <- rule_names
+  list(
+    scenario = as.character(protocol$scenario)[1],
+    scale_min = .scalar_num(protocol$scale_min),
+    scale_max = .scalar_num(protocol$scale_max),
+    low_range = unname(as.numeric(protocol$low_range)),
+    mid_range = unname(as.numeric(protocol$mid_range)),
+    high_range = unname(as.numeric(protocol$high_range)),
+    rules = rules,
+    stability = list(
+      max_rounds = .scalar_num(protocol$stability$max_rounds),
+      class_pct = .scalar_num(protocol$stability$class_pct),
+      median_delta = .scalar_num(protocol$stability$median_delta),
+      high_pct_delta = .scalar_num(protocol$stability$high_pct_delta)
+    ),
+    open_first = isTRUE(protocol$open_first),
+    new_items = list(
+      allow = isTRUE(ni$allow),
+      min_independent = .scalar_num(ni$min_independent),
+      allow_single_with_evidence = isTRUE(ni$allow_single_with_evidence),
+      max_suggestions = .scalar_num(ni$max_suggestions),
+      require_iteration = isTRUE(ni$require_iteration),
+      review_panel = as.character(ni$review_panel %||% "")[1]
+    ),
+    rand = list(
+      rule = as.character(rnd$rule %||% rnd$disagreement)[1],
+      di_threshold = .scalar_num(rnd$di_threshold),
+      round2_mode = as.character(rnd$round2_mode)[1],
+      necessity = isTRUE(rnd$necessity),
+      boundary = as.character(rnd$boundary %||% "uncertain")[1],
+      iprr = .scalar_num(rnd$iprr),
+      cfa = .scalar_num(rnd$cfa),
+      qtype = .scalar_num(rnd$qtype),
+      percent_high = .scalar_num(rnd$percent_high),
+      percent_low = .scalar_num(rnd$percent_low),
+      purpose = as.character(rnd$purpose %||% "appropriateness")[1]
+    ),
+    authority = unname(.encode_authority_scale(.protocol_authority_scale(protocol))),
+    locked = isTRUE(protocol$locked)
+  )
+}
+
+.protocol_differs <- function(protocol, baseline) {
+  if (is.null(baseline)) return(FALSE)
+  !isTRUE(all.equal(
+    .substantive_state(protocol),
+    .substantive_state(baseline),
+    check.attributes = FALSE
+  ))
+}
+
+.protocol_call_args <- function(protocol) {
+  r <- protocol$rules
+  rnd <- protocol$rand
+  st <- protocol$stability
+  ni <- protocol$new_items
+  if (is.null(ni)) ni <- .new_item_defaults(protocol$scenario)
+  list(
+    scenario = protocol$scenario,
+    scale_min = protocol$scale_min,
+    scale_max = protocol$scale_max,
+    low_range = protocol$low_range,
+    mid_range = protocol$mid_range,
+    high_range = protocol$high_range,
+    high_pct = r$high_pct,
+    basic_pct = r$basic_pct,
+    median_min = r$median_min,
+    iqr_max = r$iqr_max,
+    reject_pct = r$reject_pct,
+    comet_in_high = r$comet_in_high,
+    comet_in_low_max = r$comet_in_low_max,
+    comet_out_low = r$comet_out_low,
+    comet_out_high_max = r$comet_out_high_max,
+    rand_disagreement = rnd$rule %||% rnd$disagreement,
+    rand_di_threshold = rnd$di_threshold,
+    rand_round2_mode = rnd$round2_mode,
+    rand_necessity = isTRUE(rnd$necessity),
+    rand_boundary = rnd$boundary %||% "uncertain",
+    rand_iprr = rnd$iprr,
+    rand_cfa = rnd$cfa,
+    rand_qtype = rnd$qtype %||% 7L,
+    rand_percent_high = rnd$percent_high,
+    rand_percent_low = rnd$percent_low,
+    rand_purpose = rnd$purpose %||% "appropriateness",
+    max_rounds = st$max_rounds,
+    stability_class_pct = st$class_pct,
+    stability_median_delta = st$median_delta,
+    stability_high_pct_delta = st$high_pct_delta,
+    polarization_threshold = r$polarization_threshold,
+    cv_max = r$cv_max,
+    ranking_topk = r$ranking_topk,
+    mean_min = r$mean_min,
+    w_min = r$w_min,
+    w_p_max = r$w_p_max,
+    mean_delta_max = r$mean_delta_max,
+    min_experts = r$min_experts,
+    response_rate_min = r$response_rate_min,
+    cr_min = r$cr_min,
+    authority_scale = protocol$authority_scale,
+    allow_new = ni$allow,
+    min_independent = ni$min_independent,
+    allow_single_with_evidence = ni$allow_single_with_evidence,
+    max_suggestions = ni$max_suggestions,
+    require_iteration = ni$require_iteration,
+    review_panel = ni$review_panel,
+    open_first = isTRUE(protocol$open_first),
+    locked = isTRUE(protocol$locked)
+  )
+}
+
+.rationale_missing <- function(rationale) {
+  is.null(rationale) || !nzchar(trimws(as.character(rationale)[1]))
+}
+
+.warn_revision_rationale <- function() {
+  warning(
+    "\u4fee\u6539\u4e86\u5df2\u9501\u5b9a\u65b9\u6848\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u521d\u6b21\u9501\u5b9a\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
+    call. = FALSE
+  )
+}
+
+.flat_from_protocol <- function(protocol) {
+  r <- protocol$rules
+  rnd <- protocol$rand
+  st <- protocol$stability
+  list(
+    scale_min = protocol$scale_min,
+    scale_max = protocol$scale_max,
+    low_range = protocol$low_range,
+    mid_range = protocol$mid_range,
+    high_range = protocol$high_range,
+    high_pct = r$high_pct,
+    basic_pct = r$basic_pct,
+    median_min = r$median_min,
+    iqr_max = r$iqr_max,
+    reject_pct = r$reject_pct,
+    comet_in_high = r$comet_in_high,
+    comet_in_low_max = r$comet_in_low_max,
+    comet_out_low = r$comet_out_low,
+    comet_out_high_max = r$comet_out_high_max,
+    rand_disagreement = rnd$rule %||% rnd$disagreement,
+    rand_di_threshold = rnd$di_threshold,
+    rand_round2_mode = rnd$round2_mode,
+    rand_necessity = isTRUE(rnd$necessity),
+    rand_boundary = rnd$boundary,
+    rand_iprr = rnd$iprr,
+    rand_cfa = rnd$cfa,
+    rand_qtype = rnd$qtype,
+    rand_percent_high = rnd$percent_high,
+    rand_percent_low = rnd$percent_low,
+    rand_purpose = rnd$purpose,
+    max_rounds = st$max_rounds,
+    stability_class_pct = st$class_pct,
+    stability_median_delta = st$median_delta,
+    stability_high_pct_delta = st$high_pct_delta,
+    polarization_threshold = r$polarization_threshold,
+    cv_max = r$cv_max,
+    ranking_topk = r$ranking_topk,
+    mean_min = r$mean_min,
+    w_min = r$w_min,
+    w_p_max = r$w_p_max,
+    mean_delta_max = r$mean_delta_max,
+    min_experts = r$min_experts,
+    response_rate_min = r$response_rate_min,
+    cr_min = r$cr_min,
+    open_first = isTRUE(protocol$open_first),
+    locked = isTRUE(protocol$locked),
+    rationale = protocol$rationale %||% ""
   )
 }
 
@@ -715,10 +838,11 @@ delphi_protocol <- function(
 #'
 #' @param scenario 场景标识，见 [delphi_protocol()]。默认
 #'   `"clinical_consensus"`。
-#' @param ... 覆盖预设的参数（必须是 [delphi_protocol()] 的形参名）。
-#'   若改变共识或分歧阈值，请同时提供 `rationale`。未出现在 `...` 中的参数
-#'   保持该场景默认值。`points = 5` 或 `7`，以及 `scale_max = 5` 或 `7`，
-#'   会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。只改分制不算偏离预设。
+#' @param ... 覆盖该场景起始值的参数（必须是 [delphi_protocol()] 的形参名）。
+#'   这里写上的值就是本研究的初次锁定，不必提供 `rationale`。未出现在 `...`
+#'   中的参数保持该场景起始值。`points = 5` 或 `7`，以及 `scale_max = 5` 或 `7`，
+#'   会按该分制自动填写区间和尺度依赖阈值，不必逐个手写。锁定后再改参数，
+#'   用 [revise_protocol()]。
 #'
 #' @return `delphi_protocol` 对象，字段与 [delphi_protocol()] 相同。
 #'
@@ -748,14 +872,11 @@ delphi_protocol <- function(
 #' preset_protocol("rand_ucla")
 #' protocol_table(preset_protocol("indicator"))
 #'
-#' # 覆盖单参数必须写理由
-#' preset_protocol(
-#'   "clinical_consensus",
-#'   iqr_max = 3,
-#'   rationale = "条目表述较长，允许 IQR=3 作为高度共识的离散上限。"
-#' )
+#' # 初次锁定可以直接改阈值，不必写理由
+#' p <- preset_protocol("clinical_consensus", iqr_max = 3)
+#' p$modified_from_preset
 #'
-#' @seealso [delphi_protocol()], [protocol_table()],
+#' @seealso [delphi_protocol()], [revise_protocol()], [protocol_table()],
 #'   vignette("preset-protocol", package = "delphir")
 #'
 #' @export
@@ -809,7 +930,8 @@ preset_protocol <- function(scenario = "clinical_consensus", ...) {
 #' @param max_rounds 计划最多轮次，默认 3。超过 2 轮是对经典 RAM 的流程偏离，
 #'   报告会说明。分歧可以成为最终结果。
 #' @param round_mode `"mail"`（默认，再次函询）、`"online"` 或 `"in_person"`。
-#' @param rationale 偏离预设时的理由。改规则、改百分比或改函询形式而未填写时会警告。
+#' @param rationale 可选备注。初次锁定时选择表 4、IPRAS 或百分比规则都不表示偏离，
+#'   也不必填写。锁定后若再改规则，用 [revise_protocol()] 并写理由。
 #' @param ... 传给 [preset_protocol()] 的其他参数，例如量表端点。不要在这里再传
 #'   `rand_disagreement`，规则由 `rule` 指定。
 #'
@@ -855,14 +977,6 @@ delphi_ram_protocol <- function(rule = c("table4", "ipras", "percent"),
       percent_low >= percent_high,
     "percent_high \u4e0e percent_low \u5fc5\u987b\u5728 0 \u4e0e 1 \u4e4b\u95f4\uff0c\u4e14 percent_low \u5c0f\u4e8e percent_high\u3002"
   )
-  if (is.null(rationale)) {
-    rationale <- switch(
-      rule,
-      table4 = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u533f\u540d\u591a\u8f6e\u51fd\u8be2\uff0c\u5206\u6b67\u4e0e\u9002\u5b9c\u6027\u6309\u624b\u518c\u8868 4 \u5224\u5b9a\u3002\u8fd9\u4e0d\u662f\u7ecf\u5178\u4e24\u8f6e\u9762\u5bf9\u9762\u9002\u5b9c\u6027\u4e13\u5bb6\u7ec4\u3002",
-      ipras = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u5206\u6b67\u6309 IPRAS\uff08IPR \u4e25\u683c\u5927\u4e8e IPRAS\uff09\u5224\u5b9a\u3002\u8fd9\u4e0d\u662f\u7ecf\u5178\u4e24\u8f6e\u9762\u5bf9\u9762\u9002\u5b9c\u6027\u4e13\u5bb6\u7ec4\u3002",
-      percent = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u4f7f\u7528\u9884\u5148\u9501\u5b9a\u7684\u767e\u5206\u6bd4\u5171\u8bc6\u89c4\u5219\uff0c\u5c5e\u4e8e RAM \u4fee\u6539\u7248\uff0c\u4e0d\u5957\u7528 IPRAS \u5e38\u6570\u3002"
-    )
-  }
   preset_protocol(
     "delphi_ram",
     rand_disagreement = rule,
@@ -874,6 +988,79 @@ delphi_ram_protocol <- function(rule = c("table4", "ipras", "percent"),
     rationale = rationale,
     ...
   )
+}
+
+#' 修改已经锁定的方案
+#'
+#' 第一次调用 [preset_protocol()]、[delphi_protocol()] 或 [delphi_ram_protocol()]
+#' 是在为本研究设定初始参数。那一次不要求 `rationale`，也不把结果标成偏离。
+#' 本函数只用于其后的再次修改：与初次锁定值不同时必须填写 `rationale`。
+#' 比较对象始终是初次锁定的 `study_preset`，不是软件自带的起始值，也不是
+#' 上一次修改之后的值。
+#'
+#' @param protocol 已有的 `delphi_protocol`。没有 `study_preset` 的旧对象，
+#'   会把当前值当作初次锁定，再比较这一次的修改。
+#' @param ... 要覆盖的参数，名称必须是 [delphi_protocol()] 的形参。
+#'   只改 `points` 或量表端点、且本次没有写明区间和尺度依赖阈值时，
+#'   这些阈值会按新分制重填。
+#' @param rationale 与初次锁定值不同时必填。没有实际变化时可以省略。
+#'
+#' @return 新的 `delphi_protocol`。`study_preset` 仍是初次锁定的副本。
+#'   有实质变化时 `modified_from_preset` 为 `TRUE`。
+#'
+#' @examples
+#' p <- preset_protocol("clinical_consensus", high_pct = 0.85)
+#' p$modified_from_preset
+#' p2 <- revise_protocol(
+#'   p, high_pct = 0.90,
+#'   rationale = "锁定后、分析前将高度共识阈值提高到 0.90。"
+#' )
+#' p2$modified_from_preset
+#' p3 <- revise_protocol(p2, high_pct = 0.85, rationale = "改回初次锁定的 0.85。")
+#' p3$modified_from_preset
+#'
+#' @seealso [preset_protocol()], [delphi_protocol()], [protocol_table()]
+#'
+#' @export
+revise_protocol <- function(protocol, ..., rationale = NULL) {
+  .stop_if(
+    !inherits(protocol, "delphi_protocol"),
+    "\u9700\u8981\u5df2\u9501\u5b9a\u7684 delphi_protocol\u3002"
+  )
+  baseline <- protocol$study_preset
+  if (is.null(baseline)) baseline <- .capture_study_preset(protocol)
+  dots <- list(...)
+  if ("points" %in% names(dots) && is.null(dots$points)) dots$points <- NULL
+  if ("rationale" %in% names(dots)) {
+    stop("rationale \u8bf7\u4f5c\u4e3a revise_protocol() \u7684\u5177\u540d\u53c2\u6570\u4f20\u5165\u3002", call. = FALSE)
+  }
+  args <- .protocol_call_args(protocol)
+  scale_changing <- any(c("points", "scale_min", "scale_max") %in% names(dots))
+  auto_keys <- c(
+    "low_range", "mid_range", "high_range", "median_min", "iqr_max",
+    "stability_median_delta", "rand_iprr", "rand_cfa"
+  )
+  scenario_now <- if (!is.null(dots$scenario)) dots$scenario else protocol$scenario
+  if (identical(scenario_now, "standard_element")) {
+    auto_keys <- c(auto_keys, "mean_min", "mean_delta_max")
+  }
+  if (scale_changing) {
+    drop <- setdiff(auto_keys, names(dots))
+    args[drop] <- NULL
+    if ("points" %in% names(dots)) {
+      if (!"scale_min" %in% names(dots)) args$scale_min <- NULL
+      if (!"scale_max" %in% names(dots)) args$scale_max <- NULL
+    }
+  }
+  if (length(dots)) args[names(dots)] <- dots
+  args$rationale <- if (.rationale_missing(rationale)) NULL else as.character(rationale)[1]
+  new <- do.call(delphi_protocol, args)
+  new$study_preset <- baseline
+  new$modified_from_preset <- .protocol_differs(new, baseline)
+  if (isTRUE(new$modified_from_preset) && .rationale_missing(rationale)) {
+    .warn_revision_rationale()
+  }
+  new
 }
 
 #' @export
@@ -917,8 +1104,8 @@ print.delphi_protocol <- function(x, ...) {
   }
   cat(sprintf("  \u9501\u5b9a: %s\n", if (x$locked) "\u662f" else "\u5426"))
   if (isTRUE(x$modified_from_preset)) {
-    cat("  \u5df2\u504f\u79bb\u9884\u8bbe")
-    if (!is.null(x$rationale)) cat(sprintf("\uff1b\u7406\u7531: %s", x$rationale))
+    cat("  \u5df2\u504f\u79bb\u521d\u6b21\u9501\u5b9a")
+    if (!.rationale_missing(x$rationale)) cat(sprintf("\uff1b\u7406\u7531: %s", x$rationale))
     cat("\n")
   }
   invisible(x)
@@ -926,8 +1113,9 @@ print.delphi_protocol <- function(x, ...) {
 
 #' 把锁定方案展开为参数表
 #'
-#' 一行一个参数，含当前值、该场景预设值、是否偏离，以及简要方法学含义。
+#' 一行一个参数，含当前值、本研究初次锁定值、是否在锁定后又改过，以及简要方法学含义。
 #' 供帮助文档、问卷封面和 [delphi_report()] 完整打印方案使用。
+#' `preset` 是初次锁定值，不是软件自带的起始值。
 #'
 #' @param protocol [delphi_protocol()] 对象。
 #'
@@ -939,8 +1127,9 @@ print.delphi_protocol <- function(x, ...) {
 #' @export
 protocol_table <- function(protocol) {
   .stop_if(!inherits(protocol, "delphi_protocol"), "\u9700\u8981 delphi_protocol \u5bf9\u8c61\u3002")
-  d <- .preset_defaults(protocol$scenario, protocol$scale_min, protocol$scale_max)
-  ni_def <- .new_item_defaults(protocol$scenario)
+  base <- protocol$study_preset %||% protocol
+  d <- .flat_from_protocol(base)
+  ni_def <- if (!is.null(base$new_items)) base$new_items else .new_item_defaults(protocol$scenario)
   recorded_new <- !is.null(protocol$new_items)
   ni <- if (recorded_new) protocol$new_items else ni_def
   fmt_rng <- function(x) paste(x, collapse = "\u2013")
@@ -998,18 +1187,21 @@ protocol_table <- function(protocol) {
       "appropriateness \u6216 recommendation"),
     c("max_rounds", fmt_num(protocol$stability$max_rounds), fmt_num(d$max_rounds),
       "\u8ba1\u5212\u6700\u591a\u8f6e\u6b21"),
-    c("stability_class_pct", fmt_num(protocol$stability$class_pct), "0.8",
+    c("stability_class_pct", fmt_num(protocol$stability$class_pct),
+      fmt_num(d$stability_class_pct),
       "\u7a33\u5b9a\u6027\uff1a\u5206\u7c7b\u4e0d\u53d8\u6bd4\u4f8b"),
     c("stability_median_delta", fmt_num(protocol$stability$median_delta),
       fmt_num(d$stability_median_delta %||% 1),
       "\u7a33\u5b9a\u6027\uff1aMedian \u53d8\u5316\u4e0a\u9650"),
-    c("stability_high_pct_delta", fmt_num(protocol$stability$high_pct_delta), "0.1",
+    c("stability_high_pct_delta", fmt_num(protocol$stability$high_pct_delta),
+      fmt_num(d$stability_high_pct_delta),
       "\u7a33\u5b9a\u6027\uff1a\u9ad8\u533a\u6bd4\u4f8b\u53d8\u5316\u4e0a\u9650"),
-    c("polarization_threshold", fmt_num(protocol$rules$polarization_threshold), "0.25",
+    c("polarization_threshold", fmt_num(protocol$rules$polarization_threshold),
+      fmt_num(d$polarization_threshold),
       "\u4e24\u6781\u5206\u5316\uff1a\u4e24\u7aef\u540c\u65f6\u8fbe\u5230\u7684\u6bd4\u4f8b"),
     c("cv_max", fmt_num(protocol$rules$cv_max), fmt_num(d$cv_max),
       "\u6307\u6807\u4f53\u7cfb\u5141\u8bb8\u7684\u6700\u5927 CV"),
-    c("ranking_topk", fmt_num(protocol$rules$ranking_topk), "5",
+    c("ranking_topk", fmt_num(protocol$rules$ranking_topk), fmt_num(d$ranking_topk),
       "\u4f18\u5148\u7ea7 Top-k"),
     c("mean_min", fmt_num(protocol$rules$mean_min), fmt_num(d$mean_min),
       "\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff1a\u91cd\u8981\u7a0b\u5ea6\u5747\u6570\u4e0b\u9650"),
@@ -1026,10 +1218,10 @@ protocol_table <- function(protocol) {
     c("cr_min", fmt_num(protocol$rules$cr_min), fmt_num(d$cr_min),
       "\u6743\u5a01\u7cfb\u6570\u7ec4\u5747\u6570\u53c2\u8003\u4e0b\u9650"),
     c("authority_cs", unname(.encode_authority_scale(.protocol_authority_scale(protocol))["authority_cs"]),
-      unname(.encode_authority_scale(authority_scales())["authority_cs"]),
+      unname(.encode_authority_scale(.protocol_authority_scale(base))["authority_cs"]),
       "\u719f\u6089\u7a0b\u5ea6\u8d4b\u5206\u8868\uff0c\u987b\u5728\u7b2c 1 \u8f6e\u524d\u9501\u5b9a"),
     c("authority_ca", unname(.encode_authority_scale(.protocol_authority_scale(protocol))["authority_ca"]),
-      unname(.encode_authority_scale(authority_scales())["authority_ca"]),
+      unname(.encode_authority_scale(.protocol_authority_scale(base))["authority_ca"]),
       "\u5224\u65ad\u4f9d\u636e\u8d4b\u5206\u8868\uff0c\u987b\u5728\u7b2c 1 \u8f6e\u524d\u9501\u5b9a"),
     c("open_first", if (isTRUE(protocol$open_first)) "TRUE" else "FALSE",
       if (isTRUE(d$open_first)) "TRUE" else "FALSE",
@@ -1049,12 +1241,13 @@ protocol_table <- function(protocol) {
       "\u65b0\u6761\u76ee\u81f3\u5c11\u4e24\u8f6e\u8bc4\u5206\u540e\u624d\u80fd\u6700\u7ec8\u7eb3\u5165"),
     c("review_panel", ni$review_panel %||% "", ni_def$review_panel %||% "",
       "\u6761\u76ee\u5ba1\u67e5\u7ec4\u6784\u6210\uff1b\u8f6f\u4ef6\u4e0d\u4ee3\u66ff\u4eba\u5de5\u7f16\u7801"),
-    c("locked", if (isTRUE(protocol$locked)) "TRUE" else "FALSE", "TRUE",
+    c("locked", if (isTRUE(protocol$locked)) "TRUE" else "FALSE",
+      if (isTRUE(d$locked)) "TRUE" else "FALSE",
       "\u662f\u5426\u7981\u6b62\u5206\u6790\u9636\u6bb5\u56de\u6539\u9608\u503c"),
     c("modified_from_preset", if (isTRUE(protocol$modified_from_preset)) "TRUE" else "FALSE",
-      "FALSE", "\u662f\u5426\u504f\u79bb\u8be5\u573a\u666f\u9884\u8bbe"),
-    c("rationale", protocol$rationale %||% "", "",
-      "\u504f\u79bb\u9884\u8bbe\u7684\u7406\u7531\uff08\u62a5\u544a\u5fc5\u987b\u5199\u660e\uff09")
+      "FALSE", "\u662f\u5426\u504f\u79bb\u672c\u7814\u7a76\u521d\u6b21\u9501\u5b9a\u7684\u65b9\u6848"),
+    c("rationale", protocol$rationale %||% "", d$rationale %||% "",
+      "\u9501\u5b9a\u540e\u518d\u6b21\u4fee\u6539\u7684\u7406\u7531\uff1b\u521d\u6b21\u9501\u5b9a\u65f6\u53ef\u4ee5\u4e0d\u586b")
   )
   if (!recorded_new) {
     drop <- vapply(rows, function(z) {
@@ -1067,7 +1260,7 @@ protocol_table <- function(protocol) {
   }
   out <- as.data.frame(do.call(rbind, rows), stringsAsFactors = FALSE)
   names(out) <- c("parameter", "value", "preset", "meaning")
-  skip <- c("scenario", "modified_from_preset")
+  skip <- c("scenario", "modified_from_preset", "rationale")
   out$modified <- !out$parameter %in% skip & out$value != out$preset
   out[, c("parameter", "value", "preset", "modified", "meaning")]
 }
