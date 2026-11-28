@@ -35,6 +35,10 @@ prepare_feedback <- function(study, round = NULL, dimension = NULL,
       classification <- do.call(rbind, lapply(.unique_sorted(summary_use$round), function(rnd) {
         classify_rand(study, round = rnd, summary = summary_use)
       }))
+    } else if (identical(study$protocol$scenario, "delphi_ram")) {
+      classification <- do.call(rbind, lapply(.unique_sorted(summary$round), function(rnd) {
+        classify_delphi_ram(study, round = rnd, summary = summary)
+      }))
     } else {
       classification <- classify_consensus(summary, study$protocol)
     }

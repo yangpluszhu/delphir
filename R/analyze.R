@@ -51,6 +51,11 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
         error = function(e) NULL
       )
     }
+  } else if (identical(p$scenario, "delphi_ram")) {
+    classification <- do.call(rbind, lapply(.unique_sorted(item_summary$round), function(rnd) {
+      classify_delphi_ram(study, round = rnd, summary = item_summary)
+    }))
+    rownames(classification) <- NULL
   } else if (identical(p$scenario, "ranking")) {
     classification <- classify_consensus(item_summary, p)
   } else {

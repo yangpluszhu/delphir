@@ -8,7 +8,7 @@ delphi_report(
   result,
   file = NULL,
   format = c("html", "word", "docx", "both"),
-  template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard"),
+  template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard", "delphi_ram"),
   stage = c("auto", "round1", "round2", "final"),
   open = FALSE
 )
@@ -22,7 +22,8 @@ delphi_report(
 \item{format}{\code{"html"}、\code{"word"} / \code{"docx"} 或 \code{"both"}。}
 
 \item{template}{\code{"auto"} 时按场景选择；也可指定 \code{"clinical"}、
-\code{"rand_ucla"}、\code{"comet_cos"} 或 \code{"standard"}（5 分核心技术要素）。}
+\code{"rand_ucla"}、\code{"comet_cos"}、\code{"standard"}（5 分核心技术要素）或
+\code{"delphi_ram"}（改良德尔菲结合 RAM）。}
 
 \item{stage}{\code{"auto"}、\code{"round1"}、\code{"round2"} 或 \code{"final"}。
 \code{auto}：若当前轮次仍小于方案 \code{max_rounds} 则写中间报告，否则写终稿。}

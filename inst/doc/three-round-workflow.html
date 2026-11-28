@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-10" />
+<meta name="date" content="2026-09-17" />
 
 <title>教学文档 6：三轮 Delphi 从零到完整报告</title>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 6：三轮 Delphi 从零到完整报告</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-10</h4>
+<h4 class="date">2026-09-17</h4>
 
 
 
@@ -176,27 +176,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: clinical_consensus (医学专家共识（Modified Delphi）)</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   新增条目: 允许；≥2 人独立提出，或 1 人且有外部证据；至少两轮评分后才能最终纳入</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">protocol_table</span>(protocol), <span class="dv">8</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    parameter              value             preset modified</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   scenario clinical_consensus clinical_consensus    FALSE</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  scale_min                  1                  1    FALSE</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  scale_max                  9                  9    FALSE</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  low_range                1–3                1–3    FALSE</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  mid_range                4–6                4–6    FALSE</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 high_range                7–9                7–9    FALSE</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   high_pct                0.8                0.8    FALSE</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  basic_pct               0.75               0.75    FALSE</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                           meaning</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 医学专家共识（Modified Delphi）</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                        量表下端</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                        量表上端</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                低区（倾向排除）</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                            中区</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6          高区（赞同/重要/适宜）</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7          高度共识：高区比例下限</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8          基本共识：高区比例下限</span></span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">protocol_table</span>(protocol), <span class="dv">8</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    parameter              value             preset modified</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   scenario clinical_consensus clinical_consensus    FALSE</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2  scale_min                  1                  1    FALSE</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  scale_max                  9                  9    FALSE</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4  low_range                1–3                1–3    FALSE</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5  mid_range                4–6                4–6    FALSE</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 high_range                7–9                7–9    FALSE</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   high_pct                0.8                0.8    FALSE</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8  basic_pct               0.75               0.75    FALSE</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                           meaning</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 医学专家共识（Modified Delphi）</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                        量表下端</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                        量表上端</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                低区（倾向排除）</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                            中区</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6          高区（赞同/重要/适宜）</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7          高度共识：高区比例下限</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8          基本共识：高区比例下限</span></span></code></pre></div>
 <p><strong>解读：</strong> 高度共识 = P(7–9)≥80% 且 Median≥7 且 IQR≤2；最多 3 轮。此后任何函数都不会根据结果把 80% 改成 75%。</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, demo<span class="sc">$</span>panel, demo<span class="sc">$</span>items, demo<span class="sc">$</span>meta)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(bp<span class="sc">$</span>ratings)</span>
@@ -219,15 +218,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(study_pre, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> xlsx1, <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>got1 <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(xlsx1)</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(got1<span class="sc">$</span>ratings)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 525</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 576</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(got1<span class="sc">$</span>ratings[, <span class="fu">c</span>(<span class="st">&quot;expert_id&quot;</span>, <span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;unable&quot;</span>)])</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   expert_id item_id score unable</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       E01     C01     9  FALSE</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       E01     C02     4  FALSE</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       E01     C02     7  FALSE</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       E01     C03     8  FALSE</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       E01     C03     8  FALSE</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7       E01     C04     7  FALSE</span></span></code></pre></div>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       E01     C01    NA   TRUE</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       E01     C02     4  FALSE</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       E01     C02     7  FALSE</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       E01     C03     8  FALSE</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       E01     C03     8  FALSE</span></span></code></pre></div>
 <p><strong>解读：</strong> 回读结果必须是长表（专家 × 条目 × 轮次 × 维度）。宽表无法区分无法判断与漏填。</p>
 </div>
 <div id="第-1-轮全流程分析" class="section level1">
@@ -247,18 +246,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   参与度:</span></span>
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 1 轮  24/24  (100.0%)</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   末轮分类:</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     临界: 1</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     基本共识: 2</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     未达共识: 5</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 3</span></span></code></pre></div>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 3</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     基本共识: 2</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     临界: 1</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     未达共识: 5</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(res1<span class="sc">$</span>participation<span class="sc">$</span>by_round)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round n_invited n_responded response_rate</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1        24          24           100</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(res1<span class="sc">$</span>last_classification<span class="sc">$</span>class_zh)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 两极分化     临界 基本共识 未达共识 高度共识 </span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1        1        2        5        3</span></span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 高度共识 基本共识 两极分化     临界 未达共识 </span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        3        2        1        1        5</span></span></code></pre></div>
 <p><strong>解读这一轮的表：</strong></p>
 <ul>
 <li><strong>参与度</strong>：回收率是积极系数，不是共识。</li>
@@ -285,7 +284,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dir2 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;r2-&quot;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>files2 <span class="ot">&lt;-</span> <span class="fu">next_round_questionnaire</span>(res1, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir2)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(files2)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r2-67e86db01b8e.xlsx&quot;</span></span></code></pre></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r2-931c24d93b56.xlsx&quot;</span></span></code></pre></div>
 <p>第 2 轮 markdown 不应再出现 Ca/Cs 赋分表：</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>md2 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">expert_id =</span> demo<span class="sc">$</span>panel<span class="sc">$</span>expert_id[<span class="dv">1</span>])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grepl</span>(<span class="st">&quot;权威程度自评&quot;</span>, md2)</span>
@@ -337,7 +336,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dir3 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;r3-&quot;</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>files3 <span class="ot">&lt;-</span> <span class="fu">next_round_questionnaire</span>(res2, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> dir3)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(files3)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r3-67e87e754e4e.docx&quot; &quot;r3-67e87e754e4e.xlsx&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r3-931c3bd06b19.docx&quot; &quot;r3-931c3bd06b19.xlsx&quot;</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>study3 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  study2,</span>
@@ -355,15 +354,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 2 轮  23/24  (95.8%)</span></span>
 <span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 3 轮  22/24  (91.7%)</span></span>
 <span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   末轮分类:</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 8</span></span>
 <span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     基本共识: 1</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     未达共识: 2</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 8</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     未达共识: 2</span></span>
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   稳定性建议终止: 否</span></span>
 <span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(res3<span class="sc">$</span>last_classification<span class="sc">$</span>class_zh)</span>
 <span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 两极分化 基本共识 未达共识 高度共识 </span></span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1        1        2        8</span></span></code></pre></div>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 高度共识 基本共识 两极分化 未达共识 </span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        8        1        1        2</span></span></code></pre></div>
 <p>超过 3 轮应被拒绝：</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">next_round_questionnaire</span>(res3, <span class="at">format =</span> <span class="st">&quot;markdown&quot;</span>), <span class="at">silent =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error : 已达方案规定的最多轮次 3，不再生成下一轮问卷。</span></span></code></pre></div>

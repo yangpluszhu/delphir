@@ -32,6 +32,9 @@ preset_protocol(scenario = "clinical_consensus", ...)
 \item RAND/UCLA (rand_ucla)：\code{rand_disagreement}（默认 \code{table4}）、
 \code{rand_di_threshold}、\code{rand_round2_mode}、\code{rand_boundary}、IPRAS 常数。
 \code{high_pct} 为 \code{NA}。\code{max_rounds} 默认为 2。百分比规则须标明修改版。
+\item 改良德尔菲结合 RAM (delphi_ram)：\code{rand_disagreement} 只能是
+\code{table4}、\code{ipras} 或 \code{percent}。默认匿名函询、最多 3 轮。
+\code{high_pct} 为 \code{NA}，不驱动分类。入口是 \code{\link[=delphi_ram_protocol]{delphi_ram_protocol()}}。
 \item 指标体系 (indicator)：\code{basic_pct}、\code{median_min}、\code{iqr_max}、\code{cv_max}。
 \item 排序 (ranking)：共识百分比多为 \code{NA}；用 \code{\link[=rank_priorities]{rank_priorities()}} 与
 \code{ranking_topk}。

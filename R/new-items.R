@@ -1067,6 +1067,7 @@ audit_new_items <- function(protocol, review = NULL, classification = NULL,
 .items_for_round <- function(study, cls, items, round) {
   all_ids <- .active_item_ids(study$items)
   round <- as.integer(round)
+  if (identical(study$protocol$scenario, "delphi_ram")) return(all_ids)
   if (round <= 1L || identical(items, "all") || is.null(cls) || !nrow(cls)) {
     return(all_ids)
   }

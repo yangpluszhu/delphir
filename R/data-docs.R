@@ -120,3 +120,40 @@
 #' data(ram_recommendation_demo, package = "delphir")
 #' ram_recommendation_demo$protocol$rand$rule
 "ram_recommendation_demo"
+
+#' 改良德尔菲结合表 4 的教学数据
+#'
+#' 9 名专家、6 条陈述、三轮匿名函询。规则为手册表 4。含适宜、不适宜、
+#' 中位数居中、分歧，以及一条「无分歧但未达到严格一致」的条目。
+#' 供 `vignette("delphi-ram-table4", package = "delphir")` 使用。
+#'
+#' @format `delphi_study`。场景 `delphi_ram`。
+#' @seealso [simulate_delphi_ram()], [run_delphi_ram()]
+#' @examples
+#' data(delphi_ram_table4_demo, package = "delphir")
+#' table(classify_delphi_ram(delphi_ram_table4_demo, round = 1)$consensus_zh)
+"delphi_ram_table4_demo"
+
+#' 改良德尔菲结合 IPRAS 的教学数据
+#'
+#' 与 [delphi_ram_table4_demo] 使用同一套分数，规则改为 IPRAS。
+#' ST05 在表 4 下为分歧，在 IPRAS 下不是分歧。
+#'
+#' @format `delphi_study`。场景 `delphi_ram`。
+#' @seealso [simulate_delphi_ram()], [classify_delphi_ram()]
+#' @examples
+#' data(delphi_ram_ipras_demo, package = "delphir")
+#' delphi_ram_ipras_demo$protocol$rand$rule
+"delphi_ram_ipras_demo"
+
+#' 改良德尔菲结合百分比共识的教学数据
+#'
+#' 12 名专家、6 条推荐意见、三轮。规则为高区至少 70% 且低区低于 15%。
+#' 含一条中位数在高区但比例未达标的条目。属于 RAM 修改版。
+#'
+#' @format `delphi_study`。`protocol$rand$rule` 为 `percent`。
+#' @seealso [simulate_delphi_ram()], [delphi_ram_protocol()]
+#' @examples
+#' data(delphi_ram_percent_demo, package = "delphir")
+#' classify_delphi_ram(delphi_ram_percent_demo, round = 1)$consensus_zh
+"delphi_ram_percent_demo"

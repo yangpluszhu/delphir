@@ -8,7 +8,8 @@
 #'   `format = "both"` 时在同一目录写出 `.html` 与 `.docx`。
 #' @param format `"html"`、`"word"` / `"docx"` 或 `"both"`。
 #' @param template `"auto"` 时按场景选择；也可指定 `"clinical"`、
-#'   `"rand_ucla"`、`"comet_cos"` 或 `"standard"`（5 分核心技术要素）。
+#'   `"rand_ucla"`、`"comet_cos"`、`"standard"`（5 分核心技术要素）或
+#'   `"delphi_ram"`（改良德尔菲结合 RAM）。
 #' @param stage `"auto"`、`"round1"`、`"round2"` 或 `"final"`。
 #'   `auto`：若当前轮次仍小于方案 `max_rounds` 则写中间报告，否则写终稿。
 #' @param open 是否打开文件，默认 `FALSE`。
@@ -25,7 +26,7 @@
 #' @export
 delphi_report <- function(result, file = NULL,
                           format = c("html", "word", "docx", "both"),
-                          template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard"),
+                          template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard", "delphi_ram"),
                           stage = c("auto", "round1", "round2", "final"),
                           open = FALSE) {
   .stop_if(!inherits(result, "delphi_result"), "\u8bf7\u5148\u7528 analyze_delphi() \u5f97\u5230\u7ed3\u679c\u3002")
@@ -40,6 +41,7 @@ delphi_report <- function(result, file = NULL,
       rand_ucla = "rand_ucla",
       comet_cos = "comet_cos",
       standard_element = "standard",
+      delphi_ram = "delphi_ram",
       "clinical"
     )
   }
@@ -57,7 +59,8 @@ delphi_report <- function(result, file = NULL,
     clinical = "delphi-clinical",
     rand_ucla = "delphi-rand-ucla",
     comet_cos = "delphi-comet-cos",
-    standard = "delphi-standard"
+    standard = "delphi-standard",
+    delphi_ram = "delphi-ram"
   )
   skeleton <- system.file(
     "rmarkdown", "templates", tpl_dir, "skeleton", "skeleton.Rmd",

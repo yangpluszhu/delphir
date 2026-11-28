@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-10" />
+<meta name="date" content="2026-10-04" />
 
 <title>教学文档 8：第一轮新增条目，从问卷到三轮报告</title>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 8：第一轮新增条目，从问卷到三轮报告</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-10</h4>
+<h4 class="date">2026-10-04</h4>
 
 
 
@@ -190,10 +190,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 26</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(round1<span class="sc">$</span>items<span class="sc">$</span>domain)</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     中医特色     临床事件         功能       安全性     客观指标 患者报告结局 </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            4            7            3            1            2            1 </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;         症状 </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            8</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       安全性         功能 患者报告结局     客观指标     临床事件         症状 </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            1            3            1            2            7            8 </span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     中医特色 </span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            4</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">delphi_blueprint</span>(protocol, round1<span class="sc">$</span>panel, round1<span class="sc">$</span>items, round1<span class="sc">$</span>meta)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>dir1 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;chf-r1-&quot;</span>)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(dir1)</span>
@@ -297,8 +297,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>round1_cls <span class="ot">&lt;-</span> round1_cls[round1_cls<span class="sc">$</span>round <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> round1_cls<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(round1_cls<span class="sc">$</span>class_zh)</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 排除共识 未达共识 纳入共识 </span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        1        3       22</span></span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 纳入共识 排除共识 未达共识 </span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       22        1        3</span></span></code></pre></div>
 <p><strong>怎么读：</strong> 这一轮 26 项里，有的已经达到 70/15，有的还没有，有的多数人打在低分区。这是中间结果。原条目还要在第 2 轮看到全组分布和自己的分数以后再评一次。三个新条目这一轮还没有分数，不能给它们编造中位数或百分比。</p>
 <p>权威系数、回收率和 Kendall 协调系数如果出现在输出里，只说明专家是否回卷、自评是否熟悉、整体排序是否齐。它们不决定某一条进不进核心指标集。</p>
 </div>
@@ -436,7 +436,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(out)</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.info</span>(out)<span class="sc">$</span>size</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 29104</span></span></code></pre></div>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 28495</span></span></code></pre></div>
 <p><strong>怎么读报告时，建议按这个顺序：</strong></p>
 <ol style="list-style-type: decimal">
 <li>先看目的和范围。本题问的是核心疗效结局，不是所有看起来重要的指标，也不是测量工具或住院费用。</li>

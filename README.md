@@ -7,7 +7,7 @@
 
 **Protocol-first toolkit for Delphi studies, RAND/UCLA appropriateness panels, and COMET core outcome sets.**
 
-以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。第一轮新增条目按双通道审查，并要求再迭代一轮。自动生成问卷并回读，写出 Word 报告。安装后即获得十一套中文教学文档、问卷样稿与示例数据。RAND/UCLA 默认按手册表 4 判定，并可生成两轮 docx/xlsx 问卷与末轮 Word 报告。
+以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。第一轮新增条目按双通道审查，并要求再迭代一轮。自动生成问卷并回读，写出 Word 报告。安装后即获得十四套中文教学文档、问卷样稿与示例数据。RAND/UCLA 默认按手册表 4 判定，并可生成两轮 docx/xlsx 问卷与末轮 Word 报告。改良德尔菲可以单独锁定表 4、IPRAS 或自定义百分比规则，生成多轮问卷并写出 docx 报告。
 
 - **Repository:** https://github.com/yangpluszhu/delphir
 - **Issues:** https://github.com/yangpluszhu/delphir/issues
@@ -48,7 +48,7 @@ remotes::install_github("yangpluszhu/delphir")
 若已下载源码包：
 
 ```r
-install.packages("delphir_0.5.0.tar.gz", repos = NULL, type = "source")
+install.packages("delphir_0.7.0.tar.gz", repos = NULL, type = "source")
 ```
 
 本地开发安装（含 vignette）：
@@ -85,6 +85,9 @@ data(consensus_3round_demo)  # 医学专家共识（三轮）
 data(standard_element_demo)  # 5 分核心技术要素（开放轮 + 三轮评分）
 data(chf_new_item_demo)      # 心衰核心指标集：第一轮新增条目（三轮）
 data(rand_ucla_demo)         # RAND/UCLA 适宜性
+data(delphi_ram_table4_demo) # 改良德尔菲 + 表 4
+data(delphi_ram_ipras_demo)  # 改良德尔菲 + IPRAS
+data(delphi_ram_percent_demo)# 改良德尔菲 + 百分比共识
 data(cos_demo)               # COMET 核心结局集
 data(indicator_demo)         # 指标体系补充示例
 ```
@@ -108,6 +111,7 @@ res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 |---|---|---|
 | 医学专家共识 | `preset_protocol("clinical_consensus")` | 9 分 Likert；高度/基本共识、排除、两极分化 |
 | RAND/UCLA 适宜性 | `simulate_rand_ucla()` / `classify_rand()` | Median 区间 + 分歧指数，不强迫共识 |
+| 改良德尔菲结合 RAM | `delphi_ram_protocol()` / `run_delphi_ram()` | 表 4、IPRAS 或自定义百分比；docx/xlsx 问卷 |
 | COMET 核心结局集 | `preset_protocol("comet_cos")` | 70/15 规则；利益相关者分层 |
 | 标准核心技术要素 | `preset_protocol("standard_element")` | 5 分；均数与满分比；协调系数决定是否结束 |
 | 第一轮新增条目 | `screen_new_items()` / `simulate_chf_new_items()` | 五问与双通道；首次评分只记暂时共识；变更日志 |
@@ -131,6 +135,12 @@ res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 | 6. 三轮 Delphi 从零到完整报告 | `vignette("three-round-workflow", package = "delphir")` |
 | 7. 5 分量表核心技术要素，从开放式首轮到完整报告 | `vignette("standard-5point-workflow", package = "delphir")` |
 | 8. 第一轮新增条目，从问卷到三轮报告 | `vignette("new-item-workflow", package = "delphir")` |
+| 9. 经典 RAND 两轮适宜性 | `vignette("rand-classic-workflow", package = "delphir")` |
+| 10. 必要性评价 | `vignette("rand-necessity-workflow", package = "delphir")` |
+| 11. 规则比较与推荐意见修改版 | `vignette("rand-rules-workflow", package = "delphir")` |
+| 12. 改良德尔菲结合表 4 | `vignette("delphi-ram-table4", package = "delphir")` |
+| 13. 改良德尔菲结合 IPRAS | `vignette("delphi-ram-ipras", package = "delphir")` |
+| 14. 改良德尔菲结合自定义百分比 | `vignette("delphi-ram-percent", package = "delphir")` |
 
 或 `delphi_guide("clinical-consensus")` 等打开预编译 HTML。
 
@@ -143,7 +153,7 @@ delphir/
 ├── NEWS.md
 ├── R/                   # 分析、问卷、报告函数
 ├── man/                 # roxygen 帮助文档
-├── vignettes/           # 十一套教学文档源稿
+├── vignettes/           # 十四套教学文档源稿
 ├── inst/
 │   ├── questionnaires/  # 第 1/2/3 轮问卷样稿
 │   ├── extdata/         # 录入模板与迷你示例
@@ -176,7 +186,7 @@ Issues 与功能建议请提交到 [GitHub Issues](https://github.com/yangpluszh
 
 ## Changelog
 
-见 [NEWS.md](NEWS.md)。当前版本 **0.5.0**。
+见 [NEWS.md](NEWS.md)。当前版本 **0.7.0**。
 
 ## License
 

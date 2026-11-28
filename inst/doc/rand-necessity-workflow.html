@@ -189,7 +189,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">rand_questionnaire</span>(nec, <span class="at">round =</span> <span class="st">&quot;necessity&quot;</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>,</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">file =</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-nec-&quot;</span>))</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(path)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ram-nec-67e874d5232a.docx&quot; &quot;ram-nec-67e874d5232a.xlsx&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ram-nec-b2685f7993f.docx&quot; &quot;ram-nec-b2685f7993f.xlsx&quot;</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>raw <span class="ot">&lt;-</span> openxlsx<span class="sc">::</span><span class="fu">read.xlsx</span>(path[<span class="fu">grepl</span>(<span class="st">&quot;xlsx&quot;</span>, path)][<span class="dv">1</span>], <span class="at">sheet =</span> <span class="st">&quot;\u8bc4\u5206&quot;</span>)</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(raw<span class="sc">$</span>item_id)</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;IND01&quot; &quot;IND05&quot; &quot;IND07&quot;</span></span>
@@ -264,7 +264,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>docx <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-nec-report-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_rand</span>(nec, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> docx, <span class="at">loo =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:/Users/Lenovo/AppData/Local/Temp/Rtmpa61liL/ram-nec-report-67e85cf52337.docx&quot;</span></span></code></pre></div>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:/Users/Lenovo/AppData/Local/Temp/RtmpWmwNNM/ram-nec-report-b2687fcd24dd.docx&quot;</span></span></code></pre></div>
 <p><strong>解读：</strong> docx 报告在适宜性清单之外另有必要性一节。可以放进指南附录的句子应当分成三列，而不是一列「共识」：</p>
 <ol style="list-style-type: decimal">
 <li>适宜且必要；</li>

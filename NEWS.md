@@ -1,3 +1,20 @@
+# delphir 0.7.0
+
+* 新增独立场景 `delphi_ram`：改良德尔菲结合 RAM。匿名多轮函询，默认最多 3 轮，
+  每轮复评全部条目。是否使用由 `delphi_ram_protocol()` 在第 1 轮前选定。
+  `run_delphi()` 与 `run_rand()` 遇到该场景会停止。
+* 主规则只能是手册表 4、IPRAS 或自定义百分比。临床 `high_pct` 不参与分类。
+  表 4 与 IPRAS 的适宜性仍是中位数区间乘以有无分歧；共识列只是报告名称。
+  无分歧不等于一致。百分比规则要求比例和中位数同时满足；中位数在高区但
+  比例未达标记为未达成共识，并标明 RAM 修改版。`classify_rand()` 的原有
+  百分比结果不变。
+* 新增 `classify_delphi_ram()`、`delphi_ram_questionnaire()`、
+  `next_delphi_ram_questionnaire()`、`delphi_ram_sensitivity()`、
+  `run_delphi_ram()` 与 `simulate_delphi_ram()`。问卷为 docx 与 xlsx。
+  报告至少含 docx。
+* 新增教学文档 12–14 与数据 `delphi_ram_table4_demo`、`delphi_ram_ipras_demo`、
+  `delphi_ram_percent_demo`。安装后随 `delphi_guides()` 提供。
+
 # delphir 0.6.0
 
 * RAND/UCLA 预设规则改为 Fitch 等（2001）表 4，按实际应答人数查一致与分歧阈值。

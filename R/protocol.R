@@ -15,6 +15,11 @@
 #'   - rand_ucla：适宜性评价。默认按手册表 4（应答人数查表）加中位数分类，
 #'     **不强迫共识**。也可改用 IPRAS、9 人严格/宽松定义或百分比规则。
 #'     high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
+#'   - delphi_ram：改良德尔菲结合 RAM。匿名多轮函询，默认最多 3 轮，
+#'     每轮复评全部条目。主规则只能是 `table4`、`ipras` 或 `percent`。
+#'     临床 `high_pct` 会写入对象供对照，但不参与分类。请用
+#'     [delphi_ram_protocol()] 与 [run_delphi_ram()]，不要用 [run_delphi()]
+#'     或 [run_rand()]。
 #'   - indicator：指标体系筛选。在基本共识之外还要求 CV 不超过 cv_max。
 #'   - ranking：优先级排序。不判定必须共识，配合 [rank_priorities()] /
 #'     [kendall_w()] 使用。
@@ -170,7 +175,7 @@
 #' @export
 delphi_protocol <- function(
     scenario = c(
-      "clinical_consensus", "comet_cos", "rand_ucla",
+      "clinical_consensus", "comet_cos", "rand_ucla", "delphi_ram",
       "indicator", "ranking", "definition", "policy",
       "standard_element"
     ),
@@ -241,6 +246,29 @@ delphi_protocol <- function(
       "rand_disagreement=\"classic\" \u73b0\u6309\u624b\u518c\u8868 4 \u5224\u5b9a\u5206\u6b67\uff0c\u4e0d\u518d\u4f7f\u7528 ceiling(n/3)\u3002n \u4e3a 10 \u6216 16 \u7b49\u65f6\u4e0e 0.5.0 \u7684\u7ed3\u679c\u53ef\u80fd\u4e0d\u540c\u3002",
       call. = FALSE
     )
+  }
+  if (identical(scenario, "delphi_ram")) {
+    if (!rand_disagreement %in% c("table4", "ipras", "percent")) {
+      stop(
+        "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM \u7684\u4e3b\u89c4\u5219\u53ea\u80fd\u662f table4\u3001ipras \u6216 percent\u3002both \u4e0e 9 \u4eba\u4e25\u683c/\u5bbd\u677e\u5b9a\u4e49\u4e0d\u4f5c\u4e3a\u672c\u573a\u666f\u7684\u9501\u5b9a\u89c4\u5219\u3002",
+        call. = FALSE
+      )
+    }
+    if (missing(max_rounds)) max_rounds <- 3L
+    if (missing(rand_round2_mode)) rand_round2_mode <- "mail"
+    if (missing(high_pct)) high_pct <- NA_real_
+    if (missing(basic_pct)) basic_pct <- NA_real_
+    if (missing(reject_pct)) reject_pct <- NA_real_
+    if (missing(rand_purpose) && identical(rand_disagreement, "percent")) {
+      rand_purpose <- "recommendation"
+    }
+    if (identical(rand_disagreement, "percent")) {
+      .stop_if(
+        !is.finite(rand_percent_high) || !is.finite(rand_percent_low) ||
+          rand_percent_low >= rand_percent_high,
+        "\u767e\u5206\u6bd4\u89c4\u5219\u8981\u6c42 percent_low \u5c0f\u4e8e percent_high\u3002"
+      )
+    }
   }
   if (identical(rand_disagreement, "percent") && !identical(rand_purpose, "recommendation")) {
     warning(
@@ -326,7 +354,7 @@ delphi_protocol <- function(
   }
 
   defaults <- .preset_defaults(scenario)
-  if (identical(scenario, "rand_ucla") && is.null(rationale)) {
+  if (scenario %in% c("rand_ucla", "delphi_ram") && is.null(rationale)) {
     if (!identical(rand_disagreement, defaults$rand_disagreement) ||
         !isTRUE(all.equal(rand_iprr, defaults$rand_iprr)) ||
         !isTRUE(all.equal(rand_cfa, defaults$rand_cfa)) ||
@@ -439,7 +467,8 @@ delphi_protocol <- function(
       ),
       rationale = rationale,
       modified_from_preset = modified,
-      locked = isTRUE(locked)
+      locked = isTRUE(locked),
+      combine_ram = identical(scenario, "delphi_ram")
     ),
     class = "delphi_protocol"
   )
@@ -520,6 +549,15 @@ delphi_protocol <- function(
       reject_pct = NA_real_, comet_in_high = 0.70, comet_in_low_max = 0.15,
       comet_out_low = 0.70, comet_out_high_max = 0.15,
       rand_di_threshold = 1, rand_disagreement = "table4", max_rounds = 2,
+      cv_max = 0.25
+    ),
+    delphi_ram = list(
+      high_pct = NA_real_, basic_pct = NA_real_, median_min = 7, iqr_max = 2,
+      reject_pct = NA_real_, comet_in_high = 0.70, comet_in_low_max = 0.15,
+      comet_out_low = 0.70, comet_out_high_max = 0.15,
+      rand_di_threshold = 1, rand_disagreement = "table4", max_rounds = 3,
+      rand_round2_mode = "mail", rand_purpose = "appropriateness",
+      rand_percent_high = 0.70, rand_percent_low = 0.15,
       cv_max = 0.25
     ),
     indicator = list(
@@ -604,6 +642,9 @@ delphi_protocol <- function(
 #' - RAND/UCLA (rand_ucla)：`rand_disagreement`（默认 `table4`）、
 #'   `rand_di_threshold`、`rand_round2_mode`、`rand_boundary`、IPRAS 常数。
 #'   `high_pct` 为 `NA`。`max_rounds` 默认为 2。百分比规则须标明修改版。
+#' - 改良德尔菲结合 RAM (delphi_ram)：`rand_disagreement` 只能是
+#'   `table4`、`ipras` 或 `percent`。默认匿名函询、最多 3 轮。
+#'   `high_pct` 为 `NA`，不驱动分类。入口是 [delphi_ram_protocol()]。
 #' - 指标体系 (indicator)：`basic_pct`、`median_min`、`iqr_max`、`cv_max`。
 #' - 排序 (ranking)：共识百分比多为 `NA`；用 [rank_priorities()] 与
 #'   `ranking_topk`。
@@ -632,7 +673,7 @@ delphi_protocol <- function(
 preset_protocol <- function(scenario = "clinical_consensus", ...) {
   scenario <- match.arg(
     scenario,
-    c("clinical_consensus", "comet_cos", "rand_ucla",
+    c("clinical_consensus", "comet_cos", "rand_ucla", "delphi_ram",
       "indicator", "ranking", "definition", "policy",
       "standard_element")
   )
@@ -640,6 +681,86 @@ preset_protocol <- function(scenario = "clinical_consensus", ...) {
   args <- c(list(scenario = scenario), .preset_defaults(scenario))
   if (length(dots)) args[names(dots)] <- dots
   do.call(delphi_protocol, args)
+}
+
+#' 锁定改良德尔菲结合 RAM 的方案
+#'
+#' 这是一套独立流程：匿名多轮函询，用预先锁定的 RAM 规则判定一致、分歧、
+#' 适宜性和共识。它不走临床共识的高区比例复合标准，也不是经典两轮面对面
+#' 适宜性专家组。分析请用 [run_delphi_ram()]，问卷请用 [delphi_ram_questionnaire()]。
+#'
+#' @param rule `"table4"`（Fitch 等，2001，表 4）、`"ipras"` 或 `"percent"`。
+#'   百分比规则属于 RAM 修改版。
+#' @param percent_high,percent_low 百分比规则的高区下限与低区上限。默认 0.70
+#'   与 0.15。只在 `rule = "percent"` 时驱动共识分类。
+#' @param max_rounds 计划最多轮次，默认 3。超过 2 轮是对经典 RAM 的流程偏离，
+#'   报告会说明。分歧可以成为最终结果。
+#' @param round_mode `"mail"`（默认，再次函询）、`"online"` 或 `"in_person"`。
+#' @param rationale 偏离预设时的理由。改规则、改百分比或改函询形式而未填写时会警告。
+#' @param ... 传给 [preset_protocol()] 的其他参数，例如量表端点。不要在这里再传
+#'   `rand_disagreement`，规则由 `rule` 指定。
+#'
+#' @return `delphi_protocol`。`scenario` 为 `delphi_ram`，`combine_ram` 为 `TRUE`。
+#'
+#' @section 输入输出:
+#' **输入**为标量。比例必须在 0 与 1 之间，且 `percent_low` 应小于 `percent_high`。
+#'
+#' **输出**供 [delphi_study()] 在第一轮前锁定。临床 `high_pct` 为 `NA`，
+#' [classify_delphi_ram()] 不读取它。
+#'
+#' @section 文献:
+#' Fitch K, Bernstein SJ, Aguilar MD, et al. The RAND/UCLA Appropriateness
+#' Method User's Manual. Santa Monica, CA: RAND; 2001.
+#'
+#' @examples
+#' p <- delphi_ram_protocol("table4")
+#' p$scenario
+#' p$rand$rule
+#' p$combine_ram
+#'
+#' p_ipras <- delphi_ram_protocol("ipras")
+#' p_ipras$rand$rule
+#'
+#' p_pct <- delphi_ram_protocol("percent", percent_high = 0.75, percent_low = 0.15)
+#' p_pct$rand$purpose
+#'
+#' @seealso [run_delphi_ram()], [classify_delphi_ram()], [delphi_ram_questionnaire()]
+#'
+#' @export
+delphi_ram_protocol <- function(rule = c("table4", "ipras", "percent"),
+                                percent_high = 0.70,
+                                percent_low = 0.15,
+                                max_rounds = 3L,
+                                round_mode = c("mail", "online", "in_person"),
+                                rationale = NULL,
+                                ...) {
+  rule <- match.arg(rule)
+  round_mode <- match.arg(round_mode)
+  .stop_if(
+    !is.finite(percent_high) || !is.finite(percent_low) ||
+      percent_high <= 0 || percent_high > 1 || percent_low < 0 || percent_low >= 1 ||
+      percent_low >= percent_high,
+    "percent_high \u4e0e percent_low \u5fc5\u987b\u5728 0 \u4e0e 1 \u4e4b\u95f4\uff0c\u4e14 percent_low \u5c0f\u4e8e percent_high\u3002"
+  )
+  if (is.null(rationale)) {
+    rationale <- switch(
+      rule,
+      table4 = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u533f\u540d\u591a\u8f6e\u51fd\u8be2\uff0c\u5206\u6b67\u4e0e\u9002\u5b9c\u6027\u6309\u624b\u518c\u8868 4 \u5224\u5b9a\u3002\u8fd9\u4e0d\u662f\u7ecf\u5178\u4e24\u8f6e\u9762\u5bf9\u9762\u9002\u5b9c\u6027\u4e13\u5bb6\u7ec4\u3002",
+      ipras = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u5206\u6b67\u6309 IPRAS\uff08IPR \u4e25\u683c\u5927\u4e8e IPRAS\uff09\u5224\u5b9a\u3002\u8fd9\u4e0d\u662f\u7ecf\u5178\u4e24\u8f6e\u9762\u5bf9\u9762\u9002\u5b9c\u6027\u4e13\u5bb6\u7ec4\u3002",
+      percent = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\uff1a\u4f7f\u7528\u9884\u5148\u9501\u5b9a\u7684\u767e\u5206\u6bd4\u5171\u8bc6\u89c4\u5219\uff0c\u5c5e\u4e8e RAM \u4fee\u6539\u7248\uff0c\u4e0d\u5957\u7528 IPRAS \u5e38\u6570\u3002"
+    )
+  }
+  preset_protocol(
+    "delphi_ram",
+    rand_disagreement = rule,
+    rand_percent_high = percent_high,
+    rand_percent_low = percent_low,
+    max_rounds = as.integer(max_rounds),
+    rand_round2_mode = round_mode,
+    rand_purpose = if (identical(rule, "percent")) "recommendation" else "appropriateness",
+    rationale = rationale,
+    ...
+  )
 }
 
 #' @export
@@ -658,6 +779,15 @@ print.delphi_protocol <- function(x, ...) {
       x$rand$round2_mode %||% "in_person",
       if (isTRUE(x$rand$necessity)) "\u8ba1\u5212\u53e6\u8bc4" else "\u4e0d\u8bc4"
     ))
+  }
+  if (identical(x$scenario, "delphi_ram")) {
+    cat(sprintf(
+      "  \u7ed3\u5408 RAM: \u662f\uff1b\u89c4\u5219: %s\uff1b\u51fd\u8be2: %s\uff1b\u6700\u591a %s \u8f6e\n",
+      x$rand$rule %||% x$rand$disagreement,
+      x$rand$round2_mode %||% "mail",
+      x$stability$max_rounds %||% 3L
+    ))
+    cat("  \u4e34\u5e8a high_pct \u4e0d\u53c2\u4e0e\u672c\u573a\u666f\u5206\u7c7b\u3002\n")
   }
   if (identical(x$scenario, "standard_element")) {
     cat(sprintf(

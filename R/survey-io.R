@@ -95,6 +95,8 @@
       s <- summarize_items(study, rounds = src_round)
       cls <- if (identical(p$scenario, "rand_ucla")) {
         classify_rand(study, round = src_round, summary = s)
+      } else if (identical(p$scenario, "delphi_ram")) {
+        classify_delphi_ram(study, round = src_round, summary = s)
       } else classify_consensus(s, p)
     }
   }

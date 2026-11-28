@@ -638,6 +638,10 @@ run_rand <- function(study, round = "last", report = FALSE,
   format <- match.arg(format)
   if (inherits(study, "delphi_result")) study <- study$study
   study <- .match_study(study)
+  .stop_if(
+    identical(study$protocol$scenario, "delphi_ram"),
+    "\u8fd9\u662f\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM\u3002\u8bf7\u4f7f\u7528 run_delphi_ram()\uff0c\u4e0d\u8981\u4f7f\u7528 run_rand()\u3002"
+  )
   .stop_if(!identical(study$protocol$scenario, "rand_ucla"),
            "run_rand() \u53ea\u7528\u4e8e\u573a\u666f rand_ucla\u3002")
   up <- NULL

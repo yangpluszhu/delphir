@@ -135,6 +135,10 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   } else {
     study <- .match_study(study)
   }
+  .stop_if(
+    identical(study$protocol$scenario, "delphi_ram"),
+    "\u573a\u666f delphi_ram \u8bf7\u4f7f\u7528 delphi_ram_questionnaire()\uff0c\u4e0d\u8981\u4f7f\u7528 delphi_questionnaire()\u3002"
+  )
   maxr <- study$protocol$stability$max_rounds %||% 3L
   .stop_if(round > maxr, sprintf("round=%s \u8d85\u8fc7\u65b9\u6848 max_rounds=%s\u3002", round, maxr))
   if (.is_standard_scenario(study$protocol) && identical(items, "unresolved")) {
@@ -378,6 +382,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
 .protocol_rules_md <- function(p) {
   r <- p$rules
   if (identical(p$scenario, "rand_ucla")) return(.protocol_rules_rand(p))
+  if (identical(p$scenario, "delphi_ram")) return(.protocol_rules_delphi_ram(p))
   if (.is_standard_scenario(p)) {
     return(paste(
       sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s \u5206\u3002\u91cd\u8981\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u91cd\u8981\uff0c2 \u4e0d\u91cd\u8981\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u91cd\u8981\uff0c5 \u5f88\u91cd\u8981\u3002",

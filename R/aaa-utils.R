@@ -177,6 +177,7 @@
     clinical_consensus = "\u533b\u5b66\u4e13\u5bb6\u5171\u8bc6\uff08Modified Delphi\uff09",
     comet_cos = "COMET \u6838\u5fc3\u7ed3\u5c40\u96c6",
     rand_ucla = "RAND/UCLA \u9002\u5b9c\u6027\u8bc4\u4ef7",
+    delphi_ram = "\u6539\u826f\u5fb7\u5c14\u83f2\u7ed3\u5408 RAM",
     indicator = "\u6307\u6807\u4f53\u7cfb\u7b5b\u9009",
     ranking = "\u4f18\u5148\u7ea7\u6392\u5e8f",
     definition = "\u5b9a\u4e49/\u8bca\u65ad\u6807\u51c6\u5171\u8bc6",

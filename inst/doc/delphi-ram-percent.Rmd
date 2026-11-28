@@ -1,0 +1,152 @@
+---
+title: "教学文档 14：改良德尔菲结合自定义百分比共识"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 14：改良德尔菲结合自定义百分比共识}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5,
+                      message = FALSE, warning = FALSE)
+```
+
+# 1. 这次要完成什么
+
+百分比共识是 RAM 的**修改版**，用来判断推荐意见一类的陈述，不是经典适宜性评价。本教程锁定的规则是：
+
+- 赞同共识：中位数在 7–9，高区比例至少 70%，且低区比例低于 15%。
+- 不赞同共识：中位数在 1–3，低区比例至少 70%，且高区比例低于 15%。
+- 分歧：低区和高区比例都达到 15%。
+- 其余情况，包括中位数已经在高区但高区比例没有达到 70%，都是未达成共识。
+
+70% 和 15% 是默认值，可以在第 1 轮前改成 75% 或 80%，但必须写入方案并说明理由。看到第 1 轮是 68% 再把线降到 65%，不是修改版，是事后改线。
+
+这条规则**不用**表 4 的人数阈值，也**不套** IPRAS 的 2.35 和 1.5。适宜性列由同一套百分比判定映射而来，并标明修改版。它和 `classify_rand()` 里旧的百分比标签不是同一件事：旧标签仍只服务 `rand_ucla` 场景；这里中位数高但比例不够，必须是未达成共识。
+
+流程仍是改良德尔菲：12 名专家、6 条推荐意见、三轮匿名函询，每轮复评全部条目。样本函数是 `simulate_delphi_ram("percent")`，安装后为 `data(delphi_ram_percent_demo)`。
+
+```{r}
+library(delphir)
+ram <- simulate_delphi_ram("percent")
+ram$protocol$rand$rule
+ram$protocol$rand$purpose
+ram$protocol$rand$percent_high
+ram$protocol$rand$percent_low
+ram$protocol$rand$modified_from_preset
+```
+
+**解读：** `purpose` 是 `recommendation`，提醒读者这不是适宜性专家组。`modified_from_preset = TRUE`，因为场景默认规则是表 4，百分比是事先声明的偏离。理由在 `rationale` 里，报告会打印。
+
+# 2. 问卷怎么说这套规则
+
+```{r}
+qdir <- tempfile("ram-percent-")
+dir.create(qdir)
+q1 <- delphi_ram_questionnaire(ram, round = 1, format = "both", file = file.path(qdir, "round1"))
+q1
+```
+
+**解读：** 评分维度是「同意程度」：1 为强烈反对，9 为强烈同意。问卷应出现「RAM 修改版」和 70% / 15%，而不是 IPRAS 常数。docx 发放，xlsx 回收。第 2 轮及以后给出本人上轮分数和 1–3 / 4–6 / 7–9 的人数，并要求 6 条全部再评。
+
+把只含第 1 轮的研究接上预填的第 2 轮，确认读回不会冲掉旧轮：
+
+```{r}
+base <- ram
+base$ratings <- base$ratings[base$ratings$round == 1, ]
+q2 <- delphi_ram_questionnaire(ram, round = 2, format = "xlsx",
+                               file = file.path(qdir, "round2.xlsx"), prefill = TRUE)
+back <- read_survey_xlsx(q2, study = base)
+sort(unique(back$ratings$round))
+```
+
+**解读：** 读回后有第 1 轮和第 2 轮。第 2 轮的 12 × 6 条都在，没有按「已经达成共识」删除条目。
+
+# 3. 第 1 轮六条分别落在哪里
+
+```{r}
+r1 <- classify_delphi_ram(ram, round = 1)
+r1[, c("item_id", "median", "n_low", "n_high", "n_valid", "class_zh", "consensus_zh", "decision_basis")]
+```
+
+**解读：** `decision_basis` 全部是 `percent_consensus`。这一列说明主判定不是表 4。
+
+- PC01：12 人全在高区，中位数在高区。达成共识（赞同）。映射到适宜性列时会写成「适宜（RAM 修改版）」，不要把它说成经典 RAM 的适宜。
+- PC02：12 人全在低区。达成共识（不赞同）。这是明确的反对共识，不是缺失。
+- PC03：中位数在 4–6，两端比例都很低。未达成共识。意见集中在中间，仍然没有过预先写的赞同线。
+- PC04：低区和高区都超过 15%。这是两端分歧，不是「中位数 5.5 所以大体中立」。未达成共识（两端比例同时达到下限）。
+- PC05：中位数是 7，已经在高区，但 12 人里只有 8 人在 7–9，8/12 约 67%，低于 70%。**必须是未达成共识。** 不能因为中位数到了 7 就写成赞同。
+- PC06 在第 1 轮和 PC05 一样，也是 8/12，未达标。
+
+# 4. 第 2 轮只允许分数变化，不允许改阈值
+
+```{r}
+r2 <- classify_delphi_ram(ram, round = 2)
+r2[r2$item_id %in% c("PC05", "PC06"),
+   c("item_id", "median", "n_high", "n_valid", "consensus_zh")]
+```
+
+**解读：** PC05 第 2 轮仍是 8/12，继续未达标。PC06 变成 9/12，也就是 75%，跨过了事先写好的 70%，中位数仍在高区，低区为 0，于是成为赞同共识。变化来自专家改了分数，不是软件把 70% 改成 67%。若 PC06 没有跨过 70%，它必须继续留在未达成共识里。
+
+# 5. 三轮分析和末轮清单
+
+```{r}
+res <- run_delphi_ram(ram, report = FALSE)
+res$delphi_ram_meta[c("rule", "modified_ram", "percent_high", "percent_low", "deviation", "supplement")]
+res$last_classification[, c("item_id", "median", "n_high", "consensus_zh", "class_zh")]
+```
+
+**解读：**
+
+- `modified_ram = TRUE`。报告里不能把这份结果叫作经典适宜性评价。
+- `percent_high` 是 0.70，`percent_low` 是 0.15。这就是锁定值。
+- `deviation` 仍然提醒：三轮函询不是经典 RAM 的两轮会议。百分比和「多一轮函询」是两种不同的偏离，都要写。
+- 末轮 PC05 仍未达标。它和 PC04 的分歧、PC03 的中间意见一起，构成未达成共识清单。只发表 PC01、PC02、PC06 会隐藏规则实际留下的条目。
+
+# 6. 和表 4、IPRAS 比，是为了说明差异
+
+```{r}
+sens <- res$sensitivity
+sens$kappa
+sens$by_item[, c("item_id", "consensus_percent", "class_table4", "class_ipras", "class_percent")]
+sens$note
+```
+
+**解读：** 百分比列是锁定规则。表 4 或 IPRAS 可能把「中位数在高区、低区很少」的条目判成适宜，即使高区比例不到 70%。那是它们的定义。本方案已经声明不用它们做主判定。κ 如果不是 1，正好说明不能在三种规则之间看完结果再选。敏感性分析的注释写明：不替换已锁定规则。
+
+# 7. 稳定性
+
+```{r}
+chg <- res$stability[res$stability$item_id == "PC06" & res$stability$from_round == 1, ]
+chg[, c("item_id", "class_r1", "class_r2", "class_unchanged", "median_r1", "median_r2")]
+res$stopping$note
+```
+
+**解读：** PC06 从第 1 轮到第 2 轮，分类由不确定变为适宜（修改版映射）。`class_unchanged` 为假是诚实的记录。它不表示第 1 轮的 70% 线定错了。停止规则里的 Wilcoxon 说明仍然有效：P 值不能单独定义意见已经稳定。
+
+# 8. 写出 docx 报告
+
+```{r}
+report_file <- tempfile("delphi-ram-percent-", fileext = ".docx")
+reported <- run_delphi_ram(ram, report = TRUE, format = "docx", file = report_file)
+file.exists(attr(reported, "report_file"))
+file.info(attr(reported, "report_file"))$size
+```
+
+**解读：** 报告应同时出现：70% 与 15%、RAM 修改版、三轮函询、PC05 未达标、PC04 两端分歧、三种规则的 κ，以及权威系数和 Kendall's W 不参与百分比判定。选择 `format = "html"` 时仍会额外写 docx。
+
+# 9. 改百分比时要改在发卷之前
+
+若项目想用 80% 而不是 70%，应这样锁定，而不是分析完再改：
+
+```{r}
+p80 <- delphi_ram_protocol("percent", percent_high = 0.80, percent_low = 0.15,
+                           rationale = "高风险推荐，第 1 轮前把赞同共识提高到 80%。")
+p80$rand$percent_high
+p80$modified_from_preset
+```
+
+**解读：** 0.80 会被标成偏离默认 0.70，理由进入报告。用这套方案重新分类时，9/12 = 75% 的 PC06 将不再算赞同共识。这是阈值的后果，应在招募专家之前就接受，而不是在末轮才发现。

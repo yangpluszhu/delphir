@@ -5,8 +5,8 @@
 \title{创建并锁定 Delphi 统计分析方案}
 \usage{
 delphi_protocol(
-  scenario = c("clinical_consensus", "comet_cos", "rand_ucla", "indicator", "ranking",
-    "definition", "policy", "standard_element"),
+  scenario = c("clinical_consensus", "comet_cos", "rand_ucla", "delphi_ram", "indicator",
+    "ranking", "definition", "policy", "standard_element"),
   scale_min = 1,
   scale_max = 9,
   low_range = c(1, 3),
@@ -69,6 +69,11 @@ high_pct 复合标准。
 \item rand_ucla：适宜性评价。默认按手册表 4（应答人数查表）加中位数分类，
 \strong{不强迫共识}。也可改用 IPRAS、9 人严格/宽松定义或百分比规则。
 high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
+\item delphi_ram：改良德尔菲结合 RAM。匿名多轮函询，默认最多 3 轮，
+每轮复评全部条目。主规则只能是 \code{table4}、\code{ipras} 或 \code{percent}。
+临床 \code{high_pct} 会写入对象供对照，但不参与分类。请用
+\code{\link[=delphi_ram_protocol]{delphi_ram_protocol()}} 与 \code{\link[=run_delphi_ram]{run_delphi_ram()}}，不要用 \code{\link[=run_delphi]{run_delphi()}}
+或 \code{\link[=run_rand]{run_rand()}}。
 \item indicator：指标体系筛选。在基本共识之外还要求 CV 不超过 cv_max。
 \item ranking：优先级排序。不判定必须共识，配合 \code{\link[=rank_priorities]{rank_priorities()}} /
 \code{\link[=kendall_w]{kendall_w()}} 使用。

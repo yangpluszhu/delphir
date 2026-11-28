@@ -48,16 +48,28 @@ stakeholder_stratify <- function(study, round = NULL, group = "stakeholder") {
     sm
   })
   res <- do.call(rbind, out)
-  if (p$scenario == "rand_ucla") {
+  if (p$scenario %in% c("rand_ucla", "delphi_ram")) {
+    settings <- .rand_settings(p)
     extra <- lapply(seq_len(nrow(res)), function(i) {
       sub <- r[r$item_id == res$item_id[i] & r$dimension == res$dimension[i] &
                  r$group_level == res$group_level[i], ]
-      rand_disagreement(.valid_scores(sub$score, sub$unable),
-                        method = p$rand$rule %||% p$rand$disagreement,
-                        di_threshold = p$rand$di_threshold,
-                        warn = FALSE)
+      rand_disagreement(
+        .valid_scores(sub$score, sub$unable),
+        method = settings$rule, di_threshold = settings$di_threshold, warn = FALSE,
+        low = settings$low, mid = settings$mid, high = settings$high,
+        iprr = settings$iprr, cfa = settings$cfa, qtype = settings$qtype,
+        percent_high = settings$percent_high, percent_low = settings$percent_low,
+        boundary = settings$boundary, scale = settings$scale
+      )
     })
-    res <- cbind(res, do.call(rbind, extra)[, c("di", "disagreement")])
+    extra <- do.call(rbind, extra)
+    if (identical(p$scenario, "delphi_ram")) {
+      keep <- setdiff(names(extra), names(res))
+      res <- cbind(res, extra[, keep, drop = FALSE])
+      res <- .delphi_ram_relabel(res, settings$rule, settings$percent_high, settings$percent_low)
+    } else {
+      res <- cbind(res, extra[, c("di", "disagreement"), drop = FALSE])
+    }
   } else {
     cls <- classify_consensus(res, p)
     res$class <- cls$class
