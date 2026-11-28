@@ -195,7 +195,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7. 教学文档 7：5 分量表核心技术要素，从开放式首轮到完整报告</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    打开: delphi_guide(&quot;standard-5point-workflow&quot;)</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    vignette(&quot;standard-5point-workflow&quot;, package = &quot;delphir&quot;)</span></span></code></pre></div>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    vignette(&quot;standard-5point-workflow&quot;, package = &quot;delphir&quot;)</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8. 教学文档 8：第一轮新增条目，从问卷到三轮报告</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    打开: delphi_guide(&quot;new-item-workflow&quot;)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    vignette(&quot;new-item-workflow&quot;, package = &quot;delphir&quot;)</span></span></code></pre></div>
 <ul>
 <li>完整样稿：<code>system.file(&quot;questionnaires&quot;, &quot;round1-complete.md&quot;, package = &quot;delphir&quot;)</code></li>
 <li>空白录入表：<code>write_survey_templates()</code> 拷到本地</li>
@@ -210,7 +214,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: clinical_consensus (医学专家共识（Modified Delphi）)</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   新增条目: 允许；≥2 人独立提出，或 1 人且有外部证据；至少两轮评分后才能最终纳入</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span></code></pre></div>
 <p>本教程锁定：</p>
 <ul>
 <li>高度共识：P(7–9) ≥ 80%，且 Median ≥ 7，且 IQR ≤ 2</li>
@@ -569,8 +574,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 1 轮  6/6  (100.0%)</span></span>
 <span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 2 轮  5/6  (83.3%)</span></span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   末轮分类:</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 3</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     两极分化: 1</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     高度共识: 3</span></span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   稳定性建议终止: 否</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>last <span class="ot">&lt;-</span> res<span class="sc">$</span>last_classification</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>last <span class="ot">&lt;-</span> last[last<span class="sc">$</span>dimension <span class="sc">==</span> <span class="st">&quot;重要性&quot;</span>, ]</span>

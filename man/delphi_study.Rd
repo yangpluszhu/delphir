@@ -10,6 +10,9 @@ delphi_study(
   items,
   ratings = NULL,
   comments = NULL,
+  suggestions = NULL,
+  concept_review = NULL,
+  floor_items = NULL,
   meta = list(),
   validate = TRUE
 )
@@ -24,6 +27,12 @@ delphi_study(
 \item{ratings}{\code{\link[=delphi_ratings]{delphi_ratings()}} 或数据框。可省略（空表）以表示尚未回收。}
 
 \item{comments}{\code{\link[=delphi_comments]{delphi_comments()}} 或数据框，可省略。}
+
+\item{suggestions}{\code{\link[=delphi_suggestions]{delphi_suggestions()}}，第 1 轮结构化新增建议，可省略。}
+
+\item{concept_review}{研究组编码后的概念表，供 \code{\link[=screen_new_items]{screen_new_items()}} 使用，可省略。}
+
+\item{floor_items}{共识会议上临时提出、尚未匿名评分的条目，可省略。}
 
 \item{meta}{命名列表。建议字段：\code{title}、\code{objective}、\code{users}、\code{geography}、
 \code{evidence_note}、\code{pilot_tested}、\code{anonymity}、\code{ethics}。}

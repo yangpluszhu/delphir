@@ -79,6 +79,20 @@
 #' @param response_rate_min 积极系数（回收率）的参考下限，默认 0.70。
 #'   只用于报告解读，不加权、不剔除专家。
 #' @param cr_min 权威系数组均数的参考下限，默认 0.70。不用于加权评分。
+#' @param allow_new 是否允许第 1 轮结构化补充候选条目。`NULL` 时按场景取值：
+#'   医学共识、COMET、定义/诊断标准、指标体系为 `TRUE`；适宜性、排序、
+#'   Policy 与 5 分核心技术要素为 `FALSE`。
+#' @param min_independent 同一新概念至少由几名专家**独立**提出才走主通道。
+#'   默认 2。同一人重复书写只计 1 人。这不是共识阈值。
+#' @param allow_single_with_evidence 是否保留例外通道：仅 1 名专家提出，
+#'   但有文献、定性访谈、患者证据、指南或重要临床依据时，仍可进入审查。
+#'   默认 `TRUE`。
+#' @param max_suggestions 每位专家最多可推荐的新条目数，默认 5。
+#' @param require_iteration 新条目是否必须至少经过两轮评分才能最终纳入。
+#'   默认在允许新增的场景中为 `TRUE`。只评过一次时，即使已达共识线，
+#'   也只记为暂时共识。
+#' @param review_panel 条目审查组构成。默认示例为 5 人：中医临床 2、
+#'   方法学 1、统计或 Delphi 方法 1、患者或患者代表 1。软件不代替人工编码。
 #' @param open_first 是否把第 1 轮作为开放式征询（不打分）。
 #'   `standard_element` 默认 `TRUE`：缺少前期基础时先凝练要素。
 #'   若要素均已有古籍或现代文献基础，设为 `FALSE`，此时第 1 轮就是
@@ -94,6 +108,8 @@
 #'   均数界值、协调系数界值、积极系数与权威系数参考值）
 #' * `stability`：`max_rounds` 与三条稳定性规则
 #' * `open_first`：第 1 轮是否为开放式征询
+#' * `new_items`：第一轮新增条目规则（是否允许、独立人数、单人例外、
+#'   每人上限、是否必须再迭代一轮、审查组说明）
 #' * `rand`：分歧设定
 #' * `modified_from_preset`, `rationale`, `locked`
 #'
@@ -171,6 +187,12 @@ delphi_protocol <- function(
     min_experts = NA_real_,
     response_rate_min = 0.70,
     cr_min = 0.70,
+    allow_new = NULL,
+    min_independent = NULL,
+    allow_single_with_evidence = NULL,
+    max_suggestions = NULL,
+    require_iteration = NULL,
+    review_panel = NULL,
     open_first = FALSE,
     rationale = NULL,
     locked = TRUE
@@ -200,6 +222,25 @@ delphi_protocol <- function(
     if (missing(cr_min)) cr_min <- ov$cr_min
     if (missing(open_first)) open_first <- ov$open_first
   }
+  ni_def <- .new_item_defaults(scenario)
+  if (is.null(allow_new)) allow_new <- ni_def$allow
+  if (is.null(min_independent)) min_independent <- ni_def$min_independent
+  if (is.null(allow_single_with_evidence)) {
+    allow_single_with_evidence <- ni_def$allow_single_with_evidence
+  }
+  if (is.null(max_suggestions)) max_suggestions <- ni_def$max_suggestions
+  if (is.null(require_iteration)) require_iteration <- ni_def$require_iteration
+  if (is.null(review_panel) || !nzchar(as.character(review_panel)[1])) {
+    review_panel <- ni_def$review_panel
+  }
+  allow_new <- isTRUE(allow_new)
+  allow_single_with_evidence <- isTRUE(allow_single_with_evidence)
+  require_iteration <- isTRUE(require_iteration) && allow_new
+  min_independent <- as.integer(min_independent)[1]
+  max_suggestions <- as.integer(max_suggestions)[1]
+  review_panel <- as.character(review_panel)[1]
+  .stop_if(is.na(min_independent) || min_independent < 1L, "min_independent \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
+  .stop_if(is.na(max_suggestions) || max_suggestions < 1L, "max_suggestions \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
   .stop_if(scale_min >= scale_max, "scale_min \u5fc5\u987b\u5c0f\u4e8e scale_max\u3002")
   .stop_if(length(low_range) != 2L || length(high_range) != 2L, "\u533a\u95f4\u53c2\u6570\u5fc5\u987b\u662f\u957f\u5ea6 2 \u7684\u5411\u91cf\u3002")
   .stop_if(any(c(high_pct, basic_pct, reject_pct) < 0 | c(high_pct, basic_pct, reject_pct) > 1),
@@ -242,6 +283,19 @@ delphi_protocol <- function(
          defaults$mean_delta_max, defaults$min_experts, defaults$open_first,
          defaults$scale_max, defaults$max_rounds)
   ))
+  ni_modified <- !identical(allow_new, ni_def$allow) ||
+    !identical(min_independent, as.integer(ni_def$min_independent)) ||
+    !identical(allow_single_with_evidence, isTRUE(ni_def$allow_single_with_evidence)) ||
+    !identical(max_suggestions, as.integer(ni_def$max_suggestions)) ||
+    !identical(require_iteration, isTRUE(ni_def$require_iteration) && isTRUE(ni_def$allow)) ||
+    !identical(review_panel, ni_def$review_panel)
+  modified <- isTRUE(modified) || ni_modified
+  if (ni_modified && is.null(rationale)) {
+    warning(
+      "\u4fee\u6539\u4e86\u7b2c\u4e00\u8f6e\u65b0\u589e\u6761\u76ee\u89c4\u5219\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
+      call. = FALSE
+    )
+  }
 
   structure(
     list(
@@ -273,6 +327,14 @@ delphi_protocol <- function(
         cr_min = cr_min
       ),
       open_first = isTRUE(open_first),
+      new_items = list(
+        allow = allow_new,
+        min_independent = min_independent,
+        allow_single_with_evidence = allow_single_with_evidence,
+        max_suggestions = max_suggestions,
+        require_iteration = require_iteration,
+        review_panel = review_panel
+      ),
       stability = list(
         max_rounds = as.integer(max_rounds),
         class_pct = stability_class_pct,
@@ -394,6 +456,28 @@ delphi_protocol <- function(
   out
 }
 
+.new_item_defaults <- function(scenario) {
+  on <- scenario %in% c("clinical_consensus", "comet_cos", "definition", "indicator")
+  list(
+    allow = on,
+    min_independent = 2L,
+    allow_single_with_evidence = TRUE,
+    max_suggestions = 5L,
+    require_iteration = on,
+    review_panel = if (on) {
+      paste0(
+        "\u6761\u76ee\u5ba1\u67e5\u7ec45\u4eba\uff1a\u4e2d\u533b\u4e34\u5e8a\u4e13\u5bb62\u540d\u3001",
+        "\u4e34\u5e8a\u7814\u7a76\u65b9\u6cd5\u5b66\u4e13\u5bb61\u540d\u3001",
+        "\u7edf\u8ba1\u5b66\u6216Delphi\u65b9\u6cd5\u4e13\u5bb61\u540d\u3001",
+        "\u60a3\u8005\u6216\u60a3\u8005\u4ee3\u88681\u540d\u3002",
+        "\u5148\u75312\u540d\u7814\u7a76\u8005\u72ec\u7acb\u7f16\u7801\uff0c\u4e0d\u4e00\u81f4\u65f6\u7531\u7b2c3\u540d\u7814\u7a76\u8005\u88c1\u51b3\u3002"
+      )
+    } else {
+      ""
+    }
+  )
+}
+
 #' 按场景取出预设分析方案
 #'
 #' 按 `scenario` 填入该场景的默认阈值，再交给 [delphi_protocol()] 锁定。
@@ -469,6 +553,12 @@ print.delphi_protocol <- function(x, ...) {
     ))
     cat(sprintf("  \u7b2c 1 \u8f6e\u5f00\u653e\u5f0f\u5f81\u8be2: %s\n", if (isTRUE(x$open_first)) "\u662f" else "\u5426"))
   }
+  if (!is.null(x$new_items) && isTRUE(x$new_items$allow)) {
+    cat(sprintf(
+      "  \u65b0\u589e\u6761\u76ee: \u5141\u8bb8\uff1b\u2265%s \u4eba\u72ec\u7acb\u63d0\u51fa\uff0c\u6216 1 \u4eba\u4e14\u6709\u5916\u90e8\u8bc1\u636e\uff1b\u81f3\u5c11\u4e24\u8f6e\u8bc4\u5206\u540e\u624d\u80fd\u6700\u7ec8\u7eb3\u5165\n",
+      x$new_items$min_independent
+    ))
+  }
   cat(sprintf("  \u9501\u5b9a: %s\n", if (x$locked) "\u662f" else "\u5426"))
   if (isTRUE(x$modified_from_preset)) {
     cat("  \u5df2\u504f\u79bb\u9884\u8bbe")
@@ -494,6 +584,9 @@ print.delphi_protocol <- function(x, ...) {
 protocol_table <- function(protocol) {
   .stop_if(!inherits(protocol, "delphi_protocol"), "\u9700\u8981 delphi_protocol \u5bf9\u8c61\u3002")
   d <- .preset_defaults(protocol$scenario)
+  ni_def <- .new_item_defaults(protocol$scenario)
+  recorded_new <- !is.null(protocol$new_items)
+  ni <- if (recorded_new) protocol$new_items else ni_def
   fmt_rng <- function(x) paste(x, collapse = "\u2013")
   fmt_num <- function(x) {
     if (length(x) == 0L || (length(x) == 1L && is.na(x))) return("NA")
@@ -559,6 +652,21 @@ protocol_table <- function(protocol) {
     c("open_first", if (isTRUE(protocol$open_first)) "TRUE" else "FALSE",
       if (isTRUE(d$open_first)) "TRUE" else "FALSE",
       "\u7b2c 1 \u8f6e\u662f\u5426\u4e3a\u5f00\u653e\u5f0f\u5f81\u8be2"),
+    c("allow_new", if (isTRUE(ni$allow)) "TRUE" else "FALSE",
+      if (isTRUE(ni_def$allow)) "TRUE" else "FALSE",
+      "\u662f\u5426\u5141\u8bb8\u7b2c 1 \u8f6e\u7ed3\u6784\u5316\u8865\u5145\u6761\u76ee"),
+    c("min_independent", fmt_num(ni$min_independent), fmt_num(ni_def$min_independent),
+      "\u4e3b\u901a\u9053\uff1a\u81f3\u5c11\u51e0\u540d\u4e13\u5bb6\u72ec\u7acb\u63d0\u51fa"),
+    c("allow_single_with_evidence", if (isTRUE(ni$allow_single_with_evidence)) "TRUE" else "FALSE",
+      if (isTRUE(ni_def$allow_single_with_evidence)) "TRUE" else "FALSE",
+      "\u4f8b\u5916\u901a\u9053\uff1a1 \u4eba\u63d0\u51fa\u4e14\u6709\u5916\u90e8\u8bc1\u636e"),
+    c("max_suggestions", fmt_num(ni$max_suggestions), fmt_num(ni_def$max_suggestions),
+      "\u6bcf\u4f4d\u4e13\u5bb6\u6700\u591a\u63a8\u8350\u7684\u65b0\u6761\u76ee\u6570"),
+    c("require_iteration", if (isTRUE(ni$require_iteration)) "TRUE" else "FALSE",
+      if (isTRUE(ni_def$require_iteration)) "TRUE" else "FALSE",
+      "\u65b0\u6761\u76ee\u81f3\u5c11\u4e24\u8f6e\u8bc4\u5206\u540e\u624d\u80fd\u6700\u7ec8\u7eb3\u5165"),
+    c("review_panel", ni$review_panel %||% "", ni_def$review_panel %||% "",
+      "\u6761\u76ee\u5ba1\u67e5\u7ec4\u6784\u6210\uff1b\u8f6f\u4ef6\u4e0d\u4ee3\u66ff\u4eba\u5de5\u7f16\u7801"),
     c("locked", if (isTRUE(protocol$locked)) "TRUE" else "FALSE", "TRUE",
       "\u662f\u5426\u7981\u6b62\u5206\u6790\u9636\u6bb5\u56de\u6539\u9608\u503c"),
     c("modified_from_preset", if (isTRUE(protocol$modified_from_preset)) "TRUE" else "FALSE",
@@ -566,6 +674,15 @@ protocol_table <- function(protocol) {
     c("rationale", protocol$rationale %||% "", "",
       "\u504f\u79bb\u9884\u8bbe\u7684\u7406\u7531\uff08\u62a5\u544a\u5fc5\u987b\u5199\u660e\uff09")
   )
+  if (!recorded_new) {
+    drop <- vapply(rows, function(z) {
+      z[[1]] %in% c(
+        "allow_new", "min_independent", "allow_single_with_evidence",
+        "max_suggestions", "require_iteration", "review_panel"
+      )
+    }, logical(1))
+    rows <- rows[!drop]
+  }
   out <- as.data.frame(do.call(rbind, rows), stringsAsFactors = FALSE)
   names(out) <- c("parameter", "value", "preset", "meaning")
   skip <- c("scenario", "modified_from_preset")

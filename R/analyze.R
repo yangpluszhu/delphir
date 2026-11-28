@@ -16,6 +16,9 @@
 #'   `comments_summary`, `kendall`, `stopping`。核心技术要素场景另含
 #'   `expert_profile`、`panel_compliance`、`open_round`；此时 `stopping`
 #'   来自 [coordination_decision()]，而不是中位数稳定性。
+#'   若方案允许第一轮新增条目，另含 `new_item_review`、`item_log`、
+#'   `meeting_agenda`、`new_item_audit`。没有编码表时这些审查结果为空，
+#'   不会改写已有条目的共识分类。
 #'
 #' @examples
 #' study <- simulate_delphi(n_experts = 16, n_items = 8, n_rounds = 2, seed = 16)
@@ -41,6 +44,9 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
     classification <- classify_consensus(item_summary, p)
   } else {
     classification <- classify_consensus(item_summary, p)
+  }
+  if (isTRUE(p$new_items$require_iteration)) {
+    classification <- mark_iteration(classification, study$items, study$ratings, p)
   }
 
   stability <- NULL
@@ -106,9 +112,41 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
     open_round <- analyze_open_round(study, round = 1L)
   }
 
-  last <- classification[classification$round == last_round, ]
-  if ("dimension" %in% names(last) && !is.null(dim0)) {
+  last <- .latest_class_rows(classification)
+  if ("dimension" %in% names(last) && !is.null(dim0) && any(last$dimension == dim0)) {
     last <- last[last$dimension == dim0, ]
+  }
+  screened <- NULL
+  if (!is.null(study$concept_review) && nrow(.as_df(study$concept_review))) {
+    screened <- screen_new_items(
+      suggestions = study$suggestions,
+      review = study$concept_review,
+      protocol = p,
+      items = study$items
+    )
+  }
+  item_log <- NULL
+  if (!is.null(screened)) {
+    item_log <- item_changelog(study, review = screened$concepts, classification = classification)
+  }
+  meeting_agenda <- NULL
+  new_item_audit <- NULL
+  if (!is.null(p$new_items) && isTRUE(p$new_items$allow)) {
+    meeting_agenda <- consensus_meeting_agenda(
+      classification,
+      floor_items = study$floor_items
+    )
+    if (!is.null(meeting_agenda) && nrow(meeting_agenda)) {
+      known <- as.character(study$items$item_text[match(meeting_agenda$item_id, study$items$item_id)])
+      empty <- is.na(meeting_agenda$item_text) | !nzchar(meeting_agenda$item_text)
+      meeting_agenda$item_text[empty] <- known[empty]
+    }
+    new_item_audit <- audit_new_items(
+      p,
+      review = if (is.null(screened)) NULL else screened$concepts,
+      classification = classification,
+      suggestions = study$suggestions
+    )
   }
 
   result <- structure(
@@ -127,6 +165,10 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
       expert_profile = profile,
       panel_compliance = compliance,
       open_round = open_round,
+      new_item_review = if (is.null(screened)) NULL else screened$concepts,
+      item_log = item_log,
+      meeting_agenda = meeting_agenda,
+      new_item_audit = new_item_audit,
       last_round = last_round,
       last_classification = last
     ),

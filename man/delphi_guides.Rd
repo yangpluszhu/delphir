@@ -10,7 +10,7 @@ delphi_guides()
 不可见的数据框，同时打印路径。
 }
 \description{
-安装 delphir 后即可获得七套从零开始的教学文档，无需另行下载。
+安装 delphir 后即可获得八套从零开始的教学文档，无需另行下载。
 }
 \examples{
 delphi_guides()

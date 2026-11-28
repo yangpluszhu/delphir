@@ -139,7 +139,7 @@ delphi_report <- function(result, file = NULL,
 #' @noRd
 .delphi_references <- function() {
   data.frame(
-    id = seq_len(12),
+    id = seq_len(13),
     citation = c(
       "Hasson F, Keeney S, McKenna H. Research guidelines for the Delphi survey technique. J Adv Nurs. 2000;32(4):1008-1015.",
       "Diamond IR, Grant RC, Feldman BM, et al. Defining consensus: a systematic review recommends methodologic criteria for reporting of Delphi studies. J Clin Epidemiol. 2014;67(4):401-409.",
@@ -148,6 +148,7 @@ delphi_report <- function(result, file = NULL,
       "Manyara AM, Purvis A, Ciani O, et al. Sample size in Delphi studies: a systematic review and proposal of a reporting guideline (DCAT). BMJ. 2025;388:e082006.",
       "Fitch K, Bernstein SJ, Aguilar MD, et al. The RAND/UCLA Appropriateness Method User's Manual. Santa Monica: RAND; 2001.",
       "Williamson PR, Altman DG, Bagley H, et al. The COMET Handbook: version 1.0. Trials. 2017;18(Suppl 3):280.",
+      "Kirkham JJ, Davis K, Altman DG, et al. Core Outcome Set-STAndards for Development: the COS-STAD recommendations. PLoS Med. 2017;14(11):e1002447.",
       "Humphrey-Murto S, Varpio L, Wood TJ, et al. The use of the Delphi and other consensus group methods in medical education research. Acad Med. 2017;92(11):1491-1498.",
       "Boulkedid R, Abdoul H, Loustau M, Sibony O, Alberti C. Using and reporting the Delphi method for selecting healthcare quality indicators. PLoS One. 2011;6(6):e20476.",
       "Zeng G. Modern Epidemiological Methods and Application. Beijing: Beijing Medical University Press; 1994. (曾光. 现代流行病学方法与应用. 权威系数赋分表)",

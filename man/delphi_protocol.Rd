@@ -37,6 +37,12 @@ delphi_protocol(
   min_experts = NA_real_,
   response_rate_min = 0.7,
   cr_min = 0.7,
+  allow_new = NULL,
+  min_independent = NULL,
+  allow_single_with_evidence = NULL,
+  max_suggestions = NULL,
+  require_iteration = NULL,
+  review_panel = NULL,
   open_first = FALSE,
   rationale = NULL,
   locked = TRUE
@@ -146,6 +152,26 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 
 \item{cr_min}{权威系数组均数的参考下限，默认 0.70。不用于加权评分。}
 
+\item{allow_new}{是否允许第 1 轮结构化补充候选条目。\code{NULL} 时按场景取值：
+医学共识、COMET、定义/诊断标准、指标体系为 \code{TRUE}；适宜性、排序、
+Policy 与 5 分核心技术要素为 \code{FALSE}。}
+
+\item{min_independent}{同一新概念至少由几名专家\strong{独立}提出才走主通道。
+默认 2。同一人重复书写只计 1 人。这不是共识阈值。}
+
+\item{allow_single_with_evidence}{是否保留例外通道：仅 1 名专家提出，
+但有文献、定性访谈、患者证据、指南或重要临床依据时，仍可进入审查。
+默认 \code{TRUE}。}
+
+\item{max_suggestions}{每位专家最多可推荐的新条目数，默认 5。}
+
+\item{require_iteration}{新条目是否必须至少经过两轮评分才能最终纳入。
+默认在允许新增的场景中为 \code{TRUE}。只评过一次时，即使已达共识线，
+也只记为暂时共识。}
+
+\item{review_panel}{条目审查组构成。默认示例为 5 人：中医临床 2、
+方法学 1、统计或 Delphi 方法 1、患者或患者代表 1。软件不代替人工编码。}
+
 \item{open_first}{是否把第 1 轮作为开放式征询（不打分）。
 \code{standard_element} 默认 \code{TRUE}：缺少前期基础时先凝练要素。
 若要素均已有古籍或现代文献基础，设为 \code{FALSE}，此时第 1 轮就是
@@ -165,6 +191,8 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 均数界值、协调系数界值、积极系数与权威系数参考值）
 \item \code{stability}：\code{max_rounds} 与三条稳定性规则
 \item \code{open_first}：第 1 轮是否为开放式征询
+\item \code{new_items}：第一轮新增条目规则（是否允许、独立人数、单人例外、
+每人上限、是否必须再迭代一轮、审查组说明）
 \item \code{rand}：分歧设定
 \item \code{modified_from_preset}, \code{rationale}, \code{locked}
 }

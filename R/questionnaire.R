@@ -64,7 +64,9 @@ write_survey_templates <- function(dir, include_mini_example = TRUE, overwrite =
 #' @param expert_id 第 2 轮及以后要生成的专家编号；缺省则生成全部专家。
 #' @param format `"markdown"`、`"html"`、`"docx"`、`"xlsx"` 或 `"both"`（docx+xlsx）。
 #' @param file 输出路径。单个文档写文件；目录则写入 `roundN.docx` / `roundN.xlsx`。
-#' @param items 第 2 轮及以后纳入 `"all"` 全部条目或 `"unresolved"`（默认，非 keep）。
+#' @param items 第 2 轮及以后纳入 `"all"`、`"unresolved"`（默认，已完成纳入或排除的不再重评）
+#'   或 `"iteration"`（新条目、未共识条目、实质性修改）。首次进入的条目总会列入，
+#'   并标明没有上轮统计。
 #' @param sample 若 `TRUE`，忽略 `study`，直接返回随包完整样稿（markdown/html）。
 #' @param split_experts 第 2 轮及以后是否按专家拆成单独文件，默认 `FALSE`。
 #' @param prefill 若 `TRUE` 且 `study` 已有该轮评分，xlsx 中预填 score/unable。
@@ -92,7 +94,7 @@ delphi_questionnaire <- function(study = NULL, round = 1,
                                  expert_id = NULL,
                                  format = c("markdown", "html", "docx", "xlsx", "both"),
                                  file = NULL,
-                                 items = c("all", "unresolved"),
+                                 items = c("all", "unresolved", "iteration"),
                                  sample = FALSE,
                                  split_experts = FALSE,
                                  prefill = FALSE) {
@@ -354,6 +356,15 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
     sprintf("- **\u6700\u591a\u8f6e\u6b21\uff1a** %s\uff1b\u76f8\u90bb\u8f6e\u5206\u7c7b\u4e0d\u53d8 \u2265 %s\uff1bMedian \u53d8\u5316 \u2264 %s\uff1b\u9ad8\u533a\u6bd4\u4f8b\u53d8\u5316 < %s",
             p$stability$max_rounds, pct(p$stability$class_pct),
             num(p$stability$median_delta), pct(p$stability$high_pct_delta)),
+    if (!is.null(p$new_items) && isTRUE(p$new_items$allow)) {
+      paste(
+        sprintf("- **\u65b0\u589e\u6761\u76ee\uff1a** \u7b2c 1 \u8f6e\u53ef\u8865\u5145\uff0c\u6bcf\u4eba\u6700\u591a %s \u9879\u3002\u81f3\u5c11 %s \u540d\u4e13\u5bb6\u72ec\u7acb\u63d0\u51fa\u540c\u4e00\u65b0\u6982\u5ff5\uff0c\u6216\u4ec5 1 \u540d\u4f46\u6709\u6587\u732e\u3001\u8bbf\u8c08\u3001\u6307\u5357\u6216\u91cd\u8981\u4e34\u5e8a\u4f9d\u636e\uff0c\u5e76\u7ecf\u6761\u76ee\u5ba1\u67e5\u7ec4\u786e\u8ba4\u540e\uff0c\u624d\u8fdb\u5165\u4e0b\u4e00\u8f6e\u3002",
+                p$new_items$max_suggestions, p$new_items$min_independent),
+        "- \u8303\u56f4\u5916\u3001\u4e0e\u5df2\u6709\u6761\u76ee\u91cd\u590d\u3001\u6d4b\u91cf\u5de5\u5177\u3001\u6d4b\u91cf\u65f6\u70b9\u6216\u5355\u7eaf\u6587\u5b57\u4fee\u6539\uff0c\u4e0d\u4f5c\u4e3a\u65b0\u6761\u76ee\u3002\u672a\u8fdb\u5165\u4e0b\u4e00\u8f6e\u7684\u5efa\u8bae\u4ecd\u4f1a\u8bb0\u5f55\u7406\u7531\u3002",
+        "- \u65b0\u6761\u76ee\u5728\u4e0b\u4e00\u8f6e\u662f\u9996\u6b21\u8bc4\u5206\uff0c\u4e0d\u63d0\u4f9b\u4e0a\u8f6e\u7edf\u8ba1\u3002\u81f3\u5c11\u518d\u7ecf\u8fc7\u4e00\u8f6e\u53cd\u9988\u540e\u7684\u8bc4\u5206\uff0c\u624d\u6309\u5171\u8bc6\u6807\u51c6\u6700\u7ec8\u7eb3\u5165\u3002",
+        sep = "\n"
+      )
+    },
     sep = "\n"
   )
 }
@@ -456,9 +467,41 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
     "> Cr = (Ca + Cs) / 2\u3002\u4e0d\u7528\u4e8e\u52a0\u6743\u8bc4\u5206\uff1b\u53ea\u5728\u9996\u6b21\u8bc4\u5206\u8f6e\u81ea\u8bc4\u4e00\u6b21\uff0c\u4ee5\u540e\u5404\u8f6e\u4e0d\u518d\u586b\u5199\u3002\n\n",
     "## \u6761\u76ee\u8bc4\u5206\n\n",
     paste(item_blocks, collapse = "\n"),
-    "\n## \u65b0\u589e\u6761\u76ee\uff08\u53ef\u9009\uff09\n\n",
-    "\u5efa\u8bae\u8868\u8ff0 / \u7406\u7531 / \u60a8\u8bc4\u7684\u91cd\u8981\u6027\uff1a\n\n",
-    "________________________________________________________________\n"
+    .new_item_prompt_md(study),
+    "\n"
+  )
+}
+
+.new_item_prompt_md <- function(study) {
+  p <- study$protocol
+  if (is.null(p$new_items) || !isTRUE(p$new_items$allow)) {
+    return(paste0(
+      "\n## \u5176\u4ed6\u610f\u89c1\uff08\u53ef\u9009\uff09\n\n",
+      "________________________________________________________________\n"
+    ))
+  }
+  n <- p$new_items$max_suggestions
+  objective <- study$meta$objective %||% "\u672c\u7814\u7a76\u8981\u8bc4\u4ef7\u7684\u95ee\u9898"
+  blocks <- vapply(seq_len(n), function(i) {
+    paste0(
+      "### \u5efa\u8bae ", i, "\n\n",
+      "**1. \u5efa\u8bae\u65b0\u589e\u6307\u6807\u540d\u79f0\uff1a** ________________________________\n\n",
+      "**2. \u6307\u6807\u542b\u4e49\uff1a** ________________________________\n\n",
+      "**3. \u63a8\u8350\u7406\u7531\uff1a** ________________________________\n\n",
+      "**4. \u4e0e\u73b0\u6709\u6761\u76ee\u7684\u533a\u522b\uff1a** ________________________________\n\n",
+      "**5. \u6587\u732e\u3001\u6307\u5357\u3001\u60a3\u8005\u8bbf\u8c08\u6216\u4e34\u5e8a\u4f9d\u636e\uff1a** ________________________________\n"
+    )
+  }, character(1))
+  paste0(
+    "\n## \u8865\u5145\u9057\u6f0f\u7684\u8bc4\u4ef7\u6307\u6807\n\n",
+    "\u8bf7\u4e0d\u8981\u53ea\u5199\u300c\u8fd8\u6709\u5176\u4ed6\u610f\u89c1\u5417\u300d\u3002\u8bf7\u9488\u5bf9\u4e0b\u9762\u8fd9\u4e2a\u95ee\u9898\u9010\u9879\u56de\u7b54\u3002\n\n",
+    "**\u60a8\u8ba4\u4e3a\u4e0a\u8ff0\u5019\u9009\u6307\u6807\u662f\u5426\u9057\u6f0f\u4e86\u8bc4\u4ef7\u672c\u7814\u7a76\u76ee\u7684\u6240\u5fc5\u9700\u7684\u91cd\u8981\u6307\u6807\uff1f**\n\n",
+    "\u672c\u7814\u7a76\u76ee\u7684\uff1a", objective, "\n\n",
+    sprintf("\u5982\u6709\uff0c\u8bf7\u6700\u591a\u586b\u5199 %s \u9879\u3002\u6bcf\u4e00\u9879\u90fd\u5199\u6e05\u540d\u79f0\u3001\u542b\u4e49\u3001\u7406\u7531\u3001\u4e0e\u73b0\u6709\u6761\u76ee\u7684\u533a\u522b\uff0c\u4ee5\u53ca\u4f9d\u636e\u3002", n),
+    "\u7814\u7a76\u7ec4\u4f1a\u53bb\u91cd\u3001\u5f52\u5e76\uff0c\u5e76\u6309\u4e8b\u5148\u9501\u5b9a\u7684\u53cc\u901a\u9053\u89c4\u5219\u51b3\u5b9a\u662f\u5426\u8fdb\u5165\u4e0b\u4e00\u8f6e\u3002",
+    "\u5199\u5230\u5e76\u4e0d\u7b49\u4e8e\u4f1a\u52a0\u5165\u3002\u672a\u8fdb\u5165\u7684\u5efa\u8bae\u4e5f\u4f1a\u8bb0\u5f55\u7406\u7531\u3002",
+    "\u540c\u4e00\u4f4d\u4e13\u5bb6\u628a\u540c\u4e00\u6761\u5199\u591a\u6b21\uff0c\u53ea\u7b97 1 \u4eba\u3002\n\n",
+    paste(blocks, collapse = "\n")
   )
 }
 
@@ -512,22 +555,18 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
 }
 
 .questionnaire_followup <- function(study, fb_one, cls, items, round) {
-  eid <- fb_one$expert_id[1]
+  eid <- if (nrow(fb_one)) fb_one$expert_id[1] else ""
   title <- study$meta$title %||% "Modified Delphi"
   src_round <- as.integer(round) - 1L
-  dim0 <- fb_one$dimension[1]
-  if (identical(items, "unresolved")) {
-    keep_ids <- .unresolved_item_ids(cls, src_round, items, dim0)
-    fb_use <- fb_one[fb_one$item_id %in% keep_ids, , drop = FALSE]
-    fb_skip <- fb_one[!fb_one$item_id %in% keep_ids, , drop = FALSE]
-  } else {
-    fb_use <- fb_one
-    fb_skip <- fb_one[0, ]
-  }
+  selected <- .items_for_round(study, cls, items, round)
+  fb_use <- fb_one[fb_one$item_id %in% selected, , drop = FALSE]
+  fb_skip <- fb_one[!fb_one$item_id %in% selected, , drop = FALSE]
+  first_ids <- setdiff(selected, as.character(fb_use$item_id))
   dim_label <- .primary_dimension(study, round)
   block <- function(d) {
     if (!nrow(d)) return("")
     paste(apply(d, 1, function(row) {
+      provisional <- !is.na(row[["class_zh"]]) && startsWith(as.character(row[["class_zh"]]), "\u6682\u65f6")
       paste0(
         "### \u6761\u76ee ", row[["item_id"]], "\n\n",
         "**", row[["item_text"]], "**\n\n",
@@ -538,12 +577,35 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
                 round(as.numeric(row[["p_high"]]), 1),
                 round(as.numeric(row[["p_low"]]), 1),
                 row[["class_zh"]]),
+        if (provisional) {
+          "\u4e0a\u4e00\u8f6e\u662f\u8be5\u6761\u76ee\u7684\u9996\u6b21\u8bc4\u5206\u3002\u5373\u4f7f\u5df2\u7ecf\u8fc7\u7ebf\uff0c\u4e5f\u8fd8\u4e0d\u662f\u6700\u7ec8\u7eb3\u5165\u3002\u8bf7\u9605\u8bfb\u53cd\u9988\u540e\u91cd\u65b0\u8bc4\u5206\u3002\n\n"
+        } else "",
         if (!is.na(row[["anonymous_comments"]]) && nzchar(row[["anonymous_comments"]]))
           paste0("**\u533f\u540d\u610f\u89c1\u6458\u8981\uff1a** ", row[["anonymous_comments"]], "\n\n") else "",
         .likert_line(study$protocol, paste0("\u672c\u8f6e", dim_label)), "\n",
         "**\u672c\u8f6e\u610f\u89c1\uff08\u53ef\u7a7a\uff09\uff1a** ________________________________________________\n"
       )
     }), collapse = "\n")
+  }
+  first_block <- function(ids) {
+    if (!length(ids)) return("")
+    paste(vapply(ids, function(iid) {
+      row <- study$items[as.character(study$items$item_id) == iid, , drop = FALSE]
+      text <- if (nrow(row)) row$item_text[1] else iid
+      note <- ""
+      if (nrow(row) && "source_note" %in% names(row) && !is.na(row$source_note[1]) && nzchar(row$source_note[1])) {
+        note <- paste0("- \u6765\u6e90\u8bf4\u660e\uff1a", row$source_note[1], "\n\n")
+      }
+      paste0(
+        "### \u6761\u76ee ", iid, "\n\n",
+        "**", text, "**\n\n",
+        "> \u4ee5\u4e0b\u4e3a\u7b2c\u4e00\u8f6e\u4e13\u5bb6\u65b0\u589e\u6761\u76ee\u3002\u672c\u8f6e\u662f\u7b2c\u4e00\u6b21\u8bc4\u5206\u3002",
+        "\u6ca1\u6709\u4e0a\u4e00\u8f6e\u4e2d\u4f4d\u6570\u3001IQR \u6216\u533a\u95f4\u6bd4\u4f8b\uff0c\u8bf7\u4e0d\u8981\u628a\u7a7a\u767d\u7406\u89e3\u6210 0 \u5206\u6216\u4e2d\u95f4\u5206\u3002\n\n",
+        note,
+        .likert_line(study$protocol, paste0("\u672c\u8f6e", dim_label)), "\n",
+        "**\u672c\u8f6e\u610f\u89c1\uff08\u53ef\u7a7a\uff09\uff1a** ________________________________________________\n"
+      )
+    }, character(1)), collapse = "\n")
   }
   skip_tab <- ""
   if (nrow(fb_skip)) {
@@ -559,6 +621,14 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
       "\n\n"
     )
   }
+  first_sec <- ""
+  if (length(first_ids)) {
+    first_sec <- paste0(
+      "## \u7b2c\u4e00\u8f6e\u4e13\u5bb6\u65b0\u589e\u6761\u76ee\uff08\u672c\u8f6e\u4e3a\u9996\u6b21\u8bc4\u5206\uff09\n\n",
+      "\u8fd9\u4e9b\u6761\u76ee\u6ca0\u6709\u4e0a\u4e00\u8f6e\u7edf\u8ba1\u3002\u8bf7\u6309\u91cf\u8868\u9996\u6b21\u8bc4\u5206\u3002\u65e0\u6cd5\u8bc4\u4ef7\u8bf7\u52fe\u9009\u300c\u65e0\u6cd5\u5224\u65ad\u300d\uff0c\u4e0d\u8981\u586b\u4e2d\u95f4\u5206\u3002\n\n",
+      first_block(first_ids), "\n"
+    )
+  }
   paste0(
     sprintf("# \u7b2c %s \u8f6e Delphi \u4e13\u5bb6\u54a8\u8be2\u95ee\u5377\n\n", round),
     "**\u7814\u7a76\u9898\u76ee\uff1a** ", title, "\n\n",
@@ -567,6 +637,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
     "\u8bf7\u5148\u9605\u8bfb\u7ec4\u7ed3\u679c\u4e0e\u60a8\u7684\u4e0a\u8f6e\u8bc4\u5206\uff0c\u518d\u7ed9\u51fa\u672c\u8f6e\u5206\u6570\u3002\u5171\u8bc6\u89c4\u5219\u4e0e\u7b2c 1 \u8f6e\u76f8\u540c\u3002\n\n",
     "## \u9700\u8981\u672c\u8f6e\u91cd\u8bc4\u7684\u6761\u76ee\n\n",
     block(fb_use), "\n",
+    first_sec,
     skip_tab
   )
 }

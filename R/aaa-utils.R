@@ -26,7 +26,7 @@
 }
 
 .pkg_version <- function() {
-  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.4.0")
+  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.5.0")
 }
 
 .need_pkg <- function(pkg) {

@@ -1,3 +1,18 @@
+# delphir 0.5.0
+
+* 第一轮新增条目按事先锁定的规则审查：五问、双通道（至少 2 名专家独立提出，
+  或 1 名提出且有外部证据）、范围优先于人数。同一人重复书写只计 1 人。
+* 新条目在下一轮标为首次评分，不编造上轮统计。只评过一次即使达到纳入线，
+  也记为暂时共识，必须再迭代一轮。文字修改不重置轮次，实质性修改按新版本重评。
+* 新增 `screen_new_items()`、`mark_iteration()`、`classify_modification()`、
+  `item_changelog()`、`consensus_meeting_agenda()`、`audit_new_items()`
+  与 `simulate_chf_new_items()`。问卷增加结构化开放题；第 3 轮可用
+  `items = "iteration"`。
+* 报告写入审查去向、变更日志和会议分组。会上临时提出、从未匿名评分的条目
+  不得当场纳入。
+* 新增教学文档 8：心衰核心指标集从第 1 轮问卷到三轮 docx 报告。
+  9 分共识、RAND/UCLA 与 5 分核心技术要素的原有判定不变。
+
 # delphir 0.4.0
 
 * 新增场景 `standard_element`：5 分量表的核心技术要素。重要性以均数判定，

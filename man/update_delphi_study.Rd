@@ -10,6 +10,9 @@ update_delphi_study(
   comments = NULL,
   panel = NULL,
   items = NULL,
+  suggestions = NULL,
+  concept_review = NULL,
+  floor_items = NULL,
   validate = TRUE
 )
 }
@@ -23,6 +26,12 @@ update_delphi_study(
 \item{panel}{若提供，按 \code{expert_id} 更新专家表（用于写入 Ca/Cs），不删除原行。}
 
 \item{items}{若提供，按 \code{item_id} 追加尚未存在的条目（第 1 轮新增条目）。}
+
+\item{suggestions}{若提供，追加结构化新增建议；空名称会被去掉。}
+
+\item{concept_review}{若提供，替换研究上的概念审查表。}
+
+\item{floor_items}{若提供，替换会上临时提案。}
 
 \item{validate}{合并后是否 \code{\link[=validate_delphi]{validate_delphi()}}，默认 \code{TRUE}。}
 }

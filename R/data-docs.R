@@ -69,3 +69,17 @@
 #' data(standard_element_demo, package = "delphir")
 #' sort(unique(standard_element_demo$ratings$round))
 "standard_element_demo"
+
+#' 心衰核心指标集新增条目教学数据
+#'
+#' 30 名专家、初始 26 项、三轮 9 分评分。第一轮开放建议经双通道审查后，
+#' 3 项进入后续轮次。第 2 轮这三个条目是首次评分。供
+#' `vignette("new-item-workflow", package = "delphir")` 使用。
+#' 数据为教学模拟。
+#'
+#' @format `delphi_study` 对象，场景 `comet_cos`。
+#' @seealso [simulate_chf_new_items()], [screen_new_items()]
+#' @examples
+#' data(chf_new_item_demo, package = "delphir")
+#' sort(unique(chf_new_item_demo$ratings$round))
+"chf_new_item_demo"

@@ -31,6 +31,9 @@ analyze_delphi(
 \code{comments_summary}, \code{kendall}, \code{stopping}。核心技术要素场景另含
 \code{expert_profile}、\code{panel_compliance}、\code{open_round}；此时 \code{stopping}
 来自 \code{\link[=coordination_decision]{coordination_decision()}}，而不是中位数稳定性。
+若方案允许第一轮新增条目，另含 \code{new_item_review}、\code{item_log}、
+\code{meeting_agenda}、\code{new_item_audit}。没有编码表时这些审查结果为空，
+不会改写已有条目的共识分类。
 }
 \description{
 主分析入口：参与度、条目汇总、共识/适宜性判定、稳定性、利益相关者分层、

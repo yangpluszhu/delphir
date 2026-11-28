@@ -6,13 +6,14 @@
 \usage{
 delphi_guide(
   which = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow",
-    "preset-protocol", "three-round-workflow", "standard-5point-workflow")
+    "preset-protocol", "three-round-workflow", "standard-5point-workflow",
+    "new-item-workflow")
 )
 }
 \arguments{
 \item{which}{\code{"clinical-consensus"}、\code{"rand-ucla"}、\code{"comet-cos"}、
-\code{"questionnaire-workflow"}、\code{"preset-protocol"}、\code{"three-round-workflow"}
-或 \code{"standard-5point-workflow"}。}
+\code{"questionnaire-workflow"}、\code{"preset-protocol"}、\code{"three-round-workflow"}、
+\code{"standard-5point-workflow"} 或 \code{"new-item-workflow"}。}
 }
 \value{
 不可见的文件路径。

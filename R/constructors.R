@@ -59,7 +59,7 @@ delphi_items <- function(data) {
   data$item_id <- as.character(data$item_id)
   data$item_text <- as.character(data$item_text)
   .stop_if(anyDuplicated(data$item_id) > 0, "item_id \u5fc5\u987b\u552f\u4e00\u3002")
-  if (!"domain" %in% names(data)) data$domain <- NA_character_
+  if (!"domain" %in% names(data)) data$domain <- rep(NA_character_, nrow(data))
   .add_class(data, "delphi_items")
 }
 
@@ -141,6 +141,9 @@ delphi_comments <- function(data) {
 #' @param items [delphi_items()] 或数据框。
 #' @param ratings [delphi_ratings()] 或数据框。可省略（空表）以表示尚未回收。
 #' @param comments [delphi_comments()] 或数据框，可省略。
+#' @param suggestions [delphi_suggestions()]，第 1 轮结构化新增建议，可省略。
+#' @param concept_review 研究组编码后的概念表，供 [screen_new_items()] 使用，可省略。
+#' @param floor_items 共识会议上临时提出、尚未匿名评分的条目，可省略。
 #' @param meta 命名列表。建议字段：`title`、`objective`、`users`、`geography`、
 #'   `evidence_note`、`pilot_tested`、`anonymity`、`ethics`。
 #' @param validate 是否立即调用 [validate_delphi()]，默认 `TRUE`。无评分时自动跳过。
@@ -153,6 +156,7 @@ delphi_comments <- function(data) {
 #'
 #' @export
 delphi_study <- function(protocol, panel, items, ratings = NULL, comments = NULL,
+                         suggestions = NULL, concept_review = NULL, floor_items = NULL,
                          meta = list(), validate = TRUE) {
   .stop_if(!inherits(protocol, "delphi_protocol"), "protocol \u5fc5\u987b\u662f delphi_protocol \u5bf9\u8c61\u3002")
   if (!inherits(panel, "delphi_panel")) panel <- delphi_panel(panel)
@@ -162,6 +166,11 @@ delphi_study <- function(protocol, panel, items, ratings = NULL, comments = NULL
   if (!is.null(comments) && !inherits(comments, "delphi_comments")) {
     comments <- delphi_comments(comments)
   }
+  if (!is.null(suggestions) && nrow(.as_df(suggestions))) {
+    if (!inherits(suggestions, "delphi_suggestions")) suggestions <- delphi_suggestions(suggestions)
+  } else {
+    suggestions <- NULL
+  }
   study <- structure(
     list(
       protocol = protocol,
@@ -169,6 +178,9 @@ delphi_study <- function(protocol, panel, items, ratings = NULL, comments = NULL
       items = items,
       ratings = ratings,
       comments = comments,
+      suggestions = suggestions,
+      concept_review = if (is.null(concept_review)) NULL else .as_df(concept_review),
+      floor_items = if (is.null(floor_items)) NULL else .as_df(floor_items),
       meta = as.list(meta)
     ),
     class = "delphi_study"
@@ -222,6 +234,9 @@ delphi_blueprint <- function(protocol, panel, items, meta = list()) {
 #' @param comments 新意见，可省略。
 #' @param panel 若提供，按 `expert_id` 更新专家表（用于写入 Ca/Cs），不删除原行。
 #' @param items 若提供，按 `item_id` 追加尚未存在的条目（第 1 轮新增条目）。
+#' @param suggestions 若提供，追加结构化新增建议；空名称会被去掉。
+#' @param concept_review 若提供，替换研究上的概念审查表。
+#' @param floor_items 若提供，替换会上临时提案。
 #' @param validate 合并后是否 [validate_delphi()]，默认 `TRUE`。
 #'
 #' @return 更新后的 `delphi_study`。
@@ -235,7 +250,9 @@ delphi_blueprint <- function(protocol, panel, items, meta = list()) {
 #'
 #' @export
 update_delphi_study <- function(study, ratings = NULL, comments = NULL,
-                                panel = NULL, items = NULL, validate = TRUE) {
+                                panel = NULL, items = NULL,
+                                suggestions = NULL, concept_review = NULL,
+                                floor_items = NULL, validate = TRUE) {
   study <- .match_study(study)
   if (!is.null(panel)) {
     if (!inherits(panel, "delphi_panel")) panel <- delphi_panel(panel)
@@ -260,9 +277,28 @@ update_delphi_study <- function(study, ratings = NULL, comments = NULL,
     extra <- items[!items$item_id %in% study$items$item_id, , drop = FALSE]
     if (nrow(extra)) {
       study$items <- .rbind_fill(study$items, extra)
+      if ("introduced_round" %in% names(study$items)) {
+        miss <- is.na(study$items$introduced_round)
+        study$items$introduced_round[miss] <- 1L
+      }
       study$items <- delphi_items(study$items)
     }
   }
+  if (!is.null(suggestions) && nrow(.as_df(suggestions))) {
+    if (!inherits(suggestions, "delphi_suggestions")) suggestions <- delphi_suggestions(suggestions)
+    if (nrow(suggestions)) {
+      if (is.null(study$suggestions) || !nrow(study$suggestions)) {
+        study$suggestions <- suggestions
+      } else {
+        both <- .rbind_fill(study$suggestions, suggestions)
+        key <- paste(both$expert_id, both$round, both$slot, both$raw_name, both$concept_id)
+        both <- both[!duplicated(key), , drop = FALSE]
+        study$suggestions <- delphi_suggestions(both)
+      }
+    }
+  }
+  if (!is.null(concept_review)) study$concept_review <- .as_df(concept_review)
+  if (!is.null(floor_items)) study$floor_items <- .as_df(floor_items)
   if (!is.null(ratings)) {
     if (!inherits(ratings, "delphi_ratings")) ratings <- delphi_ratings(ratings)
     key_old <- .rating_key(study$ratings)

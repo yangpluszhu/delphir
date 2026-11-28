@@ -1,6 +1,6 @@
 #' 列出随包安装的教学文档
 #'
-#' 安装 delphir 后即可获得七套从零开始的教学文档，无需另行下载。
+#' 安装 delphir 后即可获得八套从零开始的教学文档，无需另行下载。
 #'
 #' @return 不可见的数据框，同时打印路径。
 #'
@@ -21,8 +21,8 @@ delphi_guides <- function() {
 #' 打开一套教学文档
 #'
 #' @param which `"clinical-consensus"`、`"rand-ucla"`、`"comet-cos"`、
-#'   `"questionnaire-workflow"`、`"preset-protocol"`、`"three-round-workflow"`
-#'   或 `"standard-5point-workflow"`。
+#'   `"questionnaire-workflow"`、`"preset-protocol"`、`"three-round-workflow"`、
+#'   `"standard-5point-workflow"` 或 `"new-item-workflow"`。
 #'
 #' @return 不可见的文件路径。
 #'
@@ -34,7 +34,8 @@ delphi_guides <- function() {
 #' @export
 delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos",
                                    "questionnaire-workflow", "preset-protocol",
-                                   "three-round-workflow", "standard-5point-workflow")) {
+                                   "three-round-workflow", "standard-5point-workflow",
+                                   "new-item-workflow")) {
   which <- match.arg(which)
   info <- .guide_index()
   row <- info[info$key == which, ][1, ]
@@ -61,10 +62,10 @@ delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos
   data.frame(
     key = c("clinical-consensus", "rand-ucla", "comet-cos",
             "questionnaire-workflow", "preset-protocol", "three-round-workflow",
-            "standard-5point-workflow"),
+            "standard-5point-workflow", "new-item-workflow"),
     vignette = c("clinical-consensus", "rand-ucla", "comet-cos",
                  "questionnaire-workflow", "preset-protocol", "three-round-workflow",
-                 "standard-5point-workflow"),
+                 "standard-5point-workflow", "new-item-workflow"),
     file = c(
       "clinical-consensus.html",
       "rand-ucla.html",
@@ -72,7 +73,8 @@ delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos
       "questionnaire-workflow.html",
       "preset-protocol.html",
       "three-round-workflow.html",
-      "standard-5point-workflow.html"
+      "standard-5point-workflow.html",
+      "new-item-workflow.html"
     ),
     title = c(
       "\u6559\u5b66\u6587\u6863 1\uff1a\u533b\u5b66\u4e13\u5bb6\u5171\u8bc6 Modified Delphi \u5168\u6d41\u7a0b\uff08ACCORD \u62a5\u544a\uff09",
@@ -81,7 +83,8 @@ delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos
       "\u6559\u5b66\u6587\u6863 4\uff1a\u4ece\u7b2c 1 \u8f6e\u95ee\u5377\u8bbe\u8ba1\u5230 ACCORD \u65b9\u6cd5\u5b66\u62a5\u544a",
       "\u6559\u5b66\u6587\u6863 5\uff1a\u9884\u8bbe Delphi \u65b9\u6848\u53c2\u6570\u8be6\u89e3",
       "\u6559\u5b66\u6587\u6863 6\uff1a\u4e09\u8f6e Delphi \u4ece\u96f6\u5230\u5b8c\u6574\u62a5\u544a",
-      "\u6559\u5b66\u6587\u6863 7\uff1a5 \u5206\u91cf\u8868\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff0c\u4ece\u5f00\u653e\u5f0f\u9996\u8f6e\u5230\u5b8c\u6574\u62a5\u544a"
+      "\u6559\u5b66\u6587\u6863 7\uff1a5 \u5206\u91cf\u8868\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff0c\u4ece\u5f00\u653e\u5f0f\u9996\u8f6e\u5230\u5b8c\u6574\u62a5\u544a",
+      "\u6559\u5b66\u6587\u6863 8\uff1a\u7b2c\u4e00\u8f6e\u65b0\u589e\u6761\u76ee\uff0c\u4ece\u95ee\u5377\u5230\u4e09\u8f6e\u62a5\u544a"
     ),
     stringsAsFactors = FALSE
   )

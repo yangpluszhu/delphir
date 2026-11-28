@@ -7,7 +7,7 @@
 
 **Protocol-first toolkit for Delphi studies, RAND/UCLA appropriateness panels, and COMET core outcome sets.**
 
-以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。自动生成问卷并回读，写出 Word 报告。安装后即获得七套中文教学文档、问卷样稿与示例数据。
+以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。第一轮新增条目按双通道审查，并要求再迭代一轮。自动生成问卷并回读，写出 Word 报告。安装后即获得八套中文教学文档、问卷样稿与示例数据。
 
 - **Repository:** https://github.com/yangpluszhu/delphir
 - **Issues:** https://github.com/yangpluszhu/delphir/issues
@@ -48,7 +48,7 @@ remotes::install_github("yangpluszhu/delphir")
 若已下载源码包：
 
 ```r
-install.packages("delphir_0.4.0.tar.gz", repos = NULL, type = "source")
+install.packages("delphir_0.5.0.tar.gz", repos = NULL, type = "source")
 ```
 
 本地开发安装（含 vignette）：
@@ -83,6 +83,7 @@ delphi_report(res, file = "consensus-report.html")
 data(consensus_demo)         # 医学专家共识（两轮）
 data(consensus_3round_demo)  # 医学专家共识（三轮）
 data(standard_element_demo)  # 5 分核心技术要素（开放轮 + 三轮评分）
+data(chf_new_item_demo)      # 心衰核心指标集：第一轮新增条目（三轮）
 data(rand_ucla_demo)         # RAND/UCLA 适宜性
 data(cos_demo)               # COMET 核心结局集
 data(indicator_demo)         # 指标体系补充示例
@@ -109,6 +110,7 @@ res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 | RAND/UCLA 适宜性 | `simulate_rand_ucla()` / `classify_rand()` | Median 区间 + 分歧指数，不强迫共识 |
 | COMET 核心结局集 | `preset_protocol("comet_cos")` | 70/15 规则；利益相关者分层 |
 | 标准核心技术要素 | `preset_protocol("standard_element")` | 5 分；均数与满分比；协调系数决定是否结束 |
+| 第一轮新增条目 | `screen_new_items()` / `simulate_chf_new_items()` | 五问与双通道；首次评分只记暂时共识；变更日志 |
 | 问卷全流程 | `delphi_questionnaire()` / `read_survey_xlsx()` / `next_round_questionnaire()` | 开放式首轮或评分轮；docx/xlsx；本人上轮分数与组结果 |
 | 权威系数 | `score_authority()` / `expert_authority()` | 曾光量表；专家级 Ca、Cs、Cr |
 | 报告 | `run_delphi()` / `delphi_report()` | 指定轮次全流程；html/docx；含方案、各轮问卷与参考文献 |
@@ -128,6 +130,7 @@ res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 | 5. 预设方案参数详解 | `vignette("preset-protocol", package = "delphir")` |
 | 6. 三轮 Delphi 从零到完整报告 | `vignette("three-round-workflow", package = "delphir")` |
 | 7. 5 分量表核心技术要素，从开放式首轮到完整报告 | `vignette("standard-5point-workflow", package = "delphir")` |
+| 8. 第一轮新增条目，从问卷到三轮报告 | `vignette("new-item-workflow", package = "delphir")` |
 
 或 `delphi_guide("clinical-consensus")` 等打开预编译 HTML。
 
@@ -140,7 +143,7 @@ delphir/
 ├── NEWS.md
 ├── R/                   # 分析、问卷、报告函数
 ├── man/                 # roxygen 帮助文档
-├── vignettes/           # 六套教学文档源稿
+├── vignettes/           # 八套教学文档源稿
 ├── inst/
 │   ├── questionnaires/  # 第 1/2/3 轮问卷样稿
 │   ├── extdata/         # 录入模板与迷你示例
@@ -173,7 +176,7 @@ Issues 与功能建议请提交到 [GitHub Issues](https://github.com/yangpluszh
 
 ## Changelog
 
-见 [NEWS.md](NEWS.md)。当前版本 **0.4.0**。
+见 [NEWS.md](NEWS.md)。当前版本 **0.5.0**。
 
 ## License
 

@@ -94,11 +94,8 @@
     }
   }
 
-  item_ids <- as.character(study$items$item_id)
-  if (round >= 2L && identical(items, "unresolved") && !is.null(cls)) {
-    dim0 <- .primary_dimension(study, round)
-    item_ids <- intersect(item_ids, .unresolved_item_ids(cls, src_round, items, dim0))
-  }
+  item_ids <- .items_for_round(study, cls, items, round)
+  if (!length(item_ids)) item_ids <- .active_item_ids(study$items)
 
   rating_rows <- list()
   for (eid in ids_all) {
@@ -129,6 +126,12 @@
             rec$full_rate <- if ("full_rate" %in% names(hit)) hit$full_rate[1] else NA_real_
             rec$class_zh <- hit$class_zh[1]
             rec$anonymous_comments <- hit$anonymous_comments[1]
+            rec$first_scoring <- FALSE
+            rec$scoring_note <- if (!is.na(rec$class_zh) && startsWith(as.character(rec$class_zh), "\u6682\u65f6")) {
+              "\u4e0a\u4e00\u8f6e\u662f\u9996\u6b21\u8bc4\u5206\uff0c\u5206\u7c7b\u662f\u6682\u65f6\u7684\uff0c\u672c\u8f6e\u8bf7\u5728\u53cd\u9988\u540e\u91cd\u8bc4\u3002"
+            } else {
+              ""
+            }
           } else {
             rec$own_prev <- NA_character_
             rec$median_iqr <- NA_character_
@@ -138,6 +141,8 @@
             rec$full_rate <- NA_real_
             rec$class_zh <- NA_character_
             rec$anonymous_comments <- ""
+            rec$first_scoring <- TRUE
+            rec$scoring_note <- "\u9996\u6b21\u8bc4\u5206\uff0c\u65e0\u4e0a\u8f6e\u7edf\u8ba1\u3002\u8bf7\u52ff\u628a\u7a7a\u767d\u7406\u89e3\u6210 0 \u6216\u4e2d\u95f4\u5206\u3002"
           }
         }
         if (isTRUE(prefill) && !is.null(study$ratings) && nrow(study$ratings)) {
@@ -245,8 +250,11 @@
       "\u4e0d\u8981\u628a\u300c\u4e0d\u719f\u300d\u586b\u6210\u4e2d\u95f4\u5206\u3002\u6743\u5a01\u7cfb\u6570\u53ea\u5728\u9996\u6b21\u8bc4\u5206\u8f6e\u586b\u300c\u6743\u5a01\u7cfb\u6570\u300d\u8868\u3002",
       if (.is_open_round(p, round)) {
         "\u672c\u8f6e\u4e3a\u5f00\u653e\u5f0f\u5f81\u8be2\uff1a\u8bf7\u5728\u300c\u610f\u89c1\u300d\u8868\u586b\u5199\u4fee\u6539\u6216\u65b0\u589e\u5efa\u8bae\uff0c\u4e0d\u8981\u5728\u300c\u8bc4\u5206\u300d\u8868\u6253\u5206\u3002"
-      } else if (feedback_round) {
-        "\u8bf7\u5148\u770b own_prev\uff08\u672c\u4eba\u4e0a\u8f6e\u8bc4\u5206\uff09\u3001group_mean\uff08\u7ec4\u5747\u6570\uff09\u548c full_rate\uff08\u6ee1\u5206\u6bd4\uff09\uff0c\u518d\u586b\u5199\u672c\u8f6e score\u3002\u4e0d\u8981\u91cd\u586b\u6743\u5a01\u7cfb\u6570\u3002"
+      } else       if (feedback_round) {
+        paste0(
+          "\u8bf7\u5148\u770b own_prev\uff08\u672c\u4eba\u4e0a\u8f6e\u8bc4\u5206\uff09\u4e0e\u7ec4\u7ed3\u679c\uff0c\u518d\u586b\u5199\u672c\u8f6e score\u3002",
+          "first_scoring \u4e3a TRUE \u7684\u884c\u6ca0\u6709\u4e0a\u8f6e\u7edf\u8ba1\uff0c\u4e0d\u8981\u628a\u7a7a\u767d\u5f53\u6210 0 \u5206\u3002\u4e0d\u8981\u91cd\u586b\u6743\u5a01\u7cfb\u6570\u3002"
+        )
       } else {
         "\u8bf7\u586b\u5199\u4e13\u5bb6\u80cc\u666f\u3001\u6743\u5a01\u7cfb\u6570\u81ea\u8bc4\uff0c\u5e76\u5bf9\u6bcf\u4e2a\u8981\u7d20\u7684\u91cd\u8981\u7a0b\u5ea6\u4e0e\u719f\u6089\u7a0b\u5ea6\u6253\u5206\u3002"
       },
@@ -279,6 +287,8 @@
   add("\u6761\u76ee", items_out)
   add("\u8bc4\u5206", ratings_df)
   add("\u610f\u89c1", comments_df)
+  sugg_out <- .suggestion_sheet(study, round, ids_all, prefill)
+  if (!is.null(sugg_out)) add("\u65b0\u589e\u5efa\u8bae", sugg_out)
   add("_meta", meta_df, withFilter = FALSE)
 
   header <- openxlsx::createStyle(
@@ -324,6 +334,16 @@
     ccol <- match("comment", names(comments_df))
     openxlsx::addStyle(wb, "\u610f\u89c1", yellow, rows = 2:(nrow(comments_df) + 1L),
                        cols = ccol, gridExpand = TRUE, stack = TRUE)
+  }
+  if (!is.null(sugg_out) && nrow(sugg_out) > 0L) {
+    for (nm in c("raw_name", "meaning", "rationale", "distinction", "evidence_note")) {
+      cc <- match(nm, names(sugg_out))
+      if (!is.na(cc)) {
+        openxlsx::addStyle(wb, "\u65b0\u589e\u5efa\u8bae", yellow,
+                           rows = 2:(nrow(sugg_out) + 1L), cols = cc,
+                           gridExpand = TRUE, stack = TRUE)
+      }
+    }
   }
   if (!is.null(auth_out) && nrow(auth_out) > 0L) {
     for (nm in setdiff(names(auth_out), "expert_id")) {
@@ -380,6 +400,10 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   items <- .rbind_fill_unique(lapply(parsed, `[[`, "items"), "item_id")
   ratings <- do.call(rbind, lapply(parsed, `[[`, "ratings"))
   comments <- do.call(rbind, lapply(parsed, `[[`, "comments"))
+  suggestions <- do.call(rbind, lapply(parsed, function(x) {
+    if (is.null(x$suggestions) || !nrow(x$suggestions)) return(NULL)
+    x$suggestions
+  }))
   authority_raw <- .rbind_fill_unique(lapply(parsed, `[[`, "authority_raw"), "expert_id")
   round <- unique(unlist(lapply(parsed, `[[`, "round")))
 
@@ -418,7 +442,8 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
       ratings = ratings,
       comments = comments,
       panel = panel,
-      items = items
+      items = items,
+      suggestions = suggestions
     ))
   }
 
@@ -429,6 +454,7 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
     items = items,
     ratings = ratings,
     comments = comments,
+    suggestions = suggestions,
     authority_raw = authority_raw
   )
 }
@@ -453,6 +479,7 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   s_items <- sh("\u6761\u76ee", "items")
   s_rat <- sh("\u8bc4\u5206", "ratings")
   s_com <- sh("\u610f\u89c1", "comments")
+  s_sugg <- sh("\u65b0\u589e\u5efa\u8bae", "suggestions")
   .stop_if(is.na(s_rat), "xlsx \u7f3a\u5c11\u300c\u8bc4\u5206\u300d\u5de5\u4f5c\u8868\u3002")
 
   read_sh <- function(nm) {
@@ -479,6 +506,7 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   items <- read_sh(s_items)
   ratings <- read_sh(s_rat)
   comments <- read_sh(s_com)
+  suggestions <- .clean_suggestion_sheet(read_sh(s_sugg))
   authority_raw <- read_sh(s_auth)
 
   if (is.null(ratings) || !nrow(ratings)) {
@@ -542,8 +570,66 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
     items = items,
     ratings = ratings,
     comments = comments,
+    suggestions = suggestions,
     authority_raw = authority_raw
   )
+}
+
+.clean_suggestion_sheet <- function(suggestions) {
+  if (is.null(suggestions) || !nrow(suggestions) || !"raw_name" %in% names(suggestions)) {
+    return(NULL)
+  }
+  suggestions$raw_name <- trimws(as.character(suggestions$raw_name))
+  suggestions <- suggestions[!is.na(suggestions$raw_name) & nzchar(suggestions$raw_name), , drop = FALSE]
+  if (!nrow(suggestions)) return(NULL)
+  if (!"round" %in% names(suggestions) || all(is.na(suggestions$round))) suggestions$round <- 1L
+  suggestions
+}
+
+.suggestion_sheet <- function(study, round, ids_all, prefill) {
+  p <- study$protocol
+  if (round != 1L || is.null(p$new_items) || !isTRUE(p$new_items$allow) || .is_open_round(p, round)) {
+    return(NULL)
+  }
+  n <- as.integer(p$new_items$max_suggestions)
+  sugg <- expand.grid(expert_id = ids_all, slot = seq_len(n), stringsAsFactors = FALSE)
+  sugg <- sugg[order(sugg$expert_id, sugg$slot), , drop = FALSE]
+  sugg$round <- round
+  sugg$raw_name <- ""
+  sugg$meaning <- ""
+  sugg$rationale <- ""
+  sugg$distinction <- ""
+  sugg$evidence_note <- ""
+  sugg$concept_id <- ""
+  if (isTRUE(prefill) && !is.null(study$suggestions) && nrow(study$suggestions)) {
+    src <- study$suggestions
+    if ("round" %in% names(src)) src <- src[is.na(src$round) | src$round == round, , drop = FALSE]
+    fields <- c("raw_name", "meaning", "rationale", "distinction", "evidence_note", "concept_id")
+    for (eid in ids_all) {
+      one <- src[as.character(src$expert_id) == eid, , drop = FALSE]
+      if (!nrow(one)) next
+      if ("slot" %in% names(one) && any(!is.na(one$slot))) {
+        for (i in seq_len(nrow(one))) {
+          w <- which(sugg$expert_id == eid & sugg$slot == suppressWarnings(as.integer(one$slot[i])))
+          if (!length(w)) next
+          for (nm in fields) {
+            if (nm %in% names(one) && !is.na(one[[nm]][i])) sugg[[nm]][w[1]] <- as.character(one[[nm]][i])
+          }
+        }
+      } else {
+        w <- which(sugg$expert_id == eid)
+        k <- min(length(w), nrow(one))
+        for (nm in fields) {
+          if (!nm %in% names(one)) next
+          val <- as.character(one[[nm]][seq_len(k)])
+          val[is.na(val)] <- ""
+          sugg[[nm]][w[seq_len(k)]] <- val
+        }
+      }
+    }
+  }
+  rownames(sugg) <- NULL
+  sugg
 }
 
 .parse_survey_score <- function(x) {
@@ -607,6 +693,17 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   if (!is.null(of) && !is.na(of) && nzchar(as.character(of))) {
     args$open_first <- tolower(as.character(of)) %in% c("true", "1", "yes", "\u662f")
   }
+  as_bool <- function(x) tolower(as.character(x)) %in% c("true", "1", "yes", "\u662f")
+  for (nm in c("allow_new", "allow_single_with_evidence", "require_iteration")) {
+    v <- getv(nm)
+    if (!is.null(v) && !is.na(v) && nzchar(as.character(v))) args[[nm]] <- as_bool(v)
+  }
+  for (nm in c("min_independent", "max_suggestions")) {
+    v <- num(getv(nm))
+    if (!is.na(v)) args[[nm]] <- v
+  }
+  rp <- getv("review_panel")
+  if (!is.null(rp) && !is.na(rp) && nzchar(as.character(rp))) args$review_panel <- as.character(rp)
   do.call(delphi_protocol, args)
 }
 

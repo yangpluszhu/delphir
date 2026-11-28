@@ -10,7 +10,7 @@ delphi_questionnaire(
   expert_id = NULL,
   format = c("markdown", "html", "docx", "xlsx", "both"),
   file = NULL,
-  items = c("all", "unresolved"),
+  items = c("all", "unresolved", "iteration"),
   sample = FALSE,
   split_experts = FALSE,
   prefill = FALSE
@@ -28,7 +28,9 @@ delphi_questionnaire(
 
 \item{file}{输出路径。单个文档写文件；目录则写入 \code{roundN.docx} / \code{roundN.xlsx}。}
 
-\item{items}{第 2 轮及以后纳入 \code{"all"} 全部条目或 \code{"unresolved"}（默认，非 keep）。}
+\item{items}{第 2 轮及以后纳入 \code{"all"}、\code{"unresolved"}（默认，已完成纳入或排除的不再重评）
+或 \code{"iteration"}（新条目、未共识条目、实质性修改）。首次进入的条目总会列入，
+并标明没有上轮统计。}
 
 \item{sample}{若 \code{TRUE}，忽略 \code{study}，直接返回随包完整样稿（markdown/html）。}
 
