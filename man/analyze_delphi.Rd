@@ -8,7 +8,8 @@ analyze_delphi(
   study,
   by_stakeholder = TRUE,
   check_dropout = TRUE,
-  wilcoxon = TRUE
+  wilcoxon = TRUE,
+  up_to_round = NULL
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ analyze_delphi(
 \item{check_dropout}{是否比较完成者与脱落者。}
 
 \item{wilcoxon}{稳定性分析中是否计算 Wilcoxon，默认 \code{TRUE}。}
+
+\item{up_to_round}{只分析 \code{ratings$round <= up_to_round} 的数据（保留历史轮，
+不丢弃脱落者上轮评分）。默认 \code{NULL} 表示研究中已有的全部轮次。}
 }
 \value{
 \code{delphi_result} 列表，主要元素：

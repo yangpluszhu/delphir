@@ -8,6 +8,6 @@ bibentry(
   title    = "{delphir}: Structured Delphi and RAND/UCLA Analysis for Consensus Studies",
   author   = person("Ming", "Yang"),
   year     = "2026",
-  note     = "R package version 0.2.0",
+  note     = "R package version 0.3.0",
   url      = "https://github.com/yangpluszhu/delphir"
 )

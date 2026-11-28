@@ -7,6 +7,8 @@
 #' @param by_stakeholder 是否做分层，默认在存在多个利益相关者时为 `TRUE`。
 #' @param check_dropout 是否比较完成者与脱落者。
 #' @param wilcoxon 稳定性分析中是否计算 Wilcoxon，默认 `TRUE`。
+#' @param up_to_round 只分析 `ratings$round <= up_to_round` 的数据（保留历史轮，
+#'   不丢弃脱落者上轮评分）。默认 `NULL` 表示研究中已有的全部轮次。
 #'
 #' @return `delphi_result` 列表，主要元素：
 #'   `study`, `item_summary`, `classification`, `participation`,
@@ -20,8 +22,9 @@
 #'
 #' @export
 analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
-                           wilcoxon = TRUE) {
+                           wilcoxon = TRUE, up_to_round = NULL) {
   study <- .match_study(study)
+  study <- .slice_study_rounds(study, up_to_round)
   validate_delphi(study)
   p <- study$protocol
   participation <- response_summary(study)
@@ -58,7 +61,18 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
   dropout <- NULL
   rounds <- .unique_sorted(study$ratings$round)
   if (isTRUE(check_dropout) && length(rounds) >= 2L) {
-    dropout <- dropout_bias(study, min(rounds), min(rounds) + 1L)
+    drop_list <- lapply(seq_len(length(rounds) - 1L), function(i) {
+          d <- suppressWarnings(tryCatch(
+            dropout_bias(study, rounds[i], rounds[i + 1L]),
+            error = function(e) NULL
+          ))
+      if (is.null(d) || !nrow(d)) return(NULL)
+      d$from_round <- rounds[i]
+      d$to_round <- rounds[i + 1L]
+      d
+    })
+    drop_list <- drop_list[!vapply(drop_list, is.null, logical(1))]
+    if (length(drop_list)) dropout <- do.call(rbind, drop_list)
   }
 
   authority <- NULL
@@ -104,6 +118,19 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
     class = "delphi_result"
   )
   result
+}
+
+.slice_study_rounds <- function(study, up_to_round) {
+  if (is.null(up_to_round) || !nrow(study$ratings)) return(study)
+  k <- as.integer(up_to_round[1])
+  .stop_if(is.na(k) || k < 1L, "up_to_round \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
+  have <- .unique_sorted(study$ratings$round)
+  .stop_if(!any(have <= k), sprintf("\u6570\u636e\u4e2d\u6ca0\u6709 round \u2264 %s \u7684\u8bc4\u5206\u3002", k))
+  study$ratings <- study$ratings[study$ratings$round <= k, , drop = FALSE]
+  if (!is.null(study$comments) && nrow(study$comments)) {
+    study$comments <- study$comments[study$comments$round <= k, , drop = FALSE]
+  }
+  study
 }
 
 #' @export

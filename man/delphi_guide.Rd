@@ -5,12 +5,13 @@
 \title{打开一套教学文档}
 \usage{
 delphi_guide(
-  which = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow")
+  which = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow",
+    "preset-protocol", "three-round-workflow")
 )
 }
 \arguments{
-\item{which}{\code{"clinical-consensus"}、\code{"rand-ucla"}、\code{"comet-cos"} 或
-\code{"questionnaire-workflow"}。}
+\item{which}{\code{"clinical-consensus"}、\code{"rand-ucla"}、\code{"comet-cos"}、
+\code{"questionnaire-workflow"}、\code{"preset-protocol"} 或 \code{"three-round-workflow"}。}
 }
 \value{
 不可见的文件路径。

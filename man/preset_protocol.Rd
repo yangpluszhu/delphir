@@ -7,20 +7,52 @@
 preset_protocol(scenario = "clinical_consensus", ...)
 }
 \arguments{
-\item{scenario}{场景标识，见 \code{\link[=delphi_protocol]{delphi_protocol()}}。}
+\item{scenario}{场景标识，见 \code{\link[=delphi_protocol]{delphi_protocol()}}。默认
+\code{"clinical_consensus"}。}
 
-\item{...}{覆盖预设的参数，若改变阈值请同时提供 \code{rationale}。}
+\item{...}{覆盖预设的参数（必须是 \code{\link[=delphi_protocol]{delphi_protocol()}} 的形参名）。
+若改变共识或分歧阈值，请同时提供 \code{rationale}。未出现在 \code{...} 中的参数
+保持该场景默认值。}
 }
 \value{
-\code{delphi_protocol} 对象。
+\code{delphi_protocol} 对象，字段与 \code{\link[=delphi_protocol]{delphi_protocol()}} 相同。
 }
 \description{
-返回与场景匹配的默认 \code{delphi_protocol}。医学专家共识使用复合标准
-（高区比例 + 中位数 + IQR）；COS 使用 COMET 70/15 规则；RAND/UCLA
-使用 Median 区间加分歧指数。
+按 \code{scenario} 填入该场景的默认阈值，再交给 \code{\link[=delphi_protocol]{delphi_protocol()}} 锁定。
+这是第一轮问卷发放前的推荐入口：先选场景，再只覆盖确需修改的参数。
 }
+\section{各场景实际生效的参数}{
+
+\itemize{
+\item 医学专家共识 (clinical_consensus)：\code{high_pct}、\code{basic_pct}、
+\code{median_min}、\code{iqr_max}、\code{reject_pct}、\code{polarization_threshold}、
+稳定性三条与 \code{max_rounds}。COMET/RAND/\code{cv_max} 写入对象但不驱动分类。
+\item COMET (comet_cos)：\verb{comet_in_*}、\verb{comet_out_*}。\code{high_pct} 默认改为
+0.70 以与 70/15 叙述一致，但 \code{\link[=classify_consensus]{classify_consensus()}} 走 COMET 分支。
+\item RAND/UCLA (rand_ucla)：\code{rand_disagreement}、\code{rand_di_threshold}、
+Median 区间（由量表高/低区导出）。\code{high_pct} 为 \code{NA}。
+\item 指标体系 (indicator)：\code{basic_pct}、\code{median_min}、\code{iqr_max}、\code{cv_max}。
+\item 排序 (ranking)：共识百分比多为 \code{NA}；用 \code{\link[=rank_priorities]{rank_priorities()}} 与
+\code{ranking_topk}。
+\item 定义 (definition)：接近临床，但基本共识阈值默认也是 0.80。
+\item Policy (policy)：不判定必须共识；阈值多为 \code{NA}，报告以分布为主。
+}
+}
+
 \examples{
 preset_protocol("comet_cos")
 preset_protocol("rand_ucla")
+protocol_table(preset_protocol("indicator"))
 
+# 覆盖单参数必须写理由
+preset_protocol(
+  "clinical_consensus",
+  iqr_max = 3,
+  rationale = "条目表述较长，允许 IQR=3 作为高度共识的离散上限。"
+)
+
+}
+\seealso{
+\code{\link[=delphi_protocol]{delphi_protocol()}}, \code{\link[=protocol_table]{protocol_table()}},
+vignette("preset-protocol", package = "delphir")
 }

@@ -42,3 +42,16 @@
 #' data(indicator_demo, package = "delphir")
 #' indicator_demo$protocol$scenario
 "indicator_demo"
+
+#' 三轮医学专家共识教学数据
+#'
+#' 由 [simulate_delphi()] 生成的三轮 Modified Delphi，供
+#' `vignette("three-round-workflow", package = "delphir")` 使用。含脱落、
+#' 无法判断与轮次间收敛，计划轮次与预设 `max_rounds = 3` 对齐。
+#'
+#' @format `delphi_study` 对象。
+#' @seealso [simulate_delphi()], [run_delphi()]
+#' @examples
+#' data(consensus_3round_demo, package = "delphir")
+#' unique(consensus_3round_demo$ratings$round)
+"consensus_3round_demo"

@@ -11,8 +11,16 @@ test_that("write_survey_templates copies files", {
   d <- tempfile("q-")
   fs <- write_survey_templates(d, include_mini_example = TRUE, overwrite = TRUE)
   expect_true(any(grepl("round1-complete.md", fs)))
+  expect_true(any(grepl("round3-complete.md", fs)))
   expect_true(file.exists(file.path(d, "templates", "authority_raw.csv")))
   expect_true(file.exists(file.path(d, "mini_example", "survey_panel.csv")))
+})
+
+test_that("sample round-3 markdown has no Ca/Cs self-rating block", {
+  md3 <- delphi_questionnaire(sample = TRUE, round = 3)
+  expect_true(grepl("不再", md3))
+  expect_false(grepl("权威程度自评", md3))
+  expect_false(grepl("熟悉程度赋分 Cs", md3))
 })
 
 test_that("mini survey CSV pipeline produces authority and round-1 study", {

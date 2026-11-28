@@ -1,6 +1,6 @@
 Package: delphir
 Title: Structured Delphi and RAND/UCLA Analysis for Consensus Studies
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
     person("Ming", "Yang", email = "yangpluszhu@sina.com",
            role = c("aut", "cre"))
@@ -9,26 +9,24 @@ Description: Protocol-first toolkit for Delphi studies, RAND/UCLA
     appropriateness panels, and COMET core outcome set surveys.
     Locks consensus rules before analysis, summarises ordinal ratings
     with medians and agreement rates, classifies items, assesses
-    between-round stability, prepares controlled feedback, and writes
-    ACCORD, DCAT and CREDES aligned reports.
+    between-round stability, prepares controlled feedback, generates
+    multi-round Word/Excel questionnaires, and writes ACCORD, DCAT and
+    CREDES aligned reports.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: zh
 LazyData: true
 LazyDataCompression: xz
 Depends: R (>= 4.1.0)
-Imports:
-    ggplot2 (>= 3.4.0),
-    rmarkdown,
-    stats,
-    utils
-Suggests:
-    knitr,
-    testthat (>= 3.0.0),
-    flextable
+Imports: ggplot2 (>= 3.4.0), officer, openxlsx, rmarkdown, stats, utils
+Suggests: knitr, testthat (>= 3.0.0), flextable
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 URL: https://github.com/yangpluszhu/delphir
 BugReports: https://github.com/yangpluszhu/delphir/issues
 Config/roxygen2/version: 8.0.0
+NeedsCompilation: no
+Packaged: 2026-09-17 15:14:15 UTC; yangpluszhu
+Author: Ming Yang [aut, cre]
+Maintainer: Ming Yang <yangpluszhu@sina.com>

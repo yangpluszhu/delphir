@@ -17,7 +17,8 @@ write_survey_templates(dir, include_mini_example = TRUE, overwrite = FALSE)
 不可见的写出文件路径向量。
 }
 \description{
-把随包安装的第 1/2 轮问卷样稿和 CSV 表头拷到本地目录，便于邮件发放与录入。
+把随包安装的第 1/2/3 轮问卷样稿和 CSV 表头拷到本地目录，便于邮件发放与录入。
+正式研究请优先用 \code{\link[=delphi_questionnaire]{delphi_questionnaire()}} 按锁定方案生成 docx/xlsx。
 }
 \examples{
 \donttest{

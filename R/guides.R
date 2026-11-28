@@ -1,6 +1,6 @@
 #' 列出随包安装的教学文档
 #'
-#' 安装 delphir 后即可获得四套从零开始的教学文档，无需另行下载。
+#' 安装 delphir 后即可获得六套从零开始的教学文档，无需另行下载。
 #'
 #' @return 不可见的数据框，同时打印路径。
 #'
@@ -20,8 +20,8 @@ delphi_guides <- function() {
 
 #' 打开一套教学文档
 #'
-#' @param which `"clinical-consensus"`、`"rand-ucla"`、`"comet-cos"` 或
-#'   `"questionnaire-workflow"`。
+#' @param which `"clinical-consensus"`、`"rand-ucla"`、`"comet-cos"`、
+#'   `"questionnaire-workflow"`、`"preset-protocol"` 或 `"three-round-workflow"`。
 #'
 #' @return 不可见的文件路径。
 #'
@@ -32,7 +32,8 @@ delphi_guides <- function() {
 #'
 #' @export
 delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos",
-                                   "questionnaire-workflow")) {
+                                   "questionnaire-workflow", "preset-protocol",
+                                   "three-round-workflow")) {
   which <- match.arg(which)
   info <- .guide_index()
   row <- info[info$key == which, ][1, ]
@@ -57,19 +58,25 @@ delphi_guide <- function(which = c("clinical-consensus", "rand-ucla", "comet-cos
 
 .guide_index <- function() {
   data.frame(
-    key = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow"),
-    vignette = c("clinical-consensus", "rand-ucla", "comet-cos", "questionnaire-workflow"),
+    key = c("clinical-consensus", "rand-ucla", "comet-cos",
+            "questionnaire-workflow", "preset-protocol", "three-round-workflow"),
+    vignette = c("clinical-consensus", "rand-ucla", "comet-cos",
+                 "questionnaire-workflow", "preset-protocol", "three-round-workflow"),
     file = c(
       "clinical-consensus.html",
       "rand-ucla.html",
       "comet-cos.html",
-      "questionnaire-workflow.html"
+      "questionnaire-workflow.html",
+      "preset-protocol.html",
+      "three-round-workflow.html"
     ),
     title = c(
       "\u6559\u5b66\u6587\u6863 1\uff1a\u533b\u5b66\u4e13\u5bb6\u5171\u8bc6 Modified Delphi \u5168\u6d41\u7a0b\uff08ACCORD \u62a5\u544a\uff09",
       "\u6559\u5b66\u6587\u6863 2\uff1aRAND/UCLA \u9002\u5b9c\u6027\u8bc4\u4ef7\u5168\u6d41\u7a0b",
       "\u6559\u5b66\u6587\u6863 3\uff1aCOMET \u6838\u5fc3\u7ed3\u5c40\u96c6 Delphi \u5168\u6d41\u7a0b",
-      "\u6559\u5b66\u6587\u6863 4\uff1a\u4ece\u7b2c 1 \u8f6e\u95ee\u5377\u8bbe\u8ba1\u5230 ACCORD \u65b9\u6cd5\u5b66\u62a5\u544a"
+      "\u6559\u5b66\u6587\u6863 4\uff1a\u4ece\u7b2c 1 \u8f6e\u95ee\u5377\u8bbe\u8ba1\u5230 ACCORD \u65b9\u6cd5\u5b66\u62a5\u544a",
+      "\u6559\u5b66\u6587\u6863 5\uff1a\u9884\u8bbe Delphi \u65b9\u6848\u53c2\u6570\u8be6\u89e3",
+      "\u6559\u5b66\u6587\u6863 6\uff1a\u4e09\u8f6e Delphi \u4ece\u96f6\u5230\u5b8c\u6574\u62a5\u544a"
     ),
     stringsAsFactors = FALSE
   )

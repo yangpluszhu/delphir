@@ -7,7 +7,7 @@
 
 **Protocol-first toolkit for Delphi studies, RAND/UCLA appropriateness panels, and COMET core outcome sets.**
 
-以第一轮前锁定的方案，完成医学专家共识、适宜性评价与核心结局集的分析，并写出对照 ACCORD、DCAT、CREDES 的方法学报告。安装后即获得四套中文教学文档、问卷样稿与示例数据。
+以第一轮前锁定的方案，完成医学专家共识、适宜性评价与核心结局集的分析，自动生成不少于三轮的 docx/xlsx 问卷并回读，写出对照 ACCORD、DCAT、CREDES 的方法学报告。安装后即获得六套中文教学文档、问卷样稿与示例数据。
 
 - **Repository:** https://github.com/yangpluszhu/delphir
 - **Issues:** https://github.com/yangpluszhu/delphir/issues
@@ -31,10 +31,10 @@ Delphi 不是普通专家问卷。本包把下列方法学约束写进分析流�
 
 ## Installation
 
-需要 R >= 4.1，以及 `ggplot2`、`rmarkdown`、`knitr`。
+需要 R >= 4.1，以及 `ggplot2`、`rmarkdown`、`knitr`、`openxlsx`、`officer`。
 
 ```r
-install.packages(c("ggplot2", "rmarkdown", "knitr"))
+install.packages(c("ggplot2", "rmarkdown", "knitr", "openxlsx", "officer"))
 
 # 推荐：从 GitHub 安装
 install.packages("remotes")
@@ -48,7 +48,7 @@ remotes::install_github("yangpluszhu/delphir")
 若已下载源码包：
 
 ```r
-install.packages("delphir_0.2.0.tar.gz", repos = NULL, type = "source")
+install.packages("delphir_0.3.0.tar.gz", repos = NULL, type = "source")
 ```
 
 本地开发安装（含 vignette）：
@@ -80,24 +80,24 @@ delphi_report(res, file = "consensus-report.html")
 内置教学数据：
 
 ```r
-data(consensus_demo)   # 医学专家共识
-data(rand_ucla_demo)   # RAND/UCLA 适宜性
-data(cos_demo)         # COMET 核心结局集
-data(indicator_demo)   # 指标体系补充示例
+data(consensus_demo)         # 医学专家共识（两轮）
+data(consensus_3round_demo)  # 医学专家共识（三轮）
+data(rand_ucla_demo)         # RAND/UCLA 适宜性
+data(cos_demo)               # COMET 核心结局集
+data(indicator_demo)         # 指标体系补充示例
 ```
 
-从空白问卷到第 2 轮反馈（权威系数由勾选赋分）：
+从空白方案到三轮问卷（docx + xlsx）与终稿：
 
 ```r
-write_survey_templates("my-delphi")
-auth <- score_authority(authority_raw)
-panel$Ca <- auth$Ca[match(panel$expert_id, auth$expert_id)]
-panel$Cs <- auth$Cs[match(panel$expert_id, auth$expert_id)]
-
-study1 <- delphi_study(protocol, panel, items, ratings_r1, comments_r1, meta = meta)
-res1 <- analyze_delphi(study1)
-delphi_report(res1, file = "round1.html", stage = "round1")
-delphi_questionnaire(res1, round = 2, file = "round2-forms")
+protocol <- preset_protocol("clinical_consensus")
+bp <- delphi_blueprint(protocol, panel, items, meta = meta)
+delphi_questionnaire(bp, round = 1, format = "both", file = "r1")
+study1 <- read_survey_xlsx("r1", study = bp)
+res1 <- run_delphi(study1, round = 1, report = TRUE, file = "round1.docx")
+next_round_questionnaire(res1, format = "both", file = "r2")
+# 第 2、第 3 轮同样回读后：
+res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
 ```
 
 ## Features
@@ -107,9 +107,9 @@ delphi_questionnaire(res1, round = 2, file = "round2-forms")
 | 医学专家共识 | `preset_protocol("clinical_consensus")` | 9 分 Likert；高度/基本共识、排除、两极分化 |
 | RAND/UCLA 适宜性 | `simulate_rand_ucla()` / `classify_rand()` | Median 区间 + 分歧指数，不强迫共识 |
 | COMET 核心结局集 | `preset_protocol("comet_cos")` | 70/15 规则；利益相关者分层 |
-| 问卷全流程 | `write_survey_templates()` / `delphi_questionnaire()` | 第 1/2 轮样稿、录入表、受控反馈单 |
+| 问卷全流程 | `delphi_questionnaire()` / `read_survey_xlsx()` / `next_round_questionnaire()` | ≥3 轮 docx/xlsx、回读长表、受控反馈 |
 | 权威系数 | `score_authority()` / `expert_authority()` | 曾光量表；专家级 Ca、Cs、Cr |
-| 报告 | `delphi_report(stage = "round1"|"final")` | 中间报告或 ACCORD 终稿 |
+| 报告 | `run_delphi()` / `delphi_report()` | 指定轮次全流程；html/docx；含方案、各轮问卷与参考文献 |
 
 主要分析函数：`analyze_delphi()`、`summarize_items()`、`classify_consensus()`、`prepare_feedback()`、`analyze_stability()`、`stakeholder_stratify()`、`dropout_bias()`、`accord_checklist()`、`dcat_checklist()`、`credes_checklist()`。
 
@@ -123,6 +123,8 @@ delphi_questionnaire(res1, round = 2, file = "round2-forms")
 | 2. RAND/UCLA 适宜性评价 | `vignette("rand-ucla", package = "delphir")` |
 | 3. COMET 核心结局集 70/15 | `vignette("comet-cos", package = "delphir")` |
 | 4. 从第 1 轮问卷设计到方法学报告 | `vignette("questionnaire-workflow", package = "delphir")` |
+| 5. 预设方案参数详解 | `vignette("preset-protocol", package = "delphir")` |
+| 6. 三轮 Delphi 从零到完整报告 | `vignette("three-round-workflow", package = "delphir")` |
 
 或 `delphi_guide("clinical-consensus")` 等打开预编译 HTML。
 
@@ -135,9 +137,9 @@ delphir/
 ├── NEWS.md
 ├── R/                   # 分析、问卷、报告函数
 ├── man/                 # roxygen 帮助文档
-├── vignettes/           # 四套教学文档源稿
+├── vignettes/           # 六套教学文档源稿
 ├── inst/
-│   ├── questionnaires/  # 第 1/2 轮问卷样稿
+│   ├── questionnaires/  # 第 1/2/3 轮问卷样稿
 │   ├── extdata/         # 录入模板与迷你示例
 │   ├── guides/          # 预编译教学 HTML
 │   └── rmarkdown/       # 报告模板
@@ -168,7 +170,7 @@ Issues 与功能建议请提交到 [GitHub Issues](https://github.com/yangpluszh
 
 ## Changelog
 
-见 [NEWS.md](NEWS.md)。当前版本 **0.2.0**。
+见 [NEWS.md](NEWS.md)。当前版本 **0.3.0**。
 
 ## License
 

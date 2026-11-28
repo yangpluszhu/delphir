@@ -1,6 +1,7 @@
 #' 导出空白问卷与数据录入模板
 #'
-#' 把随包安装的第 1/2 轮问卷样稿和 CSV 表头拷到本地目录，便于邮件发放与录入。
+#' 把随包安装的第 1/2/3 轮问卷样稿和 CSV 表头拷到本地目录，便于邮件发放与录入。
+#' 正式研究请优先用 [delphi_questionnaire()] 按锁定方案生成 docx/xlsx。
 #'
 #' @param dir 目标目录，不存在时会创建。
 #' @param include_mini_example 是否同时拷贝 6 名专家 × 4 条目的填好示例，默认 `TRUE`。
@@ -50,81 +51,207 @@ write_survey_templates <- function(dir, include_mini_example = TRUE, overwrite =
   invisible(written)
 }
 
-#' 生成第 1 轮总卷或第 2 轮个性化反馈单
+#' 按锁定方案生成 Delphi 问卷
 #'
-#' 第 1 轮含邀请说明、锁定的共识规则、**一次**权威程度自评和逐条 1–9 + 无法判断。
-#' 第 2 轮使用 [prepare_feedback()] 填入本人上轮评分与组结果，**不再出现 Ca/Cs 表**。
+#' 第 1 轮含邀请说明、锁定的共识规则、**一次**权威程度自评和逐条 Likert + 无法判断。
+#' 第 2 轮及以后使用 [prepare_feedback()] 填入本人上轮评分与组结果，**不再出现 Ca/Cs 表**。
+#' 输出可为 Markdown、HTML、Word（docx）或 Excel（xlsx）；`format = "both"` 同时写
+#' docx 与 xlsx。轮次可为 1 至方案中的 `max_rounds`（默认 3）。
 #'
-#' @param study [delphi_study()] 或 [analyze_delphi()] 结果。`NULL` 时返回随包样稿。
-#' @param round `1` 或 `2`。
-#' @param expert_id 第 2 轮要生成的专家编号；缺省则生成全部专家。
-#' @param format `"markdown"` 或 `"html"`。
-#' @param file 输出路径。单个文档写文件；多名专家且 `file` 为目录时按人拆分。
-#' @param items 第 2 轮纳入 `"all"` 全部条目或 `"unresolved"`（非高度共识 / 非 keep）。
-#' @param sample 若 `TRUE`，忽略 `study`，直接返回随包完整样稿。
+#' @param study [delphi_study()]、[delphi_blueprint()] 或 [analyze_delphi()] 结果。
+#'   `NULL` 且 `sample = TRUE` 时返回随包样稿。
+#' @param round 轮次，正整数。第 1 轮不需要已有评分。
+#' @param expert_id 第 2 轮及以后要生成的专家编号；缺省则生成全部专家。
+#' @param format `"markdown"`、`"html"`、`"docx"`、`"xlsx"` 或 `"both"`（docx+xlsx）。
+#' @param file 输出路径。单个文档写文件；目录则写入 `roundN.docx` / `roundN.xlsx`。
+#' @param items 第 2 轮及以后纳入 `"all"` 全部条目或 `"unresolved"`（默认，非 keep）。
+#' @param sample 若 `TRUE`，忽略 `study`，直接返回随包完整样稿（markdown/html）。
+#' @param split_experts 第 2 轮及以后是否按专家拆成单独文件，默认 `FALSE`。
+#' @param prefill 若 `TRUE` 且 `study` 已有该轮评分，xlsx 中预填 score/unable。
 #'
-#' @return 字符向量（Markdown/HTML）。多名专家时带 `expert_id` 名称。
+#' @return `format` 为 markdown/html 且未指定 `file` 时返回字符向量；否则不可见地
+#'   返回写出路径。
 #'
 #' @examples
 #' md <- delphi_questionnaire(sample = TRUE, round = 1)
 #' substr(md, 1, 40)
 #'
+#' \donttest{
+#' bp <- delphi_blueprint(
+#'   preset_protocol("clinical_consensus"),
+#'   data.frame(expert_id = "E01", stakeholder = "临床"),
+#'   data.frame(item_id = "C01", item_text = "应报告脱落原因。"),
+#'   meta = list(title = "示例")
+#' )
+#' f <- tempfile(fileext = ".xlsx")
+#' delphi_questionnaire(bp, round = 1, format = "xlsx", file = f)
+#' }
+#'
 #' @export
 delphi_questionnaire <- function(study = NULL, round = 1,
                                  expert_id = NULL,
-                                 format = c("markdown", "html"),
+                                 format = c("markdown", "html", "docx", "xlsx", "both"),
                                  file = NULL,
                                  items = c("all", "unresolved"),
-                                 sample = FALSE) {
+                                 sample = FALSE,
+                                 split_experts = FALSE,
+                                 prefill = FALSE) {
   format <- match.arg(format)
   items <- match.arg(items)
   round <- as.integer(round[1])
-  .stop_if(!round %in% c(1L, 2L), "round \u53ea\u80fd\u662f 1 \u6216 2\u3002")
+  .stop_if(is.na(round) || round < 1L, "round \u5fc5\u987b\u662f\u6b63\u6574\u6570\u3002")
+
   if (isTRUE(sample) || is.null(study)) {
-    fname <- if (round == 1L) "round1-complete.md" else "round2-complete.md"
+    fname <- sprintf("round%s-complete.md", round)
     src <- system.file("questionnaires", fname, package = "delphir")
+    if (!nzchar(src) || !file.exists(src)) {
+      fname <- if (round == 1L) "round1-complete.md" else "round2-complete.md"
+      src <- system.file("questionnaires", fname, package = "delphir")
+    }
     .stop_if(!nzchar(src) || !file.exists(src), "\u672a\u627e\u5230\u968f\u5305\u95ee\u5377\u6837\u7a3f\u3002")
     md <- paste(readLines(src, encoding = "UTF-8", warn = FALSE), collapse = "\n")
-    out <- if (format == "html") .md_to_html(md, title = fname) else md
-    return(.write_q_file(out, file, format))
+    if (format %in% c("markdown", "html") && is.null(file)) {
+      return(if (format == "html") .md_to_html(md, title = fname) else md)
+    }
+    docs <- md
+    names(docs) <- sprintf("round%s", round)
+    if (format %in% c("xlsx", "docx", "both") && is.null(study)) {
+      study <- .mini_example_study()
+    }
+    if (is.null(study)) {
+      out <- if (format == "html") .md_to_html(md, title = fname) else md
+      return(.write_q_file(out, file, format))
+    }
+    return(.write_questionnaires(docs, study, round, format, file, items,
+                                 expert_id, NULL, split_experts, prefill))
   }
+
+  result <- NULL
   if (inherits(study, "delphi_result")) {
     result <- study
     study <- study$study
   } else {
-    result <- NULL
     study <- .match_study(study)
   }
+  maxr <- study$protocol$stability$max_rounds %||% 3L
+  .stop_if(round > maxr, sprintf("round=%s \u8d85\u8fc7\u65b9\u6848 max_rounds=%s\u3002", round, maxr))
+
   if (round == 1L) {
     md <- .questionnaire_round1(study)
-    out <- if (format == "html") .md_to_html(md, study$meta$title %||% "\u7b2c 1 \u8f6e Delphi \u95ee\u5377") else md
-    return(.write_q_file(out, file, format))
+    docs <- md
+    names(docs) <- "round1"
+    if (format %in% c("markdown", "html") && is.null(file)) {
+      return(if (format == "html") .md_to_html(md, study$meta$title %||% "\u7b2c 1 \u8f6e Delphi \u95ee\u5377") else md)
+    }
+    return(.write_questionnaires(docs, study, round, format, file, items,
+                                 expert_id, result, FALSE, prefill))
   }
-  fb <- prepare_feedback(if (!is.null(result)) result else study, round = 1L)
-  ids <- if (is.null(expert_id)) unique(fb$expert_id) else as.character(expert_id)
-  missing <- setdiff(ids, unique(fb$expert_id))
+
+  .stop_if(is.null(study$ratings) || nrow(study$ratings) == 0L,
+           "\u751f\u6210\u7b2c 2 \u8f6e\u53ca\u4ee5\u540e\u95ee\u5377\u9700\u8981\u5df2\u6709\u4e0a\u4e00\u8f6e\u8bc4\u5206\u3002")
+  src_round <- round - 1L
+  have <- unique(study$ratings$round)
+  .stop_if(!src_round %in% have, sprintf("\u7f3a\u5c11\u7b2c %s \u8f6e\u8bc4\u5206\uff0c\u65e0\u6cd5\u751f\u6210\u7b2c %s \u8f6e\u53cd\u9988\u3002", src_round, round))
+
+  fb <- prepare_feedback(if (!is.null(result)) result else study, round = src_round)
+  ids <- if (is.null(expert_id)) unique(as.character(fb$expert_id)) else as.character(expert_id)
+  missing <- setdiff(ids, unique(as.character(fb$expert_id)))
   .stop_if(length(missing) > 0L, sprintf("\u53cd\u9988\u8868\u4e2d\u6ca1\u6709\u4e13\u5bb6: %s", paste(missing, collapse = ", ")))
   cls <- NULL
   if (!is.null(result)) cls <- result$classification
   else {
-    s <- summarize_items(study, rounds = 1)
+    s <- summarize_items(study, rounds = src_round)
     if (identical(study$protocol$scenario, "rand_ucla")) {
-      cls <- classify_rand(study, round = 1, summary = s)
+      cls <- classify_rand(study, round = src_round, summary = s)
     } else {
       cls <- classify_consensus(s, study$protocol)
     }
   }
   docs <- vapply(ids, function(eid) {
-    .questionnaire_round2(study, fb[fb$expert_id == eid, , drop = FALSE], cls, items)
+    .questionnaire_followup(study, fb[fb$expert_id == eid, , drop = FALSE], cls, items, round)
   }, character(1))
   names(docs) <- ids
-  if (format == "html") {
-    docs <- vapply(seq_along(docs), function(i) {
-      .md_to_html(docs[[i]], sprintf("\u7b2c 2 \u8f6e\u53cd\u9988\u5355 \u00b7 %s", ids[i]))
-    }, character(1))
-    names(docs) <- ids
+  if (format %in% c("markdown", "html") && is.null(file)) {
+    if (format == "html") {
+      docs <- vapply(seq_along(docs), function(i) {
+        .md_to_html(docs[[i]], sprintf("\u7b2c %s \u8f6e\u53cd\u9988\u5355 \u00b7 %s", round, ids[i]))
+      }, character(1))
+      names(docs) <- ids
+    }
+    return(docs)
   }
-  .write_q_file(docs, file, format)
+  .write_questionnaires(docs, study, round, format, file, items,
+                        expert_id, result, split_experts, prefill)
+}
+
+#' 根据本轮分析结果生成下一轮问卷
+#'
+#' 等价于 `delphi_questionnaire(result, round = last_round + 1, ...)`，
+#' 但会检查是否已达到方案中的 `max_rounds`。
+#'
+#' @param result [analyze_delphi()] 结果。
+#' @param format 见 [delphi_questionnaire()]，默认 `"both"`（docx + xlsx）。
+#' @param file 输出路径或目录。
+#' @param items 默认 `"unresolved"`。
+#' @param ... 传给 [delphi_questionnaire()] 的其他参数。
+#'
+#' @return 见 [delphi_questionnaire()]。
+#'
+#' @examples
+#' \donttest{
+#' study <- simulate_delphi(n_experts = 8, n_items = 4, n_rounds = 1, seed = 4)
+#' res <- analyze_delphi(study)
+#' d <- tempfile("r2-")
+#' next_round_questionnaire(res, format = "xlsx", file = d)
+#' }
+#'
+#' @export
+next_round_questionnaire <- function(result, format = "both", file = NULL,
+                                     items = "unresolved", ...) {
+  .stop_if(!inherits(result, "delphi_result"), "\u8bf7\u63d0\u4f9b analyze_delphi() \u7ed3\u679c\u3002")
+  nxt <- as.integer(result$last_round) + 1L
+  maxr <- result$study$protocol$stability$max_rounds %||% 3L
+  .stop_if(
+    nxt > maxr,
+    sprintf("\u5df2\u8fbe\u65b9\u6848\u89c4\u5b9a\u7684\u6700\u591a\u8f6e\u6b21 %s\uff0c\u4e0d\u518d\u751f\u6210\u4e0b\u4e00\u8f6e\u95ee\u5377\u3002", maxr)
+  )
+  delphi_questionnaire(
+    study = result,
+    round = nxt,
+    format = format,
+    file = file,
+    items = items,
+    ...
+  )
+}
+
+.mini_example_study <- function() {
+  ex <- system.file("extdata", package = "delphir")
+  panel_f <- file.path(ex, "survey_panel.csv")
+  if (!file.exists(panel_f)) {
+    return(simulate_delphi(n_experts = 6, n_items = 4, n_rounds = 1, seed = 1))
+  }
+  panel <- utils::read.csv(panel_f, fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+  items <- utils::read.csv(file.path(ex, "survey_items.csv"), fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+  ratings <- utils::read.csv(file.path(ex, "survey_ratings.csv"), fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+  raw_f <- file.path(ex, "survey_authority_raw.csv")
+  if (file.exists(raw_f)) {
+    raw <- utils::read.csv(raw_f, fileEncoding = "UTF-8", stringsAsFactors = FALSE)
+    scored <- tryCatch(score_authority(raw), error = function(e) NULL)
+    if (!is.null(scored)) {
+      panel$Ca <- scored$Ca[match(panel$expert_id, scored$expert_id)]
+      panel$Cs <- scored$Cs[match(panel$expert_id, scored$expert_id)]
+    }
+  }
+  suppressWarnings(delphi_study(
+    protocol = preset_protocol("clinical_consensus"),
+    panel = panel,
+    items = items,
+    ratings = ratings,
+    meta = list(title = "\u8ff7\u4f60\u793a\u4f8b", objective = "\u6559\u5b66",
+                users = "\u7814\u7a76\u8005", geography = "\u4e2d\u56fd\u5927\u9646"),
+    validate = FALSE
+  ))
 }
 
 .copy_dir_files <- function(from, to, overwrite) {
@@ -160,20 +287,27 @@ delphi_questionnaire <- function(study = NULL, round = 1,
 
 .protocol_rules_md <- function(p) {
   r <- p$rules
-  sprintf(paste(
-    "- **\u9ad8\u5ea6\u5171\u8bc6\uff1a** \u8bc4\u5206 %s\u2013%s \u7684\u6bd4\u4f8b \u2265 %.0f%%\uff0c\u4e14 Median \u2265 %s\uff0c\u4e14 IQR \u2264 %s",
-    "- **\u57fa\u672c\u5171\u8bc6\uff1a** %.0f%% \u2264 \u9ad8\u533a\u6bd4\u4f8b < %.0f%%\uff0c\u4e14 Median \u2265 %s",
-    "- **\u503e\u5411\u6392\u9664\uff1a** \u8bc4\u5206 %s\u2013%s \u7684\u6bd4\u4f8b \u2265 %.0f%%",
-    "- **\u4e24\u6781\u5206\u5316\uff1a** \u9ad8\u533a\u4e0e\u4f4e\u533a\u540c\u65f6 \u2265 %.0f%%",
-    "- **\u6700\u591a\u8f6e\u6b21\uff1a** %s\uff1b\u76f8\u90bb\u8f6e\u5206\u7c7b\u4e0d\u53d8 \u2265 %.0f%%\uff1bMedian \u53d8\u5316 \u2264 %s\uff1b\u9ad8\u533a\u6bd4\u4f8b\u53d8\u5316 < %.0f%%",
+  pct <- function(x) {
+    if (is.null(x) || length(x) == 0L || is.na(x)) return("\uff08\u672c\u573a\u666f\u4e0d\u9002\u7528\uff09")
+    sprintf("%.0f%%", 100 * x)
+  }
+  num <- function(x) {
+    if (is.null(x) || length(x) == 0L || is.na(x)) return("\uff08\u672c\u573a\u666f\u4e0d\u9002\u7528\uff09")
+    as.character(x)
+  }
+  paste(
+    sprintf("- **\u9ad8\u5ea6\u5171\u8bc6\uff1a** \u8bc4\u5206 %s\u2013%s \u7684\u6bd4\u4f8b \u2265 %s\uff0c\u4e14 Median \u2265 %s\uff0c\u4e14 IQR \u2264 %s",
+            p$high_range[1], p$high_range[2], pct(r$high_pct), num(r$median_min), num(r$iqr_max)),
+    sprintf("- **\u57fa\u672c\u5171\u8bc6\uff1a** %s \u2264 \u9ad8\u533a\u6bd4\u4f8b < %s\uff0c\u4e14 Median \u2265 %s",
+            pct(r$basic_pct), pct(r$high_pct), num(r$median_min)),
+    sprintf("- **\u503e\u5411\u6392\u9664\uff1a** \u8bc4\u5206 %s\u2013%s \u7684\u6bd4\u4f8b \u2265 %s",
+            p$low_range[1], p$low_range[2], pct(r$reject_pct)),
+    sprintf("- **\u4e24\u6781\u5206\u5316\uff1a** \u9ad8\u533a\u4e0e\u4f4e\u533a\u540c\u65f6 \u2265 %s",
+            pct(r$polarization_threshold)),
+    sprintf("- **\u6700\u591a\u8f6e\u6b21\uff1a** %s\uff1b\u76f8\u90bb\u8f6e\u5206\u7c7b\u4e0d\u53d8 \u2265 %s\uff1bMedian \u53d8\u5316 \u2264 %s\uff1b\u9ad8\u533a\u6bd4\u4f8b\u53d8\u5316 < %s",
+            p$stability$max_rounds, pct(p$stability$class_pct),
+            num(p$stability$median_delta), pct(p$stability$high_pct_delta)),
     sep = "\n"
-  ),
-  p$high_range[1], p$high_range[2], 100 * r$high_pct, r$median_min, r$iqr_max,
-  100 * r$basic_pct, 100 * r$high_pct, r$median_min,
-  p$low_range[1], p$low_range[2], 100 * r$reject_pct,
-  100 * r$polarization_threshold,
-  p$stability$max_rounds, 100 * p$stability$class_pct,
-  p$stability$median_delta, 100 * p$stability$high_pct_delta
   )
 }
 
@@ -199,14 +333,15 @@ delphi_questionnaire <- function(study = NULL, round = 1,
                   ca$source, ca$large, ca$medium, ca$small), collapse = "\n")
   )
   item_blocks <- apply(study$items, 1, function(row) {
+    dims <- .questionnaire_dimensions(study, 1L)
+    likert <- paste(vapply(dims, function(d) .likert_line(p, d), character(1)), collapse = "\n")
     paste0(
       "### \u6761\u76ee ", row[["item_id"]], "\n\n",
       "**", row[["item_text"]], "**\n\n",
       if (!is.na(row[["domain"]]) && nzchar(row[["domain"]])) paste0("- \u9886\u57df\uff1a", row[["domain"]], "\n") else "",
       if ("evidence_level" %in% names(row) && !is.na(row[["evidence_level"]]))
         paste0("- \u6761\u76ee\u6765\u6e90 / \u8bc1\u636e\u51c6\u5907\uff1a", row[["evidence_level"]], "\n") else "",
-      "\n", .likert_line(p, "\u91cd\u8981\u6027"), "\n",
-      .likert_line(p, "\u53ef\u884c\u6027"), "\n",
+      "\n", likert, "\n",
       "**\u4fee\u6539\u610f\u89c1\uff1a** ________________________________________________\n"
     )
   })
@@ -236,22 +371,23 @@ delphi_questionnaire <- function(study = NULL, round = 1,
 }
 
 .questionnaire_round2 <- function(study, fb_one, cls, items) {
+  .questionnaire_followup(study, fb_one, cls, items, round = 2L)
+}
+
+.questionnaire_followup <- function(study, fb_one, cls, items, round) {
   eid <- fb_one$expert_id[1]
   title <- study$meta$title %||% "Modified Delphi"
+  src_round <- as.integer(round) - 1L
   dim0 <- fb_one$dimension[1]
-  sub <- cls[cls$round == 1, ]
-  if ("dimension" %in% names(sub) && !is.na(dim0)) {
-    sub <- sub[sub$dimension == dim0, ]
-  }
-  unresolved <- !(sub$action %in% "keep") | sub$class %in% c("borderline", "no_consensus", "polarized")
   if (identical(items, "unresolved")) {
-    keep_ids <- sub$item_id[unresolved]
+    keep_ids <- .unresolved_item_ids(cls, src_round, items, dim0)
     fb_use <- fb_one[fb_one$item_id %in% keep_ids, , drop = FALSE]
     fb_skip <- fb_one[!fb_one$item_id %in% keep_ids, , drop = FALSE]
   } else {
     fb_use <- fb_one
     fb_skip <- fb_one[0, ]
   }
+  dim_label <- .primary_dimension(study, round)
   block <- function(d) {
     if (!nrow(d)) return("")
     paste(apply(d, 1, function(row) {
@@ -267,7 +403,7 @@ delphi_questionnaire <- function(study = NULL, round = 1,
                 row[["class_zh"]]),
         if (!is.na(row[["anonymous_comments"]]) && nzchar(row[["anonymous_comments"]]))
           paste0("**\u533f\u540d\u610f\u89c1\u6458\u8981\uff1a** ", row[["anonymous_comments"]], "\n\n") else "",
-        .likert_line(study$protocol, "\u672c\u8f6e\u91cd\u8981\u6027"), "\n",
+        .likert_line(study$protocol, paste0("\u672c\u8f6e", dim_label)), "\n",
         "**\u672c\u8f6e\u610f\u89c1\uff08\u53ef\u7a7a\uff09\uff1a** ________________________________________________\n"
       )
     }), collapse = "\n")
@@ -275,7 +411,7 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   skip_tab <- ""
   if (nrow(fb_skip)) {
     skip_tab <- paste0(
-      "## \u7b2c 1 \u8f6e\u5df2\u8fbe\u9ad8\u5ea6/\u57fa\u672c\u5171\u8bc6\u3001\u672c\u8f6e\u53ef\u4e0d\u91cd\u8bc4\u7684\u6761\u76ee\n\n",
+      sprintf("## \u7b2c %s \u8f6e\u5df2\u8fbe\u9ad8\u5ea6/\u57fa\u672c\u5171\u8bc6\u3001\u672c\u8f6e\u53ef\u4e0d\u91cd\u8bc4\u7684\u6761\u76ee\n\n", src_round),
       "| \u6761\u76ee | \u539f\u6587 | Median\uff08IQR\uff09 | \u9ad8\u533a | \u5206\u7c7b |\n|---|---|---|---|---|\n",
       paste(sprintf("| %s | %s | %s | %s%% | %s |",
                     fb_skip$item_id,
@@ -287,10 +423,10 @@ delphi_questionnaire <- function(study = NULL, round = 1,
     )
   }
   paste0(
-    "# \u7b2c 2 \u8f6e Delphi \u4e13\u5bb6\u54a8\u8be2\u95ee\u5377\n\n",
+    sprintf("# \u7b2c %s \u8f6e Delphi \u4e13\u5bb6\u54a8\u8be2\u95ee\u5377\n\n", round),
     "**\u7814\u7a76\u9898\u76ee\uff1a** ", title, "\n\n",
     "**\u672c\u5377\u9002\u7528\u4e13\u5bb6\u7f16\u53f7\uff1a** ", eid, "\n\n",
-    "\u7b2c 2 \u8f6e**\u4e0d\u518d**\u586b\u5199\u719f\u6089\u7a0b\u5ea6\u4e0e\u5224\u65ad\u4f9d\u636e\uff08Ca\u3001Cs\uff09\u3002",
+    sprintf("\u7b2c %s \u8f6e**\u4e0d\u518d**\u586b\u5199\u719f\u6089\u7a0b\u5ea6\u4e0e\u5224\u65ad\u4f9d\u636e\uff08Ca\u3001Cs\uff09\u3002", round),
     "\u8bf7\u5148\u9605\u8bfb\u7ec4\u7ed3\u679c\u4e0e\u60a8\u7684\u4e0a\u8f6e\u8bc4\u5206\uff0c\u518d\u7ed9\u51fa\u672c\u8f6e\u5206\u6570\u3002\u5171\u8bc6\u89c4\u5219\u4e0e\u7b2c 1 \u8f6e\u76f8\u540c\u3002\n\n",
     "## \u9700\u8981\u672c\u8f6e\u91cd\u8bc4\u7684\u6761\u76ee\n\n",
     block(fb_use), "\n",

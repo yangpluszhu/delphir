@@ -2,42 +2,63 @@
 % Please edit documentation in R/questionnaire.R
 \name{delphi_questionnaire}
 \alias{delphi_questionnaire}
-\title{生成第 1 轮总卷或第 2 轮个性化反馈单}
+\title{按锁定方案生成 Delphi 问卷}
 \usage{
 delphi_questionnaire(
   study = NULL,
   round = 1,
   expert_id = NULL,
-  format = c("markdown", "html"),
+  format = c("markdown", "html", "docx", "xlsx", "both"),
   file = NULL,
   items = c("all", "unresolved"),
-  sample = FALSE
+  sample = FALSE,
+  split_experts = FALSE,
+  prefill = FALSE
 )
 }
 \arguments{
-\item{study}{\code{\link[=delphi_study]{delphi_study()}} 或 \code{\link[=analyze_delphi]{analyze_delphi()}} 结果。\code{NULL} 时返回随包样稿。}
+\item{study}{\code{\link[=delphi_study]{delphi_study()}}、\code{\link[=delphi_blueprint]{delphi_blueprint()}} 或 \code{\link[=analyze_delphi]{analyze_delphi()}} 结果。
+\code{NULL} 且 \code{sample = TRUE} 时返回随包样稿。}
 
-\item{round}{\code{1} 或 \code{2}。}
+\item{round}{轮次，正整数。第 1 轮不需要已有评分。}
 
-\item{expert_id}{第 2 轮要生成的专家编号；缺省则生成全部专家。}
+\item{expert_id}{第 2 轮及以后要生成的专家编号；缺省则生成全部专家。}
 
-\item{format}{\code{"markdown"} 或 \code{"html"}。}
+\item{format}{\code{"markdown"}、\code{"html"}、\code{"docx"}、\code{"xlsx"} 或 \code{"both"}（docx+xlsx）。}
 
-\item{file}{输出路径。单个文档写文件；多名专家且 \code{file} 为目录时按人拆分。}
+\item{file}{输出路径。单个文档写文件；目录则写入 \code{roundN.docx} / \code{roundN.xlsx}。}
 
-\item{items}{第 2 轮纳入 \code{"all"} 全部条目或 \code{"unresolved"}（非高度共识 / 非 keep）。}
+\item{items}{第 2 轮及以后纳入 \code{"all"} 全部条目或 \code{"unresolved"}（默认，非 keep）。}
 
-\item{sample}{若 \code{TRUE}，忽略 \code{study}，直接返回随包完整样稿。}
+\item{sample}{若 \code{TRUE}，忽略 \code{study}，直接返回随包完整样稿（markdown/html）。}
+
+\item{split_experts}{第 2 轮及以后是否按专家拆成单独文件，默认 \code{FALSE}。}
+
+\item{prefill}{若 \code{TRUE} 且 \code{study} 已有该轮评分，xlsx 中预填 score/unable。}
 }
 \value{
-字符向量（Markdown/HTML）。多名专家时带 \code{expert_id} 名称。
+\code{format} 为 markdown/html 且未指定 \code{file} 时返回字符向量；否则不可见地
+返回写出路径。
 }
 \description{
-第 1 轮含邀请说明、锁定的共识规则、\strong{一次}权威程度自评和逐条 1–9 + 无法判断。
-第 2 轮使用 \code{\link[=prepare_feedback]{prepare_feedback()}} 填入本人上轮评分与组结果，\strong{不再出现 Ca/Cs 表}。
+第 1 轮含邀请说明、锁定的共识规则、\strong{一次}权威程度自评和逐条 Likert + 无法判断。
+第 2 轮及以后使用 \code{\link[=prepare_feedback]{prepare_feedback()}} 填入本人上轮评分与组结果，\strong{不再出现 Ca/Cs 表}。
+输出可为 Markdown、HTML、Word（docx）或 Excel（xlsx）；\code{format = "both"} 同时写
+docx 与 xlsx。轮次可为 1 至方案中的 \code{max_rounds}（默认 3）。
 }
 \examples{
 md <- delphi_questionnaire(sample = TRUE, round = 1)
 substr(md, 1, 40)
+
+\donttest{
+bp <- delphi_blueprint(
+  preset_protocol("clinical_consensus"),
+  data.frame(expert_id = "E01", stakeholder = "临床"),
+  data.frame(item_id = "C01", item_text = "应报告脱落原因。"),
+  meta = list(title = "示例")
+)
+f <- tempfile(fileext = ".xlsx")
+delphi_questionnaire(bp, round = 1, format = "xlsx", file = f)
+}
 
 }

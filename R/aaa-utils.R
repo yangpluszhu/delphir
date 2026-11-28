@@ -25,6 +25,19 @@
   )
 }
 
+.pkg_version <- function() {
+  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.3.0")
+}
+
+.need_pkg <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(
+      sprintf("\u9700\u8981\u5b89\u88c5\u5305 %s\uff1ainstall.packages(\"%s\")", pkg, pkg),
+      call. = FALSE
+    )
+  }
+}
+
 .scale_range <- function(protocol) {
   c(protocol$scale_min, protocol$scale_max)
 }
@@ -101,6 +114,12 @@
 }
 
 .ensure_unable <- function(ratings) {
+  n <- nrow(ratings)
+  if (is.null(n) || n == 0L) {
+    if (!"unable" %in% names(ratings)) ratings$unable <- logical()
+    ratings$unable <- as.logical(ratings$unable)
+    return(ratings)
+  }
   if (!"unable" %in% names(ratings)) {
     ratings$unable <- is.na(ratings$score)
   }
@@ -111,8 +130,14 @@
 }
 
 .ensure_dimension <- function(ratings) {
+  n <- nrow(ratings)
+  if (is.null(n) || n == 0L) {
+    if (!"dimension" %in% names(ratings)) ratings$dimension <- character()
+    ratings$dimension <- as.character(ratings$dimension)
+    return(ratings)
+  }
   if (!"dimension" %in% names(ratings) || all(is.na(ratings$dimension))) {
-    ratings$dimension <- "overall"
+    ratings$dimension <- rep("overall", n)
   }
   ratings$dimension <- as.character(ratings$dimension)
   ratings

@@ -1,0 +1,281 @@
+---
+title: "教学文档 6：三轮 Delphi 从零到完整报告"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 6：三轮 Delphi 从零到完整报告}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. 这份文档解决什么问题
+
+从空白方案走完 **不少于 3 轮** 的 Modified Delphi：锁定阈值 → 生成 docx/xlsx 问卷 → 回读 xlsx → 逐轮分析 → 自动生成下一轮 → 终稿报告（含 docx），并对报告每一节做方法学解读。
+
+参数含义见 `vignette("preset-protocol", package = "delphir")`。数据为包内 `consensus_3round_demo`（模拟，含脱落、无法判断、临界与两极分化）。
+
+```{r}
+library(delphir)
+data("consensus_3round_demo", package = "delphir")
+demo <- consensus_3round_demo
+demo
+unique(demo$ratings$round)
+```
+
+# 2. 第 0 步：锁定问题与方案
+
+```{r}
+protocol <- preset_protocol("clinical_consensus")
+protocol
+head(protocol_table(protocol), 8)
+```
+
+**解读：** 高度共识 = P(7–9)≥80% 且 Median≥7 且 IQR≤2；最多 3 轮。此后任何函数都不会根据结果把 80% 改成 75%。
+
+```{r}
+bp <- delphi_blueprint(protocol, demo$panel, demo$items, demo$meta)
+nrow(bp$ratings)
+```
+
+# 3. 生成第 1 轮问卷（docx 与 xlsx）
+
+```{r}
+dir1 <- tempfile("r1-")
+dir.create(dir1)
+files1 <- delphi_questionnaire(bp, round = 1, format = "both", file = dir1)
+basename(files1)
+```
+
+xlsx 含「说明 / 方案 / 专家 / 权威系数 / 条目 / 评分 / 意见」。黄色列为填空：`score`、`unable`。docx 供打印或邮件。
+
+用已填数据演示回读（真实研究由专家填写后同样调用）：
+
+```{r}
+xlsx1 <- tempfile(fileext = ".xlsx")
+study_pre <- delphi_study(protocol, demo$panel, demo$items,
+                          demo$ratings[demo$ratings$round == 1, ],
+                          demo$comments[demo$comments$round == 1, ],
+                          meta = demo$meta, validate = FALSE)
+delphi_questionnaire(study_pre, round = 1, format = "xlsx", file = xlsx1, prefill = TRUE)
+got1 <- read_survey_xlsx(xlsx1)
+nrow(got1$ratings)
+head(got1$ratings[, c("expert_id", "item_id", "score", "unable")])
+```
+
+**解读：** 回读结果必须是长表（专家 × 条目 × 轮次 × 维度）。宽表无法区分无法判断与漏填。
+
+# 4. 第 1 轮全流程分析
+
+```{r}
+study1 <- delphi_study(
+  protocol, demo$panel, demo$items,
+  demo$ratings[demo$ratings$round == 1, ],
+  demo$comments[demo$comments$round == 1, ],
+  meta = demo$meta
+)
+res1 <- run_delphi(study1, round = 1)
+res1
+```
+
+```{r}
+head(res1$participation$by_round)
+table(res1$last_classification$class_zh)
+```
+
+**解读这一轮的表：**
+
+- **参与度**：回收率是积极系数，不是共识。
+- **Median / IQR / p_high**：主指标。均数、CV、Kendall W 只能当补充。
+- **高度共识**：可考虑第 2 轮不重评（查阅即可）。
+- **基本共识**：保留，但与高度共识分列。
+- **临界 / 未达共识**：必须带反馈进入第 2 轮。
+- **两极分化**：不要写成「均数约 5，意见一般」。
+- **无法判断**：报告人数，不进 1–9 分母。
+- **权威系数**：专家级一次自评，不加权。
+
+```{r}
+head(accord_checklist(res1)[, c("id", "status")], 6)
+```
+
+中间报告对照清单时大量 Unsure 是正常的——软件不能假装伦理批件已经写进论文。
+
+# 5. 由第 1 轮结果生成第 2 轮问卷
+
+```{r}
+dir2 <- tempfile("r2-")
+files2 <- next_round_questionnaire(res1, format = "xlsx", file = dir2)
+basename(files2)
+```
+
+第 2 轮 markdown 不应再出现 Ca/Cs 赋分表：
+
+```{r}
+md2 <- delphi_questionnaire(res1, round = 2, expert_id = demo$panel$expert_id[1])
+grepl("权威程度自评", md2)
+grepl("不再", md2)
+```
+
+# 6. 并入第 2 轮并分析
+
+```{r}
+study2 <- update_delphi_study(
+  study1,
+  ratings = demo$ratings[demo$ratings$round == 2, ],
+  comments = demo$comments[demo$comments$round == 2, ]
+)
+unique(study2$ratings$round)
+res2 <- run_delphi(study2, round = 2)
+res2$participation$by_round
+if (!is.null(res2$stability)) {
+  attr(res2$stability, "stopping")[c("recommend_stop", "class_unchanged_pct")]
+}
+```
+
+**解读：**
+
+- `update_delphi_study()` **追加** round=2，拒绝覆盖 round=1。脱落者的第 1 轮分数仍在。
+- 稳定性看分类是否还在变，而不是 Wilcoxon P>0.05。
+- 若第 2 轮后仍未达 `max_rounds`，`delphi_report(..., stage = "auto")` 应是中间报告而不是终稿。
+
+```{r}
+head(res2$dropout[, intersect(c("item_id", "from_round", "n_dropout",
+                                "median_completer", "median_dropout"), names(res2$dropout))])
+```
+
+若脱落者在关键条目上更反对，终稿赞同率可能被高估，必须写进报告。
+
+# 7. 第 3 轮：生成、回读、分析
+
+```{r}
+dir3 <- tempfile("r3-")
+files3 <- next_round_questionnaire(res2, format = "both", file = dir3)
+basename(files3)
+
+study3 <- update_delphi_study(
+  study2,
+  ratings = demo$ratings[demo$ratings$round == 3, ],
+  comments = demo$comments[demo$comments$round == 3, ]
+)
+res3 <- run_delphi(study3, round = "last")
+res3
+table(res3$last_classification$class_zh)
+```
+
+超过 3 轮应被拒绝：
+
+```{r, error=TRUE}
+try(next_round_questionnaire(res3, format = "markdown"), silent = FALSE)
+```
+
+**仍两极 / 无共识的条目：** 正确写法是「未形成共识」，不是加开第 4 轮直到表面一致。
+
+指定只分析到第 2 轮（历史轮仍保留）：
+
+```{r}
+res_upto2 <- analyze_delphi(study3, up_to_round = 2)
+res_upto2$last_round
+max(res_upto2$study$ratings$round)
+```
+
+# 8. 输出完整分析报告（必须含 docx）
+
+```{r}
+docx <- tempfile(fileext = ".docx")
+out <- run_delphi(study3, report = TRUE, format = "docx", file = docx)
+file.exists(attr(out, "report_file"))
+```
+
+也可 `format = "both"` 同时写 html。`file` 可以是目录或完整路径。
+
+# 9. 终稿每一节读什么、不能读成什么
+
+下面按报告结构解读。可用 `res3` 中的对象对照。
+
+## 9.1 报告性质与范围
+
+必须能回答：为什么用共识方法、目的、目标使用者、地理范围。缺一项，审稿人会问。Delphi **不能**代替系统评价。
+
+## 9.2 预设方案参数表
+
+`protocol_table(res3$study$protocol)` 应出现全部阈值。若 `modified_from_preset` 为 TRUE 却没有 rationale，属于方法学缺陷。
+
+## 9.3 专家构成与权威系数
+
+目的抽样不是随机样本。Cr 是专家对主题的一次自评：组均数 ≥0.70 仅供国内发表参考，**不是** DCAT 核心，更不能加权 Likert。
+
+```{r}
+if (!is.null(res3$authority)) attr(res3$authority, "overall")[c("mean_cr", "pct_ok")]
+```
+
+## 9.4 各轮问卷内容
+
+第 1 轮：规则原文 + 权威系数 + 全部条目。  
+第 2–3 轮：本人上轮分、组 Median/IQR、高区、匿名意见；无 Ca/Cs。  
+这对应 DCAT 的受控反馈。缺少「本人上轮评分」的反馈不算合格 Delphi。
+
+## 9.5 逐轮调查结果
+
+过程必须透明：不能只报第 3 轮。主指标永远是 Median、IQR、高/低区比例。`n_unable` 要单独在。
+
+```{r}
+utils::head(res3$classification[res3$classification$round == 3,
+  c("item_id", "median_iqr", "p_high", "class_zh", "action")], 8)
+```
+
+## 9.6 稳定性、分层、脱落、意见、Kendall W
+
+- 稳定性：分类不变 + Median + 高区比例；P 值依赖样本量。
+- 分层：总体过线不等于每一组过线（尤其患者组）。
+- 脱落：比较完成者与脱落者在上一轮的分布。
+- 意见：主题需预先编码，不是事后用共识率代替定性。
+- Kendall W：**排序协调性**，不是条目共识。
+
+## 9.7 最终结果与会议建议
+
+已达高度共识的条目不要在少数人参加的会议上推翻大样本匿名结果。会议聚焦临界、无共识、组间相反、改文字。稳定分歧 = 未达共识。
+
+```{r}
+if (!is.null(res3$stopping)) {
+  res3$stopping[c("recommend_stop", "current_round", "max_rounds")]
+}
+```
+
+## 9.8 ACCORD / DCAT / CREDES
+
+Unsure 必须由作者在论文里补写。DCAT 四个核心项：匿名、迭代、受控反馈、统计汇总。任一为 No，应评为关键缺陷。
+
+```{r}
+dcat_checklist(res3)[1:4, c("id", "core", "status")]
+```
+
+## 9.9 参考文献
+
+报告末尾列出 Diamond 2014、Hasson 2000、ACCORD、DCAT、CREDES、RAND 手册、COMET Handbook、曾光赋分表及 `citation("delphir")`。引用规范不等于已经满足规范。
+
+# 10. 最小可复现代码
+
+```r
+protocol <- preset_protocol("clinical_consensus")
+bp <- delphi_blueprint(protocol, panel, items, meta)
+delphi_questionnaire(bp, round = 1, format = "both", file = "r1")
+# 专家填写 r1/*.xlsx 后：
+study <- read_survey_xlsx("r1", study = bp)
+res1 <- run_delphi(study, round = 1, report = TRUE, file = "round1.docx")
+next_round_questionnaire(res1, format = "both", file = "r2")
+# 重复至第 3 轮后：
+res <- run_delphi(study3, report = TRUE, format = "both", file = "final")
+```
+
+常见错误仍是：事后改阈值、用 Cr 加权、把「不熟」录成 5 分、删除脱落者历史评分、反复投票直到全部「达成共识」。

@@ -12,13 +12,15 @@
 \section{从这里开始}{
 
 \itemize{
-\item \code{\link[=delphi_guides]{delphi_guides()}} 打开四套随包教学文档
-\item \code{\link[=preset_protocol]{preset_protocol()}} 选择场景并锁定阈值
-\item \code{\link[=write_survey_templates]{write_survey_templates()}} / \code{\link[=delphi_questionnaire]{delphi_questionnaire()}} 问卷样稿与第 2 轮反馈单
+\item \code{\link[=delphi_guides]{delphi_guides()}} 打开六套随包教学文档
+\item \code{\link[=preset_protocol]{preset_protocol()}} / \code{\link[=protocol_table]{protocol_table()}} 选择场景并锁定、打印阈值
+\item \code{\link[=delphi_blueprint]{delphi_blueprint()}} / \code{\link[=delphi_questionnaire]{delphi_questionnaire()}} / \code{\link[=read_survey_xlsx]{read_survey_xlsx()}}
+第 1 轮及后续轮次 docx/xlsx 问卷与回读
+\item \code{\link[=next_round_questionnaire]{next_round_questionnaire()}} 按分析结果生成下一轮
 \item \code{\link[=score_authority]{score_authority()}} / \code{\link[=expert_authority]{expert_authority()}} 由自评勾选计算 Ca、Cs、Cr
 \item \code{\link[=simulate_delphi]{simulate_delphi()}} / \code{\link[=simulate_rand_ucla]{simulate_rand_ucla()}} / \code{\link[=simulate_cos]{simulate_cos()}} 生成示例
-\item \code{\link[=analyze_delphi]{analyze_delphi()}} 全流程分析
-\item \code{\link[=delphi_report]{delphi_report()}} 输出第 1 轮中间报告或终稿
+\item \code{\link[=analyze_delphi]{analyze_delphi()}} / \code{\link[=run_delphi]{run_delphi()}} 全流程分析与可选完整报告
+\item \code{\link[=delphi_report]{delphi_report()}} 输出中间报告或 ACCORD 终稿（html / docx）
 }
 }
 
