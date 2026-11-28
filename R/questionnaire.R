@@ -135,11 +135,25 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   }
   maxr <- study$protocol$stability$max_rounds %||% 3L
   .stop_if(round > maxr, sprintf("round=%s \u8d85\u8fc7\u65b9\u6848 max_rounds=%s\u3002", round, maxr))
+  if (.is_standard_scenario(study$protocol) && identical(items, "unresolved")) {
+    items <- "all"
+  }
 
-  if (round == 1L) {
-    md <- .questionnaire_round1(study)
+  if (.is_open_round(study$protocol, round)) {
+    md <- .questionnaire_open(study)
     docs <- md
     names(docs) <- "round1"
+    if (format %in% c("markdown", "html") && is.null(file)) {
+      return(if (format == "html") .md_to_html(md, study$meta$title %||% "\u7b2c 1 \u8f6e\u5f00\u653e\u5f0f\u5f81\u8be2") else md)
+    }
+    return(.write_questionnaires(docs, study, round, format, file, items,
+                                 expert_id, result, FALSE, prefill))
+  }
+
+  if (.is_first_scoring_round(study$protocol, round)) {
+    md <- .questionnaire_round1(study, round = round)
+    docs <- md
+    names(docs) <- sprintf("round%s", round)
     if (format %in% c("markdown", "html") && is.null(file)) {
       return(if (format == "html") .md_to_html(md, study$meta$title %||% "\u7b2c 1 \u8f6e Delphi \u95ee\u5377") else md)
     }
@@ -148,12 +162,13 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   }
 
   .stop_if(is.null(study$ratings) || nrow(study$ratings) == 0L,
-           "\u751f\u6210\u7b2c 2 \u8f6e\u53ca\u4ee5\u540e\u95ee\u5377\u9700\u8981\u5df2\u6709\u4e0a\u4e00\u8f6e\u8bc4\u5206\u3002")
+           "\u751f\u6210\u53cd\u9988\u8f6e\u95ee\u5377\u9700\u8981\u5df2\u6709\u4e0a\u4e00\u8f6e\u8bc4\u5206\u3002")
   src_round <- round - 1L
   have <- unique(study$ratings$round)
   .stop_if(!src_round %in% have, sprintf("\u7f3a\u5c11\u7b2c %s \u8f6e\u8bc4\u5206\uff0c\u65e0\u6cd5\u751f\u6210\u7b2c %s \u8f6e\u53cd\u9988\u3002", src_round, round))
 
-  fb <- prepare_feedback(if (!is.null(result)) result else study, round = src_round)
+  fb_dim <- if (.is_standard_scenario(study$protocol)) "\u91cd\u8981\u7a0b\u5ea6" else NULL
+  fb <- prepare_feedback(if (!is.null(result)) result else study, round = src_round, dimension = fb_dim)
   ids <- if (is.null(expert_id)) unique(as.character(fb$expert_id)) else as.character(expert_id)
   missing <- setdiff(ids, unique(as.character(fb$expert_id)))
   .stop_if(length(missing) > 0L, sprintf("\u53cd\u9988\u8868\u4e2d\u6ca1\u6709\u4e13\u5bb6: %s", paste(missing, collapse = ", ")))
@@ -167,8 +182,21 @@ delphi_questionnaire <- function(study = NULL, round = 1,
       cls <- classify_consensus(s, study$protocol)
     }
   }
+  fb_fam <- NULL
+  if (.is_standard_scenario(study$protocol)) {
+    fb_fam <- prepare_feedback(
+      if (!is.null(result)) result else study,
+      round = src_round, dimension = "\u719f\u6089\u7a0b\u5ea6"
+    )
+  }
   docs <- vapply(ids, function(eid) {
-    .questionnaire_followup(study, fb[fb$expert_id == eid, , drop = FALSE], cls, items, round)
+    one <- fb[fb$expert_id == eid, , drop = FALSE]
+    if (.is_standard_scenario(study$protocol)) {
+      fam <- if (is.null(fb_fam)) one[0, ] else fb_fam[fb_fam$expert_id == eid, , drop = FALSE]
+      .questionnaire_standard_followup(study, one, fam, round)
+    } else {
+      .questionnaire_followup(study, one, cls, items, round)
+    }
   }, character(1))
   names(docs) <- ids
   if (format %in% c("markdown", "html") && is.null(file)) {
@@ -287,6 +315,25 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
 
 .protocol_rules_md <- function(p) {
   r <- p$rules
+  if (.is_standard_scenario(p)) {
+    return(paste(
+      sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s \u5206\u3002\u91cd\u8981\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u91cd\u8981\uff0c2 \u4e0d\u91cd\u8981\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u91cd\u8981\uff0c5 \u5f88\u91cd\u8981\u3002",
+              p$scale_min, p$scale_max),
+      "\u719f\u6089\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u719f\u6089\uff0c2 \u4e0d\u719f\u6089\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u719f\u6089\uff0c5 \u5f88\u719f\u6089\u3002",
+      sprintf("- **\u7eb3\u5165\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff1a** \u6700\u7ec8\u8f6e\u91cd\u8981\u7a0b\u5ea6\u5747\u6570 \u2265 %s\uff0c\u4e14\u8be5\u6761\u53d8\u5f02\u7cfb\u6570 \u2264 %s\u3002\u6ee1\u5206\u6bd4\u5fc5\u987b\u62a5\u544a\uff0c\u4e0d\u5355\u72ec\u4f5c\u4e3a\u5254\u9664\u7ebf\u3002",
+              r$mean_min, r$cv_max),
+      sprintf("- **\u7ed3\u675f\u8c03\u67e5\uff1a** \u81f3\u5c11\u4e24\u8f6e 5 \u5206\u8bc4\u5206\u540e\uff0c\u82e5\u91cd\u8981\u7a0b\u5ea6 Kendall W \u2265 %s\u3001\u5361\u65b9\u68c0\u9a8c P < %s\uff0c\u4e14\u5404\u6761\u76ee\u5747\u6570\u76f8\u5bf9\u4e0a\u8f6e\u7684\u5e73\u5747\u7edd\u5bf9\u53d8\u5316 < %s\uff0c\u5219\u534f\u8c03\u7a0b\u5ea6\u8f83\u597d\uff0c\u8c03\u67e5\u7ed3\u675f\u3002\u6700\u591a %s \u8f6e\u3002",
+              r$w_min, r$w_p_max, r$mean_delta_max, p$stability$max_rounds),
+      sprintf("- **\u53c2\u8003\u754c\u503c\uff08\u4e0d\u52a0\u6743\uff09\uff1a** \u79ef\u6781\u7cfb\u6570 \u2265 %s%%\uff1b\u7ec4\u5747\u6743\u5a01\u7cfb\u6570 \u2265 %s\u3002",
+              round(100 * r$response_rate_min), r$cr_min),
+      if (isTRUE(p$open_first)) {
+        "- **\u7b2c 1 \u8f6e\uff1a** \u5f00\u653e\u5f0f\u5f81\u8be2\uff0c\u4e0d\u6253\u5206\u3002\u7528\u4e8e\u8865\u9f50\u7f3a\u5c11\u524d\u671f\u57fa\u7840\u7684\u8981\u7d20\u3002"
+      } else {
+        "- **\u7f16\u53f7\uff1a** \u8981\u7d20\u5747\u5df2\u6709\u524d\u671f\u57fa\u7840\uff0c\u672c\u6b21\u4ece\u8bc4\u5206\u8f6e\u5f00\u59cb\uff0c\u5bf9\u5e94\u6280\u672f\u8981\u6c42\u4e2d\u7684\u7b2c 2 \u8f6e\u8bc4\u5206\u8c03\u67e5\u3002"
+      },
+      sep = "\n"
+    ))
+  }
   pct <- function(x) {
     if (is.null(x) || length(x) == 0L || is.na(x)) return("\uff08\u672c\u573a\u666f\u4e0d\u9002\u7528\uff09")
     sprintf("%.0f%%", 100 * x)
@@ -311,13 +358,58 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
   )
 }
 
-.likert_line <- function(p, label) {
-  nums <- paste(seq(p$scale_min, p$scale_max), collapse = "  ")
-  sprintf("**%s\uff08%s\u2013%s\uff09\uff1a** %s\u3000\u3000\u25a1 \u65e0\u6cd5\u5224\u65ad / \u8d85\u51fa\u672c\u4eba\u4e13\u4e1a\u9886\u57df",
-          label, p$scale_min, p$scale_max, nums)
+.scale_anchor <- function(p, label) {
+  if (!.is_standard_scenario(p)) return("")
+  if (grepl("\u719f\u6089", label)) {
+    return("\uff081 \u5f88\u4e0d\u719f\u6089\uff0c2 \u4e0d\u719f\u6089\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u719f\u6089\uff0c5 \u5f88\u719f\u6089\uff09")
+  }
+  if (grepl("\u91cd\u8981", label)) {
+    return("\uff081 \u5f88\u4e0d\u91cd\u8981\uff0c2 \u4e0d\u91cd\u8981\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u91cd\u8981\uff0c5 \u5f88\u91cd\u8981\uff09")
+  }
+  ""
 }
 
-.questionnaire_round1 <- function(study) {
+.likert_line <- function(p, label) {
+  nums <- paste(seq(p$scale_min, p$scale_max), collapse = "  ")
+  sprintf("**%s\uff08%s\u2013%s\uff09%s\uff1a** %s\u3000\u3000\u25a1 \u65e0\u6cd5\u5224\u65ad / \u8d85\u51fa\u672c\u4eba\u4e13\u4e1a\u9886\u57df",
+          label, p$scale_min, p$scale_max, .scale_anchor(p, label), nums)
+}
+
+.questionnaire_open <- function(study) {
+  meta <- study$meta
+  title <- meta$title %||% "\u6838\u5fc3\u6280\u672f\u8981\u7d20\u5fb7\u5c14\u83f2\u8c03\u67e5"
+  blocks <- apply(study$items, 1, function(row) {
+    src <- if ("source_type" %in% names(row) && !is.na(row[["source_type"]])) {
+      paste0("- \u6765\u6e90\uff1a", row[["source_type"]],
+             if ("source_note" %in% names(row) && !is.na(row[["source_note"]]) && nzchar(row[["source_note"]])) {
+               paste0("\uff08", row[["source_note"]], "\uff09")
+             } else "",
+             "\n")
+    } else ""
+    paste0(
+      "### \u8981\u7d20 ", row[["item_id"]], "\n\n",
+      "**", row[["item_text"]], "**\n\n",
+      src,
+      "\u8bf7\u52fe\u9009\u4e00\u9879\uff1a\u25a1 \u4fdd\u7559\u3000\u25a1 \u4fee\u6539\u8868\u8ff0\u3000\u25a1 \u4e0d\u5efa\u8bae\u4f5c\u4e3a\u6838\u5fc3\u8981\u7d20\n\n",
+      "**\u610f\u89c1\uff1a** ________________________________________________\n"
+    )
+  })
+  paste0(
+    "# \u7b2c 1 \u8f6e\u5f00\u653e\u5f0f\u5f81\u8be2\n\n",
+    "**\u7814\u7a76\u9898\u76ee\uff1a** ", title, "\n\n",
+    "**\u76ee\u7684\uff1a** ", meta$objective %||% "\uff08\u8bf7\u5728 study$meta$objective \u4e2d\u8865\u5145\uff09", "\n\n",
+    "**\u5730\u7406\u8303\u56f4\uff1a** ", meta$geography %||% "\u672a\u8bf4\u660e", "\n\n",
+    "> \u672c\u8f6e\u4e0d\u6253\u5206\u3002\u90e8\u5206\u6838\u5fc3\u6280\u672f\u8981\u7d20\u8fd8\u7f3a\u5c11\u53e4\u7c4d\u6216\u73b0\u4ee3\u6587\u732e\u57fa\u7840\uff0c",
+    "\u8bf7\u5148\u63d0\u51fa\u4fdd\u7559\u3001\u4fee\u6539\u6216\u65b0\u589e\u5efa\u8bae\u3002\u7814\u7a76\u7ec4\u4f1a\u628a\u610f\u89c1\u51dd\u7ec3\u6210\u6761\u6b3e\uff0c\u518d\u8fdb\u5165 5 \u5206\u91cf\u8868\u8bc4\u5206\u3002\n\n",
+    "## \u5df2\u6709\u8981\u7d20\n\n",
+    paste(blocks, collapse = "\n"),
+    "\n## \u5efa\u8bae\u65b0\u589e\u7684\u6838\u5fc3\u6280\u672f\u8981\u7d20\n\n",
+    "\u8bf7\u5199\u51fa\u8981\u7d20\u8868\u8ff0\u3001\u4f9d\u636e\u6765\u6e90\uff08\u53e4\u7c4d\u3001\u73b0\u4ee3\u6587\u732e\u6216\u4e34\u5e8a\u7ecf\u9a8c\uff09\uff1a\n\n",
+    "________________________________________________________________\n"
+  )
+}
+
+.questionnaire_round1 <- function(study, round = 1L) {
   p <- study$protocol
   meta <- study$meta
   title <- meta$title %||% "Modified Delphi \u4e13\u5bb6\u54a8\u8be2"
@@ -333,7 +425,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
                   ca$source, ca$large, ca$medium, ca$small), collapse = "\n")
   )
   item_blocks <- apply(study$items, 1, function(row) {
-    dims <- .questionnaire_dimensions(study, 1L)
+    dims <- .questionnaire_dimensions(study, round)
     likert <- paste(vapply(dims, function(d) .likert_line(p, d), character(1)), collapse = "\n")
     paste0(
       "### \u6761\u76ee ", row[["item_id"]], "\n\n",
@@ -346,7 +438,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
     )
   })
   paste0(
-    "# \u7b2c 1 \u8f6e Delphi \u4e13\u5bb6\u54a8\u8be2\u95ee\u5377\n\n",
+    sprintf("# \u7b2c %s \u8f6e Delphi \u4e13\u5bb6\u54a8\u8be2\u95ee\u5377\n\n", round),
     "**\u7814\u7a76\u9898\u76ee\uff1a** ", title, "\n\n",
     "**\u76ee\u7684\uff1a** ", meta$objective %||% "\uff08\u8bf7\u5728 study$meta$objective \u4e2d\u8865\u5145\uff09", "\n\n",
     "**\u76ee\u6807\u4f7f\u7528\u8005\uff1a** ", meta$users %||% "\u672a\u8bf4\u660e", "\n\n",
@@ -361,7 +453,7 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
     "## \u6743\u5a01\u7a0b\u5ea6\u81ea\u8bc4\uff08\u5bf9\u672c\u6b21\u4e3b\u9898\u6574\u4f53\u53ea\u8bc4\u4e00\u6b21\uff09\n\n",
     "### \u719f\u6089\u7a0b\u5ea6 Cs\n\n", cs_tab, "\n\n",
     "### \u5224\u65ad\u4f9d\u636e Ca\n\n", ca_tab, "\n\n",
-    "> Cr = (Ca + Cs) / 2\u3002\u4e0d\u7528\u4e8e\u52a0\u6743 1\u20139 \u5206\uff1b\u7b2c\u4e8c\u8f6e\u4e0d\u5fc5\u91cd\u8bc4\u3002\n\n",
+    "> Cr = (Ca + Cs) / 2\u3002\u4e0d\u7528\u4e8e\u52a0\u6743\u8bc4\u5206\uff1b\u53ea\u5728\u9996\u6b21\u8bc4\u5206\u8f6e\u81ea\u8bc4\u4e00\u6b21\uff0c\u4ee5\u540e\u5404\u8f6e\u4e0d\u518d\u586b\u5199\u3002\n\n",
     "## \u6761\u76ee\u8bc4\u5206\n\n",
     paste(item_blocks, collapse = "\n"),
     "\n## \u65b0\u589e\u6761\u76ee\uff08\u53ef\u9009\uff09\n\n",
@@ -372,6 +464,51 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
 
 .questionnaire_round2 <- function(study, fb_one, cls, items) {
   .questionnaire_followup(study, fb_one, cls, items, round = 2L)
+}
+
+.questionnaire_standard_followup <- function(study, fb_imp, fb_fam, round) {
+  eid <- if (nrow(fb_imp)) fb_imp$expert_id[1] else if (nrow(fb_fam)) fb_fam$expert_id[1] else ""
+  title <- study$meta$title %||% "\u6838\u5fc3\u6280\u672f\u8981\u7d20\u5fb7\u5c14\u83f2\u8c03\u67e5"
+  src_round <- as.integer(round) - 1L
+  ids <- unique(c(as.character(fb_imp$item_id), as.character(fb_fam$item_id)))
+  blocks <- vapply(ids, function(iid) {
+    imp <- fb_imp[fb_imp$item_id == iid, , drop = FALSE]
+    fam <- fb_fam[fb_fam$item_id == iid, , drop = FALSE]
+    text <- if (nrow(imp)) imp$item_text[1] else if (nrow(fam)) fam$item_text[1] else iid
+    cell <- function(d, col, fmt = "%s") {
+      if (!nrow(d) || !col %in% names(d) || is.na(d[[col]][1])) return("\u2014")
+      if (is.numeric(d[[col]][1])) sprintf(fmt, d[[col]][1]) else as.character(d[[col]][1])
+    }
+    note <- if (nrow(imp) && !is.na(imp$anonymous_comments[1]) && nzchar(imp$anonymous_comments[1])) {
+      paste0("**\u533f\u540d\u610f\u89c1\u6458\u8981\uff1a** ", imp$anonymous_comments[1], "\n\n")
+    } else ""
+    paste0(
+      "### \u8981\u7d20 ", iid, "\n\n",
+      "**", text, "**\n\n",
+      "| \u7ef4\u5ea6 | \u60a8\u7684\u4e0a\u8f6e\u8bc4\u5206 | \u7ec4\u5747\u6570 | \u6ee1\u5206\u6bd4 | \u6709\u6548\u4eba\u6570 |\n",
+      "|---|---|---|---|---|\n",
+      sprintf("| \u91cd\u8981\u7a0b\u5ea6 | %s | %s | %s%% | %s |\n",
+              cell(imp, "own_score"), cell(imp, "mean", "%.2f"),
+              cell(imp, "full_rate", "%.0f"), cell(imp, "n_valid", "%.0f")),
+      sprintf("| \u719f\u6089\u7a0b\u5ea6 | %s | %s | %s%% | %s |\n\n",
+              cell(fam, "own_score"), cell(fam, "mean", "%.2f"),
+              cell(fam, "full_rate", "%.0f"), cell(fam, "n_valid", "%.0f")),
+      note,
+      .likert_line(study$protocol, "\u672c\u8f6e\u91cd\u8981\u7a0b\u5ea6"), "\n",
+      .likert_line(study$protocol, "\u672c\u8f6e\u719f\u6089\u7a0b\u5ea6"), "\n",
+      "**\u672c\u8f6e\u610f\u89c1\uff08\u53ef\u7a7a\uff09\uff1a** ________________________________________________\n"
+    )
+  }, character(1))
+  paste0(
+    sprintf("# \u7b2c %s \u8f6e\u5fb7\u5c14\u83f2\u8bc4\u5206\u95ee\u5377\n\n", round),
+    "**\u7814\u7a76\u9898\u76ee\uff1a** ", title, "\n\n",
+    "**\u672c\u5377\u9002\u7528\u4e13\u5bb6\u7f16\u53f7\uff1a** ", eid, "\n\n",
+    sprintf("\u8bf7\u5148\u770b\u7b2c %s \u8f6e\u7684\u7ec4\u5747\u6570\u3001\u6ee1\u5206\u6bd4\uff0c\u4ee5\u53ca\u60a8\u672c\u4eba\u4e0a\u4e00\u8f6e\u7684\u91cd\u8981\u7a0b\u5ea6\u548c\u719f\u6089\u7a0b\u5ea6\uff0c\u518d\u7ed9\u51fa\u672c\u8f6e\u5206\u6570\u3002", src_round),
+    "\u672c\u8f6e\u4e0d\u518d\u586b\u5199\u6743\u5a01\u7cfb\u6570\u3002\u6bcf\u4e00\u6761\u8981\u7d20\u90fd\u8981\u91cd\u65b0\u56de\u7b54\u3002\n\n",
+    "## \u5df2\u9501\u5b9a\u7684\u5224\u5b9a\u89c4\u5219\n\n",
+    .protocol_rules_md(study$protocol), "\n\n",
+    paste(blocks, collapse = "\n")
+  )
 }
 
 .questionnaire_followup <- function(study, fb_one, cls, items, round) {

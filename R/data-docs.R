@@ -55,3 +55,17 @@
 #' data(consensus_3round_demo, package = "delphir")
 #' unique(consensus_3round_demo$ratings$round)
 "consensus_3round_demo"
+
+#' 5 分核心技术要素教学数据
+#'
+#' 按技术要求生成的模拟研究：36 名高级职称专家，第 1 轮开放式征询，
+#' 第 2 至第 4 轮为重要程度与熟悉程度的 5 分评分。供
+#' `vignette("standard-5point-workflow", package = "delphir")` 与帮助页示例使用。
+#' 数据是教学模拟，不能当作真实标准条款。
+#'
+#' @format `delphi_study` 对象。`meta$initial_items` 为开放式轮次之前的 8 条要素。
+#' @seealso [simulate_standard_delphi()], [appendix_b_table()]
+#' @examples
+#' data(standard_element_demo, package = "delphir")
+#' sort(unique(standard_element_demo$ratings$round))
+"standard_element_demo"

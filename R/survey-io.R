@@ -15,6 +15,8 @@
 
 .questionnaire_dimensions <- function(study, round = 1L) {
   p <- study$protocol
+  if (.is_open_round(p, round)) return(character())
+  if (.is_standard_scenario(p)) return(c("\u91cd\u8981\u7a0b\u5ea6", "\u719f\u6089\u7a0b\u5ea6"))
   if (!is.null(study$ratings) && nrow(study$ratings) > 0L) {
     r <- .ensure_dimension(study$ratings)
     have <- unique(as.character(r$dimension[r$round == round]))
@@ -32,7 +34,7 @@
 
 .primary_dimension <- function(study, round = 1L) {
   dims <- .questionnaire_dimensions(study, round)
-  prefer <- intersect(c("\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dims)
+  prefer <- intersect(c("\u91cd\u8981\u7a0b\u5ea6", "\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dims)
   if (length(prefer)) prefer[1] else dims[1]
 }
 
@@ -74,8 +76,15 @@
   fb <- NULL
   cls <- NULL
   src_round <- round - 1L
-  if (round >= 2L) {
-    fb <- prepare_feedback(if (!is.null(result)) result else study, round = src_round)
+  feedback_round <- round >= 2L && !.is_first_scoring_round(p, round) && !.is_open_round(p, round)
+  if (feedback_round) {
+    dims_prev <- .questionnaire_dimensions(study, src_round)
+    if (!length(dims_prev)) dims_prev <- dims
+    src <- if (!is.null(result)) result else study
+    fb <- do.call(rbind, lapply(dims_prev, function(dim) {
+      prepare_feedback(src, round = src_round, dimension = dim)
+    }))
+    rownames(fb) <- NULL
     if (!is.null(result)) cls <- result$classification
     else {
       s <- summarize_items(study, rounds = src_round)
@@ -116,6 +125,8 @@
             rec$median_iqr <- hit$median_iqr[1]
             rec$p_high <- hit$p_high[1]
             rec$p_low <- hit$p_low[1]
+            rec$group_mean <- if ("mean" %in% names(hit)) hit$mean[1] else NA_real_
+            rec$full_rate <- if ("full_rate" %in% names(hit)) hit$full_rate[1] else NA_real_
             rec$class_zh <- hit$class_zh[1]
             rec$anonymous_comments <- hit$anonymous_comments[1]
           } else {
@@ -123,6 +134,8 @@
             rec$median_iqr <- NA_character_
             rec$p_high <- NA_real_
             rec$p_low <- NA_real_
+            rec$group_mean <- NA_real_
+            rec$full_rate <- NA_real_
             rec$class_zh <- NA_character_
             rec$anonymous_comments <- ""
           }
@@ -152,14 +165,27 @@
     )
   }
 
-  comments_df <- data.frame(
-    expert_id = ratings_df$expert_id,
-    item_id = ratings_df$item_id,
-    round = round,
-    comment = "",
-    stringsAsFactors = FALSE
-  )
-  comments_df <- comments_df[!duplicated(comments_df[c("expert_id", "item_id", "round")]), ]
+  if (.is_open_round(p, round)) {
+    suggest_id <- "\u65b0\u589e\u5efa\u8bae"
+    comment_items <- unique(c(as.character(study$items$item_id), suggest_id))
+    comments_df <- expand.grid(
+      expert_id = ids_all,
+      item_id = comment_items,
+      stringsAsFactors = FALSE
+    )
+    comments_df$round <- round
+    comments_df$comment <- ""
+    comments_df$theme <- ifelse(comments_df$item_id == suggest_id, "\u65b0\u589e", "")
+  } else {
+    comments_df <- data.frame(
+      expert_id = ratings_df$expert_id,
+      item_id = ratings_df$item_id,
+      round = round,
+      comment = "",
+      stringsAsFactors = FALSE
+    )
+    comments_df <- comments_df[!duplicated(comments_df[c("expert_id", "item_id", "round")]), ]
+  }
   if (isTRUE(prefill) && !is.null(study$comments) && nrow(study$comments)) {
     cc <- study$comments[study$comments$round == round, ]
     if (nrow(cc)) {
@@ -168,6 +194,15 @@
         paste(cc$expert_id, cc$item_id)
       )]
       comments_df$comment[is.na(comments_df$comment)] <- ""
+      if ("theme" %in% names(cc)) {
+        if (!"theme" %in% names(comments_df)) comments_df$theme <- ""
+        got_theme <- cc$theme[match(
+          paste(comments_df$expert_id, comments_df$item_id),
+          paste(cc$expert_id, cc$item_id)
+        )]
+        fill <- !is.na(got_theme) & nzchar(as.character(got_theme))
+        comments_df$theme[fill] <- as.character(got_theme[fill])
+      }
     }
   }
 
@@ -176,14 +211,16 @@
   names(proto_out) <- c("\u53c2\u6570", "\u503c", "\u542b\u4e49")
 
   panel_cols <- intersect(
-    c("expert_id", "stakeholder", "specialty", "region", "title", "years", "invited"),
+    c("expert_id", "sex", "age", "education", "stakeholder", "specialty",
+      "department", "region", "title", "title_level", "years",
+      "in_expert_group", "invited"),
     names(panel)
   )
   panel_out <- panel[panel$expert_id %in% ids_all, panel_cols, drop = FALSE]
 
   auth_cols <- c("expert_id", "familiarity", "practice", "theory", "literature", "intuition")
   auth_out <- NULL
-  if (round == 1L) {
+  if (.is_first_scoring_round(p, round)) {
     auth_out <- data.frame(expert_id = ids_all, stringsAsFactors = FALSE)
     for (nm in setdiff(auth_cols, "expert_id")) {
       auth_out[[nm]] <- if (nm %in% names(panel)) {
@@ -193,8 +230,8 @@
   }
 
   item_cols <- intersect(
-    c("item_id", "item_text", "domain", "evidence_level", "outcome_domain",
-      "indication", "procedure"),
+    c("item_id", "item_text", "domain", "source_type", "source_note",
+      "evidence_level", "outcome_domain", "indication", "procedure"),
     names(study$items)
   )
   items_out <- study$items[, item_cols, drop = FALSE]
@@ -205,8 +242,14 @@
       sprintf("\u7814\u7a76\uff1a%s", meta$title %||% ""),
       "\u9ec4\u8272\u5217\u4e3a\u5fc5\u586b\uff1a\u8bc4\u5206 score\u3001\u65e0\u6cd5\u5224\u65ad unable\u3002",
       "score \u5fc5\u987b\u662f\u91cf\u8868\u5185\u6574\u6570\uff1b\u82e5\u65e0\u6cd5\u5224\u65ad\u8bf7\u586b unable=TRUE \u5e76\u7559\u7a7a score\u3002",
-      "\u4e0d\u8981\u628a\u300c\u4e0d\u719f\u300d\u586b\u6210\u4e2d\u95f4\u5206\u3002Ca/Cs \u4ec5\u7b2c 1 \u8f6e\u586b\u300c\u6743\u5a01\u7cfb\u6570\u300d\u8868\u3002",
-      if (round >= 2L) "\u7b2c 2 \u8f6e\u53ca\u4ee5\u540e\u8bf7\u5148\u770b own_prev \u4e0e\u7ec4\u7ed3\u679c\u518d\u6253\u5206\uff1b\u4e0d\u8981\u91cd\u586b\u6743\u5a01\u7cfb\u6570\u3002" else "\u7b2c 1 \u8f6e\u8bf7\u586b\u5199\u4e13\u5bb6\u80cc\u666f\u4e0e\u6743\u5a01\u7cfb\u6570\u81ea\u8bc4\u3002",
+      "\u4e0d\u8981\u628a\u300c\u4e0d\u719f\u300d\u586b\u6210\u4e2d\u95f4\u5206\u3002\u6743\u5a01\u7cfb\u6570\u53ea\u5728\u9996\u6b21\u8bc4\u5206\u8f6e\u586b\u300c\u6743\u5a01\u7cfb\u6570\u300d\u8868\u3002",
+      if (.is_open_round(p, round)) {
+        "\u672c\u8f6e\u4e3a\u5f00\u653e\u5f0f\u5f81\u8be2\uff1a\u8bf7\u5728\u300c\u610f\u89c1\u300d\u8868\u586b\u5199\u4fee\u6539\u6216\u65b0\u589e\u5efa\u8bae\uff0c\u4e0d\u8981\u5728\u300c\u8bc4\u5206\u300d\u8868\u6253\u5206\u3002"
+      } else if (feedback_round) {
+        "\u8bf7\u5148\u770b own_prev\uff08\u672c\u4eba\u4e0a\u8f6e\u8bc4\u5206\uff09\u3001group_mean\uff08\u7ec4\u5747\u6570\uff09\u548c full_rate\uff08\u6ee1\u5206\u6bd4\uff09\uff0c\u518d\u586b\u5199\u672c\u8f6e score\u3002\u4e0d\u8981\u91cd\u586b\u6743\u5a01\u7cfb\u6570\u3002"
+      } else {
+        "\u8bf7\u586b\u5199\u4e13\u5bb6\u80cc\u666f\u3001\u6743\u5a01\u7cfb\u6570\u81ea\u8bc4\uff0c\u5e76\u5bf9\u6bcf\u4e2a\u8981\u7d20\u7684\u91cd\u8981\u7a0b\u5ea6\u4e0e\u719f\u6089\u7a0b\u5ea6\u6253\u5206\u3002"
+      },
       "\u65b9\u6848\u8868\u4e3a\u53ea\u8bfb\u3002\u56de\u6536\u540e\u7528 read_survey_xlsx() \u8bfb\u5165\u3002",
       paste(.protocol_rules_md(p), collapse = " ")
     ),
@@ -544,7 +587,9 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
                "comet_in_high", "comet_in_low_max", "comet_out_low", "comet_out_high_max",
                "rand_di_threshold", "max_rounds", "stability_class_pct",
                "stability_median_delta", "stability_high_pct_delta",
-               "polarization_threshold", "cv_max", "ranking_topk")) {
+               "polarization_threshold", "cv_max", "ranking_topk",
+               "mean_min", "w_min", "w_p_max", "mean_delta_max", "min_experts",
+               "response_rate_min", "cr_min")) {
     v <- num(getv(nm))
     if (!is.na(v)) args[[nm]] <- v
   }
@@ -558,6 +603,10 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   if (!is.null(rd) && !is.na(rd) && nzchar(rd)) args$rand_disagreement <- rd
   rat <- getv("rationale")
   if (!is.null(rat) && !is.na(rat) && nzchar(rat)) args$rationale <- rat
+  of <- getv("open_first")
+  if (!is.null(of) && !is.na(of) && nzchar(as.character(of))) {
+    args$open_first <- tolower(as.character(of)) %in% c("true", "1", "yes", "\u662f")
+  }
   do.call(delphi_protocol, args)
 }
 

@@ -8,7 +8,7 @@
 #'   `format = "both"` 时在同一目录写出 `.html` 与 `.docx`。
 #' @param format `"html"`、`"word"` / `"docx"` 或 `"both"`。
 #' @param template `"auto"` 时按场景选择；也可指定 `"clinical"`、
-#'   `"rand_ucla"`、`"comet_cos"`。
+#'   `"rand_ucla"`、`"comet_cos"` 或 `"standard"`（5 分核心技术要素）。
 #' @param stage `"auto"`、`"round1"`、`"round2"` 或 `"final"`。
 #'   `auto`：若当前轮次仍小于方案 `max_rounds` 则写中间报告，否则写终稿。
 #' @param open 是否打开文件，默认 `FALSE`。
@@ -25,7 +25,7 @@
 #' @export
 delphi_report <- function(result, file = NULL,
                           format = c("html", "word", "docx", "both"),
-                          template = c("auto", "clinical", "rand_ucla", "comet_cos"),
+                          template = c("auto", "clinical", "rand_ucla", "comet_cos", "standard"),
                           stage = c("auto", "round1", "round2", "final"),
                           open = FALSE) {
   .stop_if(!inherits(result, "delphi_result"), "\u8bf7\u5148\u7528 analyze_delphi() \u5f97\u5230\u7ed3\u679c\u3002")
@@ -39,6 +39,7 @@ delphi_report <- function(result, file = NULL,
       result$study$protocol$scenario,
       rand_ucla = "rand_ucla",
       comet_cos = "comet_cos",
+      standard_element = "standard",
       "clinical"
     )
   }
@@ -55,7 +56,8 @@ delphi_report <- function(result, file = NULL,
     template,
     clinical = "delphi-clinical",
     rand_ucla = "delphi-rand-ucla",
-    comet_cos = "delphi-comet-cos"
+    comet_cos = "delphi-comet-cos",
+    standard = "delphi-standard"
   )
   skeleton <- system.file(
     "rmarkdown", "templates", tpl_dir, "skeleton", "skeleton.Rmd",
@@ -163,14 +165,14 @@ delphi_report <- function(result, file = NULL,
   cls <- result$classification
   sub <- if ("round" %in% names(cls)) cls[cls$round == round, , drop = FALSE] else cls
   dim0 <- unique(sub$dimension)
-  prefer <- intersect(c("\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dim0)
+  prefer <- intersect(c("\u91cd\u8981\u7a0b\u5ea6", "\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dim0)
   if (length(prefer)) sub <- sub[sub$dimension == prefer[1], , drop = FALSE]
   list(
     round = round,
     n_items = nrow(items),
     item_ids = as.character(items$item_id),
     classification = sub,
-    includes_authority = identical(as.integer(round), 1L),
+    includes_authority = .is_first_scoring_round(study$protocol, round),
     dimensions = .questionnaire_dimensions(study, round)
   )
 }

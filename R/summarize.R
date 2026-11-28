@@ -9,8 +9,10 @@
 #'
 #' @return 数据框，一类 `"delphi_item_summary"`。主要列：
 #'   `item_id`, `round`, `dimension`, `n_valid`, `n_unable`, `median`,
-#'   `q1`, `q3`, `iqr`, `mean`, `sd`, `cv`, `n_high`, `n_mid`, `n_low`,
-#'   `p_high`, `p_mid`, `p_low`, `median_iqr`, `polarized`。
+#'   `q1`, `q3`, `iqr`, `mean`, `sd`, `cv`, `n_full`, `full_rate`,
+#'   `n_high`, `n_mid`, `n_low`, `p_high`, `p_mid`, `p_low`,
+#'   `median_iqr`, `polarized`。`full_rate` 为满分比（0–100）：得分等于
+#'   量表上端的人数占有效评分人数的百分比。
 #'
 #' @section 方法学要点:
 #' Median 通常比 Mean 更适合作为有序数据的集中趋势。IQR 小表示意见集中。
@@ -82,6 +84,8 @@ summarize_items <- function(study, rounds = NULL, dimensions = NULL) {
     mean = mn,
     sd = sdv,
     cv = coefficient_variation(xs),
+    n_full = if (n_valid == 0L) 0L else sum(xs == protocol$scale_max),
+    full_rate = full_score_ratio(xs, protocol$scale_max),
     n_high = n_high,
     n_mid = n_mid,
     n_low = n_low,

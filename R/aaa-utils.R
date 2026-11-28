@@ -26,7 +26,7 @@
 }
 
 .pkg_version <- function() {
-  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.3.0")
+  tryCatch(as.character(utils::packageVersion("delphir")), error = function(e) "0.4.0")
 }
 
 .need_pkg <- function(pkg) {
@@ -163,6 +163,9 @@
     keep = "\u4fdd\u7559",
     drop = "\u5220\u9664",
     discuss = "\u5272\u5165\u4f1a\u8bae\u8ba8\u8bba",
+    retain = "\u7eb3\u5165\u6838\u5fc3\u6280\u672f\u8981\u7d20",
+    not_retain = "\u672a\u7eb3\u5165",
+    described = "\u63cf\u8ff0\u6027\uff08\u719f\u6089\u7a0b\u5ea6\uff09",
     stable = "\u7a33\u5b9a",
     unstable = "\u5c1a\u4e0d\u7a33\u5b9a"
   )
@@ -177,7 +180,8 @@
     indicator = "\u6307\u6807\u4f53\u7cfb\u7b5b\u9009",
     ranking = "\u4f18\u5148\u7ea7\u6392\u5e8f",
     definition = "\u5b9a\u4e49/\u8bca\u65ad\u6807\u51c6\u5171\u8bc6",
-    policy = "Policy Delphi"
+    policy = "Policy Delphi",
+    standard_element = "\u6807\u51c6\u6838\u5fc3\u6280\u672f\u8981\u7d20\uff085 \u5206\u91cf\u8868\uff09"
   )
   unname(ifelse(scenario %in% names(map), map[scenario], scenario))
 }

@@ -6,7 +6,7 @@
 \usage{
 delphi_protocol(
   scenario = c("clinical_consensus", "comet_cos", "rand_ucla", "indicator", "ranking",
-    "definition", "policy"),
+    "definition", "policy", "standard_element"),
   scale_min = 1,
   scale_max = 9,
   low_range = c(1, 3),
@@ -30,6 +30,14 @@ delphi_protocol(
   polarization_threshold = 0.25,
   cv_max = 0.25,
   ranking_topk = 5,
+  mean_min = NA_real_,
+  w_min = NA_real_,
+  w_p_max = 0.05,
+  mean_delta_max = NA_real_,
+  min_experts = NA_real_,
+  response_rate_min = 0.7,
+  cr_min = 0.7,
+  open_first = FALSE,
   rationale = NULL,
   locked = TRUE
 )
@@ -49,12 +57,15 @@ high_pct 复合标准。
 \code{\link[=kendall_w]{kendall_w()}} 使用。
 \item definition：定义或诊断标准。默认要求高区比例至少 0.80 且 IQR 不超过 2。
 \item policy：Policy Delphi。描述分布、呈现分歧，不把「达成共识」当作成功标准。
+\item standard_element：标准起草中的核心技术要素。5 分量表；重要性看均数；
+附录报告调查人数、均值、满分比；轮次宜 2–4，按协调系数决定是否结束。
 }}
 
-\item{scale_min, scale_max}{评分尺度端点，默认 1 与 9。须满足
-\code{scale_min < scale_max}。Likert 通常为整数；分析时非整数会警告。
-改成 1–5 或 1–7 时，必须同步改 \code{low_range}/\code{mid_range}/\code{high_range} 和
-\code{median_min}，否则高区定义与中位数门槛会对不上。}
+\item{scale_min, scale_max}{评分尺度端点。除 \code{standard_element} 外默认 1 与 9。
+\code{standard_element} 默认 1 与 5。须满足 \code{scale_min < scale_max}。
+Likert 通常为整数；分析时非整数会警告。
+改成其他量表时，必须同步改 \code{low_range}/\code{mid_range}/\code{high_range}，
+否则区间端点会对不上。}
 
 \item{low_range, mid_range, high_range}{长度为 2 的数值向量，闭区间。
 默认 1-9 量表下低 1-3、中 4-6、高 7-9。p_high / p_low 的分母是有效
@@ -115,8 +126,34 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 \item{ranking_topk}{优先级分析中的 Top-k，默认 5。仅排序场景用于
 \code{\link[=rank_priorities]{rank_priorities()}}，不改变 Likert 共识判定。}
 
+\item{mean_min}{核心技术要素纳入所需的重要程度均数下限。仅
+\code{standard_element} 使用，默认 3.50（5 分量表）。其他场景为 \code{NA}。}
+
+\item{w_min}{结束调查所需的 Kendall 协调系数下限。仅 \code{standard_element}
+使用，默认 0.50。须与 \code{w_p_max}、\code{mean_delta_max} 同时满足。}
+
+\item{w_p_max}{协调系数卡方检验的 P 值上限，默认 0.05。P 值显著只说明
+排序不像纯随机，不能单独当作「协调程度较好」。}
+
+\item{mean_delta_max}{相邻两轮评分中，各条目重要程度均数绝对变化的平均值
+上限。仅 \code{standard_element} 使用，默认 0.25。}
+
+\item{min_experts}{调查对象人数参考下限。\code{standard_element} 默认 30，
+少于该人数时 \code{\link[=panel_compliance]{panel_compliance()}} 给出警告，不中断计算。}
+
+\item{response_rate_min}{积极系数（回收率）的参考下限，默认 0.70。
+只用于报告解读，不加权、不剔除专家。}
+
+\item{cr_min}{权威系数组均数的参考下限，默认 0.70。不用于加权评分。}
+
+\item{open_first}{是否把第 1 轮作为开放式征询（不打分）。
+\code{standard_element} 默认 \code{TRUE}：缺少前期基础时先凝练要素。
+若要素均已有古籍或现代文献基础，设为 \code{FALSE}，此时第 1 轮就是
+技术要求所称的评分调查（文档中的「第 2 轮」）。}
+
 \item{rationale}{若修改了预设阈值，必须说明理由；报告会打印「方案偏离预设」。
-临床/定义场景改了 \code{high_pct} 等而未填此项会警告。}
+临床/定义场景改了 \code{high_pct} 等、或核心技术要素场景改了均数/协调界值，
+而未填此项时会警告。}
 
 \item{locked}{是否锁定阈值。默认 \code{TRUE}。锁定后分析阶段不得把阈值当参数回改。}
 }
@@ -124,8 +161,10 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 带类 \code{"delphi_protocol"} 的列表。主要字段：
 \itemize{
 \item \code{scenario}, \code{scale_min}, \code{scale_max}, \code{low_range}, \code{mid_range}, \code{high_range}
-\item \code{rules}：共识判定阈值（含 COMET、极化、CV、Top-k）
+\item \code{rules}：共识判定阈值（含 COMET、极化、CV、Top-k，以及核心技术要素的
+均数界值、协调系数界值、积极系数与权威系数参考值）
 \item \code{stability}：\code{max_rounds} 与三条稳定性规则
+\item \code{open_first}：第 1 轮是否为开放式征询
 \item \code{rand}：分歧设定
 \item \code{modified_from_preset}, \code{rationale}, \code{locked}
 }

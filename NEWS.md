@@ -1,3 +1,14 @@
+# delphir 0.4.0
+
+* 新增场景 `standard_element`：5 分量表的核心技术要素。重要性以均数判定，
+  报告调查人数、均值和满分比；开放式首轮、重要程度与熟悉程度分列；
+  按 Kendall 协调系数、卡方检验和均数变化决定是否结束（最多 4 轮）。
+* 新增 `full_score_ratio()`、`expert_profile()`、`panel_compliance()`、
+  `coordination_decision()`、`appendix_b_table()`、`analyze_open_round()`、
+  `simulate_standard_delphi()` 与教学数据 `standard_element_demo`。
+* 新增报告模板与教学文档 7：从开放式问卷到完整 docx 报告。
+  9 分医学共识、RAND/UCLA 与 COMET 的判定规则不变。
+
 # delphir 0.3.0
 
 * `preset_protocol()` 按场景填入默认阈值；新增 `protocol_table()` 与

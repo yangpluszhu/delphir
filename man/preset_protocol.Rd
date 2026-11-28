@@ -36,6 +36,9 @@ Median 区间（由量表高/低区导出）。\code{high_pct} 为 \code{NA}。
 \code{ranking_topk}。
 \item 定义 (definition)：接近临床，但基本共识阈值默认也是 0.80。
 \item Policy (policy)：不判定必须共识；阈值多为 \code{NA}，报告以分布为主。
+\item 核心技术要素 (standard_element)：5 分量表。纳入看重要程度均数
+\code{mean_min} 与 \code{cv_max}；结束看 \code{w_min}、\code{w_p_max} 与 \code{mean_delta_max}。
+\code{open_first = TRUE} 时第 1 轮为开放式征询。Median / 高区比例不驱动分类。
 }
 }
 

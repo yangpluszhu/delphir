@@ -13,7 +13,9 @@
 #' @return `delphi_result` 列表，主要元素：
 #'   `study`, `item_summary`, `classification`, `participation`,
 #'   `stability`, `stakeholder`, `dropout`, `authority`,
-#'   `comments_summary`, `kendall`, `stopping`。
+#'   `comments_summary`, `kendall`, `stopping`。核心技术要素场景另含
+#'   `expert_profile`、`panel_compliance`、`open_round`；此时 `stopping`
+#'   来自 [coordination_decision()]，而不是中位数稳定性。
 #'
 #' @examples
 #' study <- simulate_delphi(n_experts = 16, n_items = 8, n_rounds = 2, seed = 16)
@@ -51,6 +53,9 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
     )
     stopping <- attr(stability, "stopping")
   }
+  if (identical(p$scenario, "standard_element")) {
+    stopping <- coordination_decision(study)
+  }
 
   stakeholder <- NULL
   n_st <- length(unique(stats::na.omit(study$panel$stakeholder)))
@@ -87,12 +92,19 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
 
   last_round <- max(item_summary$round)
   dims_last <- unique(item_summary$dimension[item_summary$round == last_round])
-  prefer <- intersect(c("\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dims_last)
+  prefer <- intersect(c("\u91cd\u8981\u7a0b\u5ea6", "\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dims_last)
   dim0 <- if (length(prefer)) prefer[1] else dims_last[1]
   kendall <- tryCatch(
     kendall_w(study, round = last_round, dimension = dim0),
     error = function(e) list(error = conditionMessage(e))
   )
+  profile <- tryCatch(expert_profile(study$panel), error = function(e) NULL)
+  compliance <- tryCatch(panel_compliance(study), error = function(e) NULL)
+  open_round <- NULL
+  if (!is.null(study$comments) && nrow(study$comments) &&
+      any(study$comments$round == 1L) && isTRUE(p$open_first)) {
+    open_round <- analyze_open_round(study, round = 1L)
+  }
 
   last <- classification[classification$round == last_round, ]
   if ("dimension" %in% names(last) && !is.null(dim0)) {
@@ -112,6 +124,9 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
       comments_summary = comments_summary,
       kendall = kendall,
       stopping = stopping,
+      expert_profile = profile,
+      panel_compliance = compliance,
+      open_round = open_round,
       last_round = last_round,
       last_classification = last
     ),
@@ -153,7 +168,12 @@ print.delphi_result <- function(x, ...) {
     for (nm in names(tab)) cat(sprintf("    %s: %s\n", nm, tab[[nm]]))
   }
   if (!is.null(x$stopping)) {
-    cat(sprintf("  \u7a33\u5b9a\u6027\u5efa\u8bae\u7ec8\u6b62: %s\n", if (isTRUE(x$stopping$recommend_stop)) "\u662f" else "\u5426"))
+    stop_label <- if (identical(x$study$protocol$scenario, "standard_element")) {
+      "\u534f\u8c03\u7a0b\u5ea6\u5efa\u8bae\u7ed3\u675f"
+    } else {
+      "\u7a33\u5b9a\u6027\u5efa\u8bae\u7ec8\u6b62"
+    }
+    cat(sprintf("  %s: %s\n", stop_label, if (isTRUE(x$stopping$recommend_stop)) "\u662f" else "\u5426"))
   }
   invisible(x)
 }

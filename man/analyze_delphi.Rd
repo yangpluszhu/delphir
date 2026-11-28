@@ -28,7 +28,9 @@ analyze_delphi(
 \code{delphi_result} 列表，主要元素：
 \code{study}, \code{item_summary}, \code{classification}, \code{participation},
 \code{stability}, \code{stakeholder}, \code{dropout}, \code{authority},
-\code{comments_summary}, \code{kendall}, \code{stopping}。
+\code{comments_summary}, \code{kendall}, \code{stopping}。核心技术要素场景另含
+\code{expert_profile}、\code{panel_compliance}、\code{open_round}；此时 \code{stopping}
+来自 \code{\link[=coordination_decision]{coordination_decision()}}，而不是中位数稳定性。
 }
 \description{
 主分析入口：参与度、条目汇总、共识/适宜性判定、稳定性、利益相关者分层、

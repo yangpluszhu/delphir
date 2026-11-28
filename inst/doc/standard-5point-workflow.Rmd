@@ -1,0 +1,289 @@
+---
+title: "教学文档 7：5 分量表核心技术要素，从开放式首轮到完整报告"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 7：5 分量表核心技术要素，从开放式首轮到完整报告}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. 这份教程解决什么问题
+
+标准起草里的德尔菲法，和「给一堆句子打勾、看超过百分之几就算通过」不是一回事。技术要求把过程规定成下面几件事：
+
+1. 调查对象是相关科室的临床专家，可以包括专家组以外的人，人数不宜少于 30，应有高级职称，科室和地域不要挤在一处。
+2. 问卷发出之前，先写清要问的核心技术要素。有古籍或现代文献基础的，直接进入评分；还没有基础的，先做一轮开放式征询，把专家的建议凝练成可以提问的条款。
+3. 评分用 **5 分量表**，每一条都问两件事：重要程度、熟悉程度。
+4. 下一轮必须告诉专家两样东西：上一轮全组的结果，以及他本人上次怎么答的。然后再问一遍。
+5. 做 2 到 4 轮。专家意见接近一致、协调程度较好，就可以停。
+6. 统计要同时回答三个问题：每条有多重要（看均数）、专家是什么样的人、积极系数 / 协调系数 / 权威程度分别是多少。
+7. 最后形成报告。写入标准附录时，每一条保留下来的要素要有调查人数、均值和满分比。
+
+本教程用一套**模拟**的「穴位贴敷技术操作规范」走完全程。数字可以复现，但不能写进真实标准。9 分的医学共识流程仍然用 `preset_protocol("clinical_consensus")`，不要和这次的 5 分场景混用。
+
+```{r}
+library(delphir)
+demo <- simulate_standard_delphi(seed = 2026)
+demo
+```
+
+**怎么读：** `2, 3, 4` 才是打分的轮次。第 1 轮只有文字意见，没有 1–5 分，所以不会出现在评分表的轮次里。
+
+# 2. 先把规则写死
+
+技术要求说「用均数看重要性」「协调程度好就结束」，但没有写死 3.50 分或协调系数 0.50。软件必须在看分数之前把这些话说成可以执行的规则。预设是：
+
+- 5 分：1 很不重要，2 不重要，3 一般，4 比较重要，5 很重要。熟悉程度同样从「很不熟悉」到「很熟悉」。
+- 最终纳入：重要程度均数 ≥ 3.50，并且这条的变异系数 ≤ 0.25。
+- 满分比必须写进报告，但不单独用来删掉一条。
+- 至少两轮 5 分评分之后，若协调系数 W ≥ 0.50、卡方检验 P < 0.05，且各条均数比上一轮平均挪动不到 0.25 分，就结束。最多 4 轮。
+- 回收率 70%、权威系数 0.70 只作参考，不给任何人的分数加权。
+
+```{r}
+protocol <- preset_protocol("standard_element")
+protocol
+```
+
+**怎么读：** 「锁定：是」表示分析函数不能再改这些界值。如果研究组在发问卷前就决定把均数提高到 4 分，必须当时写上理由，例如 `preset_protocol("standard_element", mean_min = 4, rationale = "高风险操作，提高纳入界值。")`。看见结果偏低再把 3.50 改成 3.20，报告会失去意义。
+
+若所有要素在调查前都已有文献基础，把 `open_first` 设为 `FALSE`。那样软件的第 1 轮就是评分卷，报告里会说明它对应技术要求中的「第 2 轮」。本教程因为饮食宜忌缺少直接证据，所以保留开放式第 1 轮。
+
+# 3. 调查对象够不够格
+
+```{r}
+panel <- demo$panel
+compliance <- panel_compliance(demo)
+compliance[, c("check", "value", "threshold", "ok", "message")]
+```
+
+**怎么读：** 五行检查分别对应人数、高级职称、科室、地域，以及组外专家。前四行「是否符合」都应为 TRUE，这份模拟数据才算按技术要求组建了专家组。最后一行永远是说明，不是门槛：组外专家可以有，不是必须有。某一科室或某一地区超过一半，就应在审查材料里解释，而不是把多出来的人悄悄删掉。
+
+```{r}
+profile <- expert_profile(panel)
+profile$tables$sex
+profile$age
+profile$tables$education
+profile$tables$title_level
+profile$tables$department
+profile$tables$region
+profile$tables$familiarity
+profile$years
+```
+
+**怎么读：** 这一组表回答「谁在评」。年龄和年限看的是平均水平和分散程度，不是越高越好。科室、地域两张表要和上一节的「不超过一半」一起看。这里的熟悉程度是专家对**整个贴敷主题**的一次自评，还不是对某一条要素的 5 分。
+
+# 4. 要素从文献里来，缺的先空着
+
+开放式问卷发出前，清单上只有已有出处的 8 条。过敏史和香薰是后来才写上的。
+
+```{r}
+initial <- demo$meta$initial_items
+initial[, c("item_id", "item_text", "source_type")]
+```
+
+**怎么读：** 「古籍」「现代文献」表示发问卷之前就有依据。「饮食宜清淡」虽然来自古籍，但依据和贴敷操作本身的关系弱，所以仍放进开放式一轮，请专家决定要不要改表述。没有出处的句子，不要假装已经是核心技术要素。
+
+# 5. 第 1 轮：开放式问卷
+
+这一轮不出现 1 到 5 的打分格。每位专家对已有要素选择保留、修改或不建议纳入，并可以提出新要素。
+
+```{r}
+meta <- demo$meta
+bp <- delphi_blueprint(protocol, panel, initial, meta = meta)
+dir1 <- tempfile("open-")
+dir.create(dir1)
+files1 <- delphi_questionnaire(bp, round = 1, format = "both", file = dir1)
+basename(files1)
+md1 <- delphi_questionnaire(bp, round = 1)
+grepl("1  2  3  4  5", md1, fixed = TRUE)
+```
+
+**怎么读：** 上面最后一个结果应是 `FALSE`：开放式问卷里没有 5 分量表。目录里的 docx 给人读，xlsx 用来把意见录回来。xlsx 的「意见」表是要填的；「评分」表这一轮留空。
+
+模拟回收已经编码好了。真实研究里，研究组先读原始句子，再填 `theme`（保留、修改表述、新增），软件只负责计数，不会替你把口语改成标准条款。
+
+```{r}
+open_only <- bp
+open_only$comments <- demo$comments[demo$comments$round == 1, ]
+open_res <- analyze_open_round(open_only, round = 1)
+open_res$by_theme
+open_res$n_experts
+utils::head(open_res$new_suggestions[, c("expert_id", "item_id", "theme", "comment")], 4)
+```
+
+**怎么读：** 「新增」出现很多次，只说明有人提议，不说明这条已经重要。研究组把两条提议写成条款：贴敷前询问药物过敏史；可配合香薰。来源记为「开放式凝练」。饮食宜清淡保留原编号，但记下「建议修改表述」。
+
+```{r}
+added <- demo$items[demo$items$source_type == "开放式凝练", ]
+bp2 <- update_delphi_study(bp, items = added, validate = FALSE)
+bp2$items$item_id
+```
+
+**怎么读：** 条目从 8 条变成 10 条之后，才能发评分卷。不要把开放式意见的原话直接拿去算平均分。
+
+# 6. 第 2 轮：第一次 5 分评分
+
+这一轮对 10 条都问重要程度和熟悉程度，并请专家做一次权威程度自评（判断依据 + 对整个主题的熟悉程度）。权威系数只评这一次，后面各轮不再评，也不用来加权。
+
+```{r}
+md2 <- delphi_questionnaire(bp2, round = 2)
+grepl("权威程度自评", md2)
+grepl("重要程度", md2)
+grepl("熟悉程度", md2)
+```
+
+把专家交回的 xlsx 用 `read_survey_xlsx()` 读成一行一个分数的长表。下面用已经填好的模拟卷演示回读，真实研究把路径换成收上来的文件即可。
+
+```{r}
+xlsx2 <- tempfile(fileext = ".xlsx")
+holder <- demo
+holder$ratings <- demo$ratings[demo$ratings$round == 2, ]
+holder$comments <- demo$comments[demo$comments$round == 2, ]
+delphi_questionnaire(holder, round = 2, format = "xlsx", file = xlsx2, prefill = TRUE)
+got2 <- read_survey_xlsx(xlsx2, study = bp2)
+nrow(got2$ratings)
+utils::head(got2$ratings[, c("expert_id", "item_id", "dimension", "score")])
+```
+
+**怎么读：** 同一位专家、同一条要素会有两行：一行重要程度，一行熟悉程度。缺这列「维度」，两套分数就会叠在一起。回读后的量表上端应仍是 5 分。
+
+只分析到第 2 轮时，还不能决定停不停，但已经可以看每条目前的均数和满分比。
+
+```{r}
+study2 <- got2
+study2$ratings <- study2$ratings[study2$ratings$round <= 2, ]
+res2 <- analyze_delphi(study2)
+imp2 <- res2$item_summary
+imp2 <- imp2[imp2$round == 2 & imp2$dimension == "重要程度", ]
+imp2[, c("item_id", "n_valid", "mean", "cv", "full_rate")]
+res2$participation$by_round
+round(attr(res2$authority, "overall")$mean_cr, 3)
+coordination_decision(study2)$note
+```
+
+**怎么读，分四句：**
+
+- **均数**是这条重要程度的平均分，技术要求用它判断重要性。它还不是最终结论，因为专家还没看到别人的结果。
+- **满分比**是打了 5 分的人数占有效评分人数的百分比。均数 4.5 左右、满分比大约一半，表示多数人觉得重要，但不是人人都给最高分。满分比很高而均数不高，通常是分数两边拉开，不能只报满分比。
+- **调查人数（n_valid）**是给出有效分数的人数。「无法判断」不计入。它会小于或等于受邀的 36 人。
+- **积极系数**是回收率，不是共识。权威系数是专家对整个主题的把握，这里的组均数用来和 0.70 比较。协调系数这一轮还没有「上一轮均数」可比较，而且只有一轮评分，所以不能结束。
+
+# 7. 第 3 轮：把上轮结果和本人答案一起发回去
+
+技术要求写明：再次提问时，要告知上一轮的调查结果，以及他们自己之前的回答。问卷因此同时列出本人上轮的重要程度、熟悉程度，以及全组均数和满分比。10 条都要重答，不是只重答没通过的那几条。
+
+```{r}
+dir3 <- tempfile("r3-")
+dir.create(dir3)
+files3 <- next_round_questionnaire(res2, format = "both", file = dir3, expert_id = "E01")
+basename(files3)
+md3 <- delphi_questionnaire(res2, round = 3, expert_id = "E01")
+grepl("均数", md3)
+grepl("您的上轮评分", md3)
+```
+
+**怎么读：** 专家先看到自己上次打了几分、全组平均是多少、有多少人打了满分，然后再打这一轮。没有这两列，就只是把同一张卷子再发一次，不是德尔菲。
+
+把第 3 轮 xlsx 并入研究后看协调程度。教学数据直接使用模拟回收。
+
+```{r}
+study3 <- demo
+study3$ratings <- demo$ratings[demo$ratings$round <= 3, ]
+study3$comments <- demo$comments[demo$comments$round <= 3, ]
+res3 <- analyze_delphi(study3)
+cd3 <- coordination_decision(study3)
+cd3$by_round
+cd3$recommend_stop
+cd3$note
+```
+
+**怎么读：** 请同时看三列，不要只看 W。第 2 轮评分的 W 还低于 0.50，顺序还比较散。第 3 轮评分的 W 可以已经不低于 0.50，P 值也可以很小，但「均数变化」仍然大于 0.25，说明分数整体还在明显移动。P 值小只表示「不像纯属巧合」，不表示「已经可以写进标准」。三条没有同时满足，调查继续。这就是本教程做满后面一轮的原因。
+
+# 8. 第 4 轮：协调程度达到预设后结束
+
+第 4 轮问卷的做法与第 3 轮相同：本人上一轮分数、组均数、满分比，然后重答。这里直接分析包含第 4 轮的完整数据。
+
+```{r}
+res <- analyze_delphi(demo)
+cd <- coordination_decision(demo)
+cd$by_round[, c("round", "w", "p_value", "mean_abs_delta", "criteria_met")]
+cd$recommend_stop
+cd$note
+```
+
+**怎么读：** 最后一轮 W 不低于 0.50，P 小于 0.05，均数变化小于 0.25，三件事同时成立，才叫协调程度较好。此时可以停止，不必为了让数字更好看而再开一轮，也不能回头把 0.50 改小。如果做满 4 轮仍有一条不满足，就在报告里写「未达到预设协调程度」，而不是改规则。
+
+# 9. 哪些要素留下来
+
+```{r}
+last <- res$last_classification
+last[, c("item_id", "item_text", "n_valid", "mean", "cv", "full_rate", "class_zh")]
+```
+
+**怎么读：** 「纳入核心技术要素」表示均数和变异系数都过了预先写好的线。「未纳入」不是算错了。饮食宜清淡、香薰这两条应留在报告里，说明专家整体没有把它们看成必须写入标准的技术要素。熟悉程度不参与这张表的判定。
+
+最后一轮的熟悉程度单独看：
+
+```{r}
+fam <- res$item_summary
+fam <- fam[fam$round == max(fam$round) & fam$dimension == "熟悉程度", ]
+fam[, c("item_id", "n_valid", "mean", "full_rate")]
+```
+
+**怎么读：** 熟悉程度低，表示不少专家觉得这条超出自己的经验。这样的重要程度均数要谨慎引用。它不能替代第 3 节里那个专家级的权威系数，也不能把一条要素「熟悉所以重要」地放进标准。
+
+# 10. 附录里的三列数字
+
+标准附录对每一条**纳入**的要素报告三列：调查人数、均值、满分比。方法写「德尔菲法」。未纳入的不进这张表。
+
+```{r}
+app <- appendix_b_table(res)
+data.frame(
+  标准内容 = app$standard_text,
+  确定方法 = app$method,
+  调查人数 = app$n_respondents,
+  均值 = app$mean,
+  满分比 = sprintf("%.0f%%", app$full_rate),
+  stringsAsFactors = FALSE
+)
+```
+
+**怎么读：** 以「标明药物组成与用量」这类均数在 4.5 上下、满分比不是 100% 也不是 0 的条目为例：调查人数是这条上真正打了分的人数；均值就是纳入时用的重要程度均数；满分比是打 5 分的百分比。三列一起看。人数很少时，很高的均数只代表少数人。审查材料可以在对应条款下摘这三列，但只能摘终稿这一轮。
+
+# 11. 写出完整的 Word 报告
+
+报告按同一套规则生成，每一节表后面都有给非统计专业读者的说明，并包含附录中的三列表。格式包括 docx。
+
+```{r}
+report_file <- tempfile("standard-report-", fileext = ".docx")
+res_doc <- run_delphi(demo, report = TRUE, format = "docx", file = report_file)
+out <- attr(res_doc, "report_file")
+basename(out)
+file.exists(out)
+file.info(out)$size
+```
+
+**怎么读：** 文件能生成并且不是空文件，才算这条流程走完。打开 Word 后按这个顺序核对：要素来源、调查对象是否符合要求、各轮问卷在问什么、积极系数、权威程度、专家个人情况、各轮均数和满分比、熟悉程度、协调系数为什么在第 4 轮才停、哪些条未纳入、附录三列表。中间轮次的报告可以同样用 `run_delphi(study3, report = TRUE, format = "docx")` 生成，但不要把中间报告的数字抄进送审稿。
+
+# 12. 做完以后不要做的事
+
+- 不要因为香薰的均数偏低，就把纳入界值从 3.50 改成 2.50。
+- 不要用权威系数去乘重要程度，再重新排名。
+- 不要把开放式第 1 轮的句子直接写成「已达成共识」。
+- 不要只报告最后一轮而删掉前面各轮的均数。前面各轮说明意见是怎样靠拢的。
+- 不要把这套模拟数据写成真实的操作规范。
+
+9 分量表的临床共识、RAND/UCLA 和核心结局集仍用原来的预设。那些场景的主指标仍是中位数和区间比例，不受本次 5 分规则影响。

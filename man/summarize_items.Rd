@@ -16,8 +16,10 @@ summarize_items(study, rounds = NULL, dimensions = NULL)
 \value{
 数据框，一类 \code{"delphi_item_summary"}。主要列：
 \code{item_id}, \code{round}, \code{dimension}, \code{n_valid}, \code{n_unable}, \code{median},
-\code{q1}, \code{q3}, \code{iqr}, \code{mean}, \code{sd}, \code{cv}, \code{n_high}, \code{n_mid}, \code{n_low},
-\code{p_high}, \code{p_mid}, \code{p_low}, \code{median_iqr}, \code{polarized}。
+\code{q1}, \code{q3}, \code{iqr}, \code{mean}, \code{sd}, \code{cv}, \code{n_full}, \code{full_rate},
+\code{n_high}, \code{n_mid}, \code{n_low}, \code{p_high}, \code{p_mid}, \code{p_low},
+\code{median_iqr}, \code{polarized}。\code{full_rate} 为满分比（0–100）：得分等于
+量表上端的人数占有效评分人数的百分比。
 }
 \description{
 对 Likert 有序评分计算有效人数、中位数、四分位距、高/中/低区比例，

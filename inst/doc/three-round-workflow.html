@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-09-17" />
+<meta name="date" content="2026-10-04" />
 
 <title>教学文档 6：三轮 Delphi 从零到完整报告</title>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 6：三轮 Delphi 从零到完整报告</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-09-17</h4>
+<h4 class="date">2026-10-04</h4>
 
 
 
@@ -218,15 +218,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">delphi_questionnaire</span>(study_pre, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> xlsx1, <span class="at">prefill =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>got1 <span class="ot">&lt;-</span> <span class="fu">read_survey_xlsx</span>(xlsx1)</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(got1<span class="sc">$</span>ratings)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 576</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 525</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(got1<span class="sc">$</span>ratings[, <span class="fu">c</span>(<span class="st">&quot;expert_id&quot;</span>, <span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;score&quot;</span>, <span class="st">&quot;unable&quot;</span>)])</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   expert_id item_id score unable</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       E01     C01     9  FALSE</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       E01     C01    NA   TRUE</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       E01     C02     4  FALSE</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       E01     C02     7  FALSE</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       E01     C03     8  FALSE</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       E01     C03     8  FALSE</span></span></code></pre></div>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       E01     C02     4  FALSE</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4       E01     C02     7  FALSE</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5       E01     C03     8  FALSE</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       E01     C03     8  FALSE</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7       E01     C04     7  FALSE</span></span></code></pre></div>
 <p><strong>解读：</strong> 回读结果必须是长表（专家 × 条目 × 轮次 × 维度）。宽表无法区分无法判断与漏填。</p>
 </div>
 <div id="第-1-轮全流程分析" class="section level1">
@@ -284,7 +284,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dir2 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;r2-&quot;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>files2 <span class="ot">&lt;-</span> <span class="fu">next_round_questionnaire</span>(res1, <span class="at">format =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">file =</span> dir2)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(files2)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r2-931c24d93b56.xlsx&quot;</span></span></code></pre></div>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r2-9304771151d6.xlsx&quot;</span></span></code></pre></div>
 <p>第 2 轮 markdown 不应再出现 Ca/Cs 赋分表：</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>md2 <span class="ot">&lt;-</span> <span class="fu">delphi_questionnaire</span>(res1, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">expert_id =</span> demo<span class="sc">$</span>panel<span class="sc">$</span>expert_id[<span class="dv">1</span>])</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">grepl</span>(<span class="st">&quot;权威程度自评&quot;</span>, md2)</span>
@@ -336,7 +336,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dir3 <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;r3-&quot;</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>files3 <span class="ot">&lt;-</span> <span class="fu">next_round_questionnaire</span>(res2, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> dir3)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(files3)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r3-931c3bd06b19.docx&quot; &quot;r3-931c3bd06b19.xlsx&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;r3-93047ba03f98.docx&quot; &quot;r3-93047ba03f98.xlsx&quot;</span></span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>study3 <span class="ot">&lt;-</span> <span class="fu">update_delphi_study</span>(</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  study2,</span>
