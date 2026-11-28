@@ -1,0 +1,212 @@
+---
+title: "Delphi 分析报告"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+params:
+  result: NULL
+  template: clinical
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    number_sections: true
+---
+
+```{r report-setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width = 8, fig.height = 5)
+`%||%` <- function(x, y) if (is.null(x) || (length(x) == 1L && is.na(x))) y else x
+res <- params$result
+study <- res$study
+p <- study$protocol
+meta <- study$meta
+sc <- p$scenario
+```
+
+# 研究问题与范围
+
+- **场景**：`r delphir:::.scenario_label(sc)`
+- **目的**：`r meta$objective %||% "（请在 study$meta$objective 中补充）"`
+- **目标使用者**：`r meta$users %||% "未说明"`
+- **地理范围**：`r meta$geography %||% "未说明"`
+- **条目来源 / 证据准备**：`r meta$evidence_note %||% "未说明"`
+- **匿名**：`r meta$anonymity %||% "评分匿名汇总"`
+
+> 方法学提示：ACCORD 要求在报告中明确目标、目标使用者和地理适用范围。Delphi 用于证据不足或不一致时整合判断，**不能替代系统评价或 GRADE**。
+
+# 预先锁定的分析方案
+
+```{r}
+knitr::kable(data.frame(
+  项目 = c("量表", "低/中/高区", "高度共识", "基本共识", "排除", "最多轮次", "稳定性"),
+  设定 = c(
+    sprintf("%s–%s", p$scale_min, p$scale_max),
+    sprintf("%s–%s / %s–%s / %s–%s", p$low_range[1], p$low_range[2],
+            p$mid_range[1], p$mid_range[2], p$high_range[1], p$high_range[2]),
+    sprintf("P(高区)≥%.0f%% 且 Median≥%s 且 IQR≤%s", 100*p$rules$high_pct, p$rules$median_min, p$rules$iqr_max),
+    sprintf("P(高区)≥%.0f%% 且 Median≥%s", 100*p$rules$basic_pct, p$rules$median_min),
+    sprintf("P(低区)≥%.0f%%", 100*p$rules$reject_pct),
+    as.character(p$stability$max_rounds),
+    sprintf("分类不变≥%.0f%%；Median 变化≤%s；高区比例变化<%.0f%%",
+            100*p$stability$class_pct, p$stability$median_delta, 100*p$stability$high_pct_delta)
+  )
+), caption = "方案在第一轮前锁定，分析阶段不得回改阈值。")
+```
+
+`r if (isTRUE(p$modified_from_preset)) paste0("**方案偏离预设。** 理由：", p$rationale %||% "（未填写 rationale）")`
+
+# 专家构成
+
+```{r}
+panel <- study$panel
+if ("stakeholder" %in% names(panel)) {
+  knitr::kable(as.data.frame(table(panel$stakeholder)), col.names = c("利益相关者", "n"),
+               caption = "专家构成（目的抽样，不是随机样本）")
+}
+```
+
+专家人数 `r nrow(panel)`。比总人数更重要的是构成有没有结构性偏倚。
+
+`r if (!is.null(res$authority)) paste0("面板平均权威系数 Cr = ", round(attr(res$authority, "overall")$mean_cr, 3), "。注意：Cr 不是 DCAT 核心要求，仅供国内发表补充。")`
+
+# 参与度与脱落
+
+```{r}
+knitr::kable(res$participation$by_round, digits = 1, caption = "各轮回收率（专家积极系数）")
+if (!is.null(res$participation$retention)) {
+  knitr::kable(res$participation$retention, digits = 1, caption = "相邻轮保留率")
+}
+```
+
+```{r, fig.cap="各轮应答人数"}
+if (requireNamespace("ggplot2", quietly = TRUE)) print(delphir::plot_attrition(res))
+```
+
+# 条目结果（分轮）
+
+Likert 按有序数据处理：主指标为 **Median、IQR、高区/低区比例**。均数与 CV 仅为补充。
+
+```{r}
+cls <- res$classification
+keep <- intersect(c("item_id", "item_text", "round", "dimension", "n_valid", "n_unable",
+                    "median_iqr", "p_high", "p_low", "cv", "class_zh", "di", "disagreement"),
+                  names(cls))
+show <- cls[, keep, drop = FALSE]
+if ("item_text" %in% names(show)) {
+  show$item_text <- substr(show$item_text, 1, 36)
+}
+knitr::kable(show, digits = 1, caption = "逐轮条目结果（过程透明，对应 CREDES/ACCORD 要求）")
+```
+
+# 证据与共识分列
+
+```{r}
+last <- res$last_classification
+ev <- "未提供条目级证据等级"
+if ("evidence_level" %in% names(last)) {
+  ev_tab <- last[, intersect(c("item_id", "evidence_level", "class_zh", "p_high"), names(last)), drop = FALSE]
+  knitr::kable(ev_tab, digits = 1, caption = "证据等级 vs 共识分类：二者不可互相替代")
+} else {
+  cat(ev)
+}
+```
+
+> **专家高度一致 ≠ 高质量科学证据。** 诊疗推荐仍应回到系统评价与 GRADE。
+
+# 稳定性
+
+```{r}
+if (is.null(res$stability)) {
+  cat("仅一轮，无法评价稳定性。DCAT 将迭代视为核心特征。")
+} else {
+  knitr::kable(res$stability[, intersect(c("item_id", "dimension", "from_round", "to_round",
+                                          "median_r1", "median_r2", "p_high_r1", "p_high_r2",
+                                          "class_r1", "class_r2", "class_unchanged", "wilcoxon_p"),
+                                        names(res$stability))],
+               digits = 2, caption = "相邻轮稳定性")
+  st <- res$stopping
+  cat(sprintf("建议终止：%s。分类不变 %.1f%%，Median 稳定 %.1f%%，高区比例稳定 %.1f%%。\n",
+              if (isTRUE(st$recommend_stop)) "是" else "否",
+              100 * st$class_unchanged_pct, 100 * st$median_stable_pct, 100 * st$p_high_stable_pct))
+  cat(st$note)
+}
+```
+
+# 利益相关者分层
+
+```{r}
+if (is.null(res$stakeholder)) {
+  cat("未做分层或仅有单一利益相关者组。")
+} else {
+  st <- res$stakeholder
+  keep <- intersect(c("item_id", "group_level", "n_valid", "median", "p_high", "p_low", "class_zh"), names(st))
+  knitr::kable(st[, keep, drop = FALSE], digits = 1, caption = "利益相关者分层：总体过线不足以代表各组")
+}
+```
+
+# 脱落偏倚
+
+```{r}
+if (is.null(res$dropout)) {
+  cat("无脱落比较。")
+} else {
+  knitr::kable(res$dropout, digits = 2, caption = "完成者 vs 脱落者在上一轮的评分")
+}
+```
+
+# 自由文本意见
+
+```{r}
+qs <- res$comments_summary
+if (!is.null(qs$by_theme) && nrow(qs$by_theme)) {
+  knitr::kable(qs$by_theme, caption = "主题频次（需由方法学组预先编码）")
+  knitr::kable(utils::head(qs$examples, 12), caption = "意见摘录（匿名）")
+} else {
+  cat("无编码意见。")
+}
+```
+
+# 共识会议建议
+
+已达高度共识的条目原则上不在会议上重新否决，否则会破坏 Delphi。会议应聚焦：临界条目、无共识、组间相反、仅需改文字的条目。如需表决，建议匿名。
+
+```{r}
+last <- res$last_classification
+if ("action" %in% names(last)) {
+  knitr::kable(as.data.frame(table(last$action, last$class_zh)),
+               col.names = c("建议动作", "分类", "n"),
+               caption = "末轮条目去向")
+}
+```
+
+# 补充统计
+
+```{r}
+if (!is.null(res$kendall$w)) {
+  cat(sprintf("Kendall W = %.3f，P = %.4f（评价排序协调性，不是条目级共识）。",
+              res$kendall$w, res$kendall$p_value))
+}
+```
+
+# 报告规范对照
+
+## ACCORD（35 条）
+
+```{r}
+knitr::kable(delphir::accord_checklist(res), caption = "ACCORD 自动对照：Unsure 需作者在文稿中补写")
+```
+
+## DCAT（16 条）
+
+```{r}
+knitr::kable(delphir::dcat_checklist(res), caption = "DCAT：核心项否视为关键缺陷")
+```
+
+## CREDES
+
+```{r}
+knitr::kable(delphir::credes_checklist(res), caption = "CREDES 补充对照")
+```
+
+# 声明
+
+本报告由 R 包 delphir 根据预先锁定的方案生成。模拟或教学数据不得当作真实临床推荐。

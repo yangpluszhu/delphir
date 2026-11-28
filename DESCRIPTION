@@ -1,0 +1,31 @@
+Package: delphir
+Title: Structured Delphi and RAND/UCLA Analysis for Consensus Studies
+Version: 0.1.0
+Authors@R: c(
+    person("Delphi", "Methodology Group", email = "delphir@example.org",
+           role = c("aut", "cre"))
+  )
+Description: Protocol-first toolkit for Delphi studies, RAND/UCLA
+    appropriateness panels, and COMET core outcome set surveys.
+    Locks consensus rules before analysis, summarises ordinal ratings
+    with medians and agreement rates, classifies items, assesses
+    between-round stability, prepares controlled feedback, and writes
+    ACCORD, DCAT and CREDES aligned reports.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: zh
+LazyData: true
+LazyDataCompression: xz
+Depends: R (>= 4.1.0)
+Imports: ggplot2 (>= 3.4.0), rmarkdown, stats, utils
+Suggests: knitr, testthat (>= 3.0.0), flextable
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+URL: https://github.com/example/delphir
+BugReports: https://github.com/example/delphir/issues
+Config/roxygen2/version: 8.0.0
+NeedsCompilation: no
+Packaged: 2026-09-06 13:48:55 UTC; yangpluszhu
+Author: Delphi Methodology Group [aut, cre]
+Maintainer: Delphi Methodology Group <delphir@example.org>

@@ -1,0 +1,374 @@
+---
+title: "教学文档 1：医学专家共识 Modified Delphi 全流程"
+author: "delphir"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 1：医学专家共识 Modified Delphi 全流程}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4.5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. 这份文档解决什么问题
+
+本教程从零演示如何用 **delphir** 完成一项医学专家共识（Modified Delphi）：
+
+1. 先写清问题、使用者和地理范围；
+2. **在看数据之前**锁定共识阈值；
+3. 读入（或模拟）专家、条目、评分和意见；
+4. 计算参与度、Median / IQR / 赞同率；
+5. 按复合标准判定高度共识、基本共识、临界、排除、两极分化；
+6. 看稳定性、分层和脱落偏倚；
+7. 制作下一轮受控反馈；
+8. 输出符合 ACCORD 结构的报告，并解读每一张表。
+
+使用的样本是包内数据集 `consensus_demo`：40 名专家、20 条临床试验质量条目、两轮 9 分 Likert。数据**故意不完美**，含脱落、无法判断、临界条目和两极分化。
+
+```{r}
+library(delphir)
+data("consensus_demo", package = "delphir")
+consensus_demo
+```
+
+# 2. 方法学边界：Delphi 不是证据评价
+
+Delphi 适合回答的是：
+
+> 在证据不足、不一致，或即使有证据仍需做价值判断时，如何系统整合多位专家的判断。
+
+它不适合代替系统评价或 GRADE。比较稳妥的框架是：
+
+**证据检索与评价 → 形成候选条目 → Delphi → 共识会议 → 定稿**
+
+本示例的 `meta$evidence_note` 记录了条目来自法规与方法学综述后的初始条目池，对应 Modified Delphi（第一轮即评分），而不是经典 Delphi 的开放式第一轮。
+
+```{r}
+unlist(consensus_demo$meta)
+```
+
+**解读：** ACCORD 要求报告目标、目标使用者和地理范围。这里目的是“临床试验质量要求”，使用者是申办者/研究者/伦理与监管，范围为中国大陆。缺任何一项，发表时都会被审稿人问。
+
+# 3. 第一步：预先锁定方案（不可事后改阈值）
+
+Diamond 等的系统评价表明，文献里的共识定义差异很大，最常见阈值中位数约为 75%。**正确原则不是“必须 ≥70%”，而是第一轮前写明阈值及其理由。**
+
+医学专家共识推荐复合标准，而不是只看一个百分比：
+
+- 高度共识：P(7–9) ≥ 80%，且 Median ≥ 7，且 IQR ≤ 2
+- 基本共识：75% ≤ P(7–9) < 80%，且 Median ≥ 7
+- 倾向排除：P(1–3) ≥ 75%
+- 两极分化：两端同时达到 25%
+
+```{r}
+protocol <- preset_protocol("clinical_consensus")
+protocol
+```
+
+如果因高风险推荐把 80% 改成 85%，必须写 `rationale`，报告会打印“方案偏离预设”。
+
+```{r}
+stricter <- delphi_protocol(
+  scenario = "clinical_consensus",
+  high_pct = 0.85,
+  rationale = "涉及受试者安全的硬性要求，将高度共识提高到 85%。"
+)
+stricter$modified_from_preset
+```
+
+**常见错误：** 看到结果后把阈值改成“刚好能过”的 75%。这在方法学上不成立。`classify_consensus()` 也没有阈值参数，防止分析阶段静默改规则。
+
+# 4. 数据长什么样
+
+评分必须是**长表**：一行 = 一位专家 × 一条目 × 一轮 × 一个维度。
+
+```{r}
+head(consensus_demo$panel[, c("expert_id", "stakeholder", "years", "Ca", "Cs")])
+head(consensus_demo$items[, c("item_id", "item_text", "domain", "pattern")])
+head(consensus_demo$ratings)
+```
+
+**解读：**
+
+- `unable = TRUE` 表示“超出本人专业领域”，**不得计入 1–9 分母**。
+- 本示例第 1 轮同时评了“重要性”和“可行性”，用来发现“很重要但几乎不可实施”的条目。
+- `pattern` 只存在于模拟数据，真实研究不会有这一列；它帮助教学识别条目原型。
+
+也可以从外部 CSV 组装对象（包内 `inst/extdata` 提供了同样结构的样例）：
+
+```{r}
+ex <- system.file("extdata", "consensus_ratings.csv", package = "delphir")
+if (nzchar(ex)) {
+  raw <- utils::read.csv(ex, fileEncoding = "UTF-8")
+  cat("外部评分表示例行数:", nrow(raw), "\n")
+}
+```
+
+# 5. 参与度：积极系数与更重要的脱落
+
+```{r}
+part <- response_summary(consensus_demo)
+part$by_round
+part$retention
+```
+
+**解读：**
+
+- 第 1 轮 40/40 = 100%，第 2 轮 37/40 = 92.5%。国内常称“专家积极系数”，本质就是回收率，值得报告。
+- 对 Delphi 更关键的是 **retention**：37/40 = 92.5%。若脱落集中在某一利益相关者组，最终共识可能被扭曲。
+- DCAT 把专家保留作为附加质量项。
+
+```{r}
+plot_attrition(consensus_demo)
+```
+
+# 6. 权威系数 Cr：可以报，但不能当科学性主证据
+
+```{r}
+auth <- expert_authority(consensus_demo$panel)
+attr(auth, "overall")
+```
+
+**解读：** \(Cr=(Ca+Cs)/2\)，国内常以 0.70 为参考。DCAT 的四个核心特征是匿名、迭代、受控反馈、统计汇总，**不包括 Cr**。`Cr = 0.90` 不能证明专家选择科学；构成偏差（例如全是同一专科）才是更大问题。
+
+# 7. 第一轮条目汇总：位置 + 离散 + 比例
+
+```{r}
+s1 <- summarize_items(consensus_demo, rounds = 1, dimensions = "重要性")
+s1[, c("item_id", "n_valid", "n_unable", "median_iqr", "p_high", "p_low", "cv", "polarized")]
+```
+
+**解读每一列：**
+
+- `n_valid`：真正进入 1–9 的人数；`n_unable` 单独报告。
+- `median_iqr`：如 `8 (7–9)` 表示中位数 8、四分位距从 7 到 9。Likert 是有序数据，**Median 通常优于 Mean**。
+- `p_high` / `p_low`：7–9 与 1–3 的百分比。分布比“平均分 8.1”信息量大得多。
+- `cv`：SD/Mean，国内常用补充指标。有序数据上 Median+IQR 更稳健。
+- `polarized`：两端同时 ≥25%。均数接近 5 往往不是“大家觉得一般”，而是严重分裂。
+
+对比两条 Median 相同、IQR 不同的条目：
+
+```{r}
+s1[order(-s1$median, -s1$iqr), c("item_id", "median", "iqr", "p_high")][1:8, ]
+```
+
+**方法学提醒：** 只报告 Mean±SD，是 Delphi 论文最常见的错误之一。
+
+```{r}
+plot_item_distribution(consensus_demo, round = 1, dimension = "重要性")
+```
+
+# 8. 按锁定方案判定共识
+
+```{r}
+c1 <- classify_consensus(s1, consensus_demo$protocol)
+table(c1$class_zh)
+c1[, c("item_id", "p_high", "median", "iqr", "class_zh", "action")]
+```
+
+**解读分类，而不是只看“过没过”：**
+
+- **高度共识 / keep：** 原则上下一轮可不再重评，或仅确认；共识会议不应轻易推翻。
+- **基本共识 / keep：** 过了 75% 但未达 80% 或 IQR 偏大，写入共识时语气宜保留弹性。
+- **临界 / discuss：** 70%–75% 一带，机械删除最危险。应先读自由意见、改表述，再进入下一轮。
+- **两极分化 / discuss：** 说明存在稳定的价值冲突，正确结论可能就是“未形成共识”。
+- **倾向排除 / drop：** 低区达 75%，倾向删除，仍应记录反对理由。
+
+# 9. 为什么不能只看平均分或 Kendall W
+
+构造一个教学对照（不是本数据集）：
+
+```{r}
+detect_polarization(p_high = c(0, 50), p_low = c(0, 50))
+coefficient_variation(c(8, 8, 8, 8))
+coefficient_variation(c(1, 1, 1, 9, 9, 9))
+```
+
+Kendall W 评价的是**一组项目的相对排序**是否协调，适合优先级排序。本例问题是“每条是否重要”，W 只能当补充。
+
+```{r}
+kw <- kendall_w(consensus_demo, round = 1, dimension = "重要性")
+kw
+```
+
+**错误推论：** “W 显著，P<0.05，因此形成专家共识。” 显著性依赖样本量，也不能说明每一条都达成共识。
+
+# 10. 自由文本：不要把条件性支持当成反对
+
+```{r}
+q1 <- summarize_comments(study = consensus_demo, round = 1)
+q1$by_theme
+head(q1$by_item)
+```
+
+**解读：** “我赞成本条，但仅适用于高风险干预性研究”不是反对，而是**条件性支持**。ACCORD 要求说明自由文本如何做内容/主题分析。delphir 只汇总你已经编码的 `theme`，不会用黑盒模型替你定性。
+
+方法学组据此修改条目后，必须把修改理由反馈给专家，这才是受控反馈的一部分。
+
+# 11. 制作第 2 轮个性化反馈单
+
+真正的 Delphi 不是把同一张表再发一次。DCAT 要求：组结果 + **本人上一轮评分**。
+
+```{r}
+fb <- prepare_feedback(consensus_demo, round = 1, dimension = "重要性")
+fb[fb$expert_id == fb$expert_id[1],
+   c("item_id", "own_score", "median_iqr", "p_high", "class_zh", "anonymous_comments")]
+```
+
+**解读：** 专家看到自己给了 6 分、全组 Median=8、82% 评 7–9，以及匿名意见后，才重新评分。这降低权威效应，也允许体面地改口。
+
+# 12. 第二轮与稳定性
+
+```{r}
+res <- analyze_delphi(consensus_demo)
+res
+```
+
+```{r}
+last <- res$last_classification
+last[, c("item_id", "median_iqr", "p_high", "p_low", "class_zh", "action")]
+```
+
+过程透明表（CREDES / ACCORD 要求分轮报告）：
+
+```{r}
+wide <- res$classification
+wide <- wide[wide$dimension == "重要性",
+             c("item_id", "round", "median_iqr", "p_high", "class_zh")]
+wide
+```
+
+```{r}
+head(res$stability[, c("item_id", "median_r1", "median_r2", "p_high_r1",
+                       "p_high_r2", "class_unchanged", "wilcoxon_p")])
+res$stopping
+```
+
+**解读稳定性：**
+
+- Median 从 7 到 8、IQR 从 3 到 1、高区从 68% 到 83%，说明共识在增强。
+- 若第 2 轮刚过 75% 就停止，可能过早；DCAT 强调看轮次间是否还在快速变化。
+- `wilcoxon_p` 可以报告，**但不能用 P>0.05 定义“意见稳定”**，因为 P 值依赖样本量。应同时看 Median/IQR/% 变化和个体改分比例。
+
+```{r}
+plot_round_shift(res, metric = "p_high")
+```
+
+本方案的停止规则：最多 3 轮；相邻轮分类不变 ≥80%；Median 变化 ≤1；高区比例变化 <10%。未达则应考虑针对争议条目做第 3 轮。**不是所有条目都必须达成共识。**
+
+# 13. 分层与脱落偏倚
+
+```{r}
+head(res$stakeholder[, c("item_id", "group_level", "n_valid", "median", "p_high", "class_zh")])
+```
+
+**解读：** 即使总体过线，若方法学专家与临床医生方向相反，必须在报告中写出来。COMET 尤其强调这一点；临床共识同样适用。
+
+```{r}
+head(res$dropout)
+```
+
+若脱落者在关键条目上系统更反对，最终赞同率可能被高估。这是“没有报告脱落”之所以危险的原因。
+
+# 14. 可行性维度：重要但不一定能做
+
+```{r}
+feas <- classify_consensus(
+  summarize_items(consensus_demo, rounds = 1, dimensions = "可行性"),
+  consensus_demo$protocol
+)
+cmp <- merge(
+  last[, c("item_id", "p_high", "class_zh")],
+  feas[, c("item_id", "p_high", "class_zh")],
+  by = "item_id", suffixes = c("_重要性", "_可行性")
+)
+head(cmp)
+```
+
+**解读：** “非常重要但几乎不可实施”的条目，若只有一个“是否同意”分数就会丢失。指标体系场景更要把重要性、可操作性、可测量性拆开。
+
+# 15. 共识会议怎么开
+
+已达高度共识的条目，原则上不要在 10 人会议上推翻 40 人的匿名结果。会议重点：
+
+- 临界与无共识；
+- 利益相关者相反；
+- 原则已共识、文字需改。
+
+再次表决建议匿名电子投票。
+
+```{r}
+table(last$action, last$class_zh)
+```
+
+# 16. 证据与共识必须分列
+
+```{r}
+last[, c("item_id", "evidence_level", "p_high", "class_zh")]
+```
+
+**专家 91% 同意 ≠ 有 RCT 支持。** 高风险诊疗推荐应把证据等级和共识程度分成两列写。
+
+# 17. 生成 ACCORD 风格报告
+
+```{r}
+html <- delphi_report(res, file = tempfile(fileext = ".html"), template = "clinical")
+file.exists(html)
+```
+
+报告内容包括：范围、锁定方案、专家构成、分轮结果、稳定性、分层、脱落、意见主题、会议建议，以及 ACCORD 35 条 / DCAT 16 条 / CREDES 自动对照。标记为 Unsure 的条目必须由作者在论文里补写，不能假装软件已经替你完成报告规范。
+
+```{r}
+head(accord_checklist(res)[, c("id", "section", "status")], 8)
+dcat_checklist(res)[1:4, c("id", "core", "item", "status")]
+```
+
+DCAT 四个核心项（匿名、迭代、统计汇总、受控反馈）任一为 No，总体质量应评为关键缺陷。
+
+# 18. 本场景对应的常见错误
+
+1. 第一轮前没有预设阈值；
+2. 根据结果回改 75%；
+3. 只报 Mean±SD；
+4. 把 Kendall W 的 P 值当成共识；
+5. 把 Cr 当成科学性主证据；
+6. 专家全来自同一专业；
+7. 反复投票直到全部“达成共识”；
+8. 第二轮没有反馈第一轮结果；
+9. 面对面会议推翻 Delphi；
+10. 不报告脱落。
+
+# 19. 你可以怎样换成自己的数据
+
+```r
+protocol <- preset_protocol("clinical_consensus")
+study <- delphi_study(
+  protocol,
+  panel = delphi_panel(your_panel),
+  items = delphi_items(your_items),
+  ratings = delphi_ratings(your_ratings),
+  comments = delphi_comments(your_comments),
+  meta = list(
+    title = "...", objective = "...", users = "...",
+    geography = "...", evidence_note = "...",
+    anonymity = "...", pilot_tested = TRUE
+  )
+)
+res <- analyze_delphi(study)
+delphi_report(res, file = "consensus-report.html")
+```
+
+下一步可阅读：
+
+- `vignette("rand-ucla", package = "delphir")`：适宜性评价，不强迫共识；
+- `vignette("comet-cos", package = "delphir")`：核心结局集与 70/15 规则。

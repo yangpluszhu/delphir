@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="delphir" />
+
+<meta name="date" content="2026-09-06" />
+
+<title>教学文档 3：COMET 核心结局集 Delphi 全流程</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">教学文档 3：COMET 核心结局集 Delphi 全流程</h1>
+<h4 class="author">delphir</h4>
+<h4 class="date">2026-09-06</h4>
+
+
+
+<div id="cos-要解决的问题" class="section level1">
+<h1>1. COS 要解决的问题</h1>
+<p>核心结局集（Core Outcome Set, COS）回答：</p>
+<blockquote>
+<p>某一健康状况的临床试验，<strong>至少</strong>应该测量哪些结局？</p>
+</blockquote>
+<p>它不是诊疗共识，也不是适宜性评价。COMET Handbook 广泛使用 9 分制：</p>
+<ul>
+<li>1–3：有限重要性</li>
+<li>4–6：重要但非关键</li>
+<li>7–9：关键结局</li>
+</ul>
+<p>以及 <strong>70/15 规则</strong>（须预先写进方案）：</p>
+<ul>
+<li><strong>Consensus in：</strong> ≥70% 评 7–9，且 &lt;15% 评 1–3</li>
+<li><strong>Consensus out：</strong> ≥70% 评 1–3，且 &lt;15% 评 7–9</li>
+<li>其余：<strong>No consensus</strong></li>
+</ul>
+<p>本教程使用 <code>cos_demo</code>：80 人（医生 40、患者 25、研究者 15），25 个 IgA 肾病候选结局，两轮评分。数据里故意放了“总体过线、患者组未过线”的条目。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cos_demo&quot;</span>, <span class="at">package =</span> <span class="st">&quot;delphir&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>cos_demo</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 研究</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   题目: IgA 肾病临床试验核心结局集（模拟 COMET Delphi）</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: COMET 核心结局集</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   专家: 80 人；条目: 25；轮次: 1, 2</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   评分行数: 3850</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(cos_demo<span class="sc">$</span>panel<span class="sc">$</span>stakeholder)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   患者 研究者   医生 </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     25     15     40</span></span></code></pre></div>
+</div>
+<div id="为什么阈值和临床共识不同" class="section level1">
+<h1>2. 为什么阈值和临床共识不同</h1>
+<p>临床专家共识常用 75%–80% + Median + IQR 的<strong>复合标准</strong>，因为要决定“写不写进共识条款”。</p>
+<p>COS 的 70/15 同时管“关键”和“明确不重要”，并防止少数强烈反对被平均掉。一条结局 76% 评 7–9 但 18% 评 1–3，按 70/15 <strong>不能纳入</strong>：反对虽不是主流，但已超过 15%。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>rules[<span class="fu">c</span>(<span class="st">&quot;comet_in_high&quot;</span>, <span class="st">&quot;comet_in_low_max&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&quot;comet_out_low&quot;</span>, <span class="st">&quot;comet_out_high_max&quot;</span>)]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $comet_in_high</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $comet_in_low_max</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $comet_out_low</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $comet_out_high_max</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span></code></pre></div>
+<p>不要把临床共识的 80% 规则或 RAM 的 DI 偷偷换到 COS 上，除非方案里写明并论证。</p>
+</div>
+<div id="范围使用者和患者参与" class="section level1">
+<h1>3. 范围、使用者和患者参与</h1>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unlist</span>(cos_demo<span class="sc">$</span>meta)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                    title </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        &quot;IgA 肾病临床试验核心结局集（模拟 COMET Delphi）&quot; </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                objective </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            &quot;确定 IgA 肾病干预试验应至少测量的核心结局。&quot; </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                    users </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       &quot;临床试验申办者、研究者与患者组织&quot; </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                geography </span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                               &quot;国际多利益相关者（模拟）&quot; </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                            evidence_note </span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     &quot;候选结局来自系统评价与患者访谈后的条目池（模拟）。&quot; </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                anonymity </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &quot;在线匿名评分；反馈含本人评分、总体及利益相关者组摘要。&quot; </span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                   ethics </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                         &quot;教学模拟数据。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> ACCORD 的 M5（患者与公众参与）在 COS 中几乎是刚需。没有患者的“核心结局”很容易变成医生方便测量的实验室指标。本面板把患者当作与医生、研究者并列的利益相关者，而不是“咨询对象”。</p>
+</div>
+<div id="候选结局从哪里来" class="section level1">
+<h1>4. 候选结局从哪里来</h1>
+<p>Modified Delphi 的第一轮不是开放提问，而是系统评价 + 患者访谈后的条目池。<code>outcome_domain</code> 帮助避免同一领域堆叠过多相似结局。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(cos_demo<span class="sc">$</span>items<span class="sc">$</span>outcome_domain)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     病死/生存      不良事件      疾病活动        实验室 症状/生命质量 </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             3             9             3             4             1 </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      资源利用 </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             5</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cos_demo<span class="sc">$</span>items[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;item_text&quot;</span>, <span class="st">&quot;outcome_domain&quot;</span>, <span class="st">&quot;pattern&quot;</span>)])</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id                                          item_text outcome_domain</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     O01                                           全因死亡       资源利用</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     O02 肾脏复合终点（血肌酐倍增/进入肾脏替代/肾源性死亡）       资源利用</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     O03                               估计肾小球滤过率斜率       疾病活动</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     O04                                         蛋白尿变化       不良事件</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     O05                                       终末期肾脏病       不良事件</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6     O06                                               疲劳      病死/生存</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   pattern</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 core_in</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 core_in</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 core_in</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 core_in</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 core_in</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 core_in</span></span></code></pre></div>
+<p><code>pattern = patient_dissent</code> 只在模拟数据中出现，对应教学点：医生认为关键、患者不认为关键。</p>
+</div>
+<div id="参与与脱落" class="section level1">
+<h1>5. 参与与脱落</h1>
+<p>COS 面板通常更大，在线调查脱落更常见。必须分轮、分组报告。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">response_summary</span>(cos_demo)<span class="sc">$</span>by_round</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round n_invited n_responded response_rate</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1        80          80         100.0</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2        80          74          92.5</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">response_summary</span>(cos_demo)<span class="sc">$</span>retention</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   from_round to_round n_previous n_retained n_lost n_new retention_rate</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1          1        2         80         74      6     0           92.5</span></span></code></pre></div>
+<p><strong>解读：</strong> 若第 2 轮丢掉的主要是患者，最终 COS 会被临床视角主导。DCAT 的 Panelist retention 要求报告流失类型，而不仅是总人数。</p>
+</div>
+<div id="总体-7015-判定" class="section level1">
+<h1>6. 总体 70/15 判定</h1>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">analyze_delphi</span>(cos_demo)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>res</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析结果</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: COMET 核心结局集</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   题目: IgA 肾病临床试验核心结局集（模拟 COMET Delphi）</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   轮次: 1, 2</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   参与度:</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 1 轮  80/80  (100.0%)</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 2 轮  74/80  (92.5%)</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   末轮分类:</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     纳入共识: 11</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     排除共识: 3</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     未达共识: 11</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   稳定性建议终止: 否</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>last <span class="ot">&lt;-</span> res<span class="sc">$</span>last_classification</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;item_text&quot;</span>, <span class="st">&quot;n_valid&quot;</span>, <span class="st">&quot;n_unable&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id                                          item_text n_valid n_unable</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26     O01                                           全因死亡      74        0</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27     O02 肾脏复合终点（血肌酐倍增/进入肾脏替代/肾源性死亡）      74        0</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28     O03                               估计肾小球滤过率斜率      74        0</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29     O04                                         蛋白尿变化      74        0</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30     O05                                       终末期肾脏病      74        0</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31     O06                                               疲劳      74        0</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32     O07                                   健康相关生命质量      74        0</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33     O08                                               水肿      74        0</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34     O09                                           血压控制      74        0</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35     O10                                       感染相关住院      74        0</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36     O11                                 糖皮质激素累积暴露      74        0</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37     O12                                   患者总体印象变化      68        6</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38     O13                               工作与学业受影响天数      74        0</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39     O14                                               血尿      72        2</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40     O15                                         血清白蛋白      74        0</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41     O16                                            补体 C3      74        0</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42     O17                                Oxford 病理评分变化      74        0</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43     O18                                   不良事件导致停药      74        0</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44     O19                                           严重感染      71        3</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45     O20                                           恶性肿瘤      71        3</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46     O21                                           医疗费用      74        0</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47     O22                                         随访依从性      74        0</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48     O23                                           疾病复发      74        0</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49     O24                                           妊娠结局      74        0</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50     O25                                           疫苗反应      74        0</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       p_high     p_low class_zh</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26 90.540541  0.000000 纳入共识</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27 94.594595  0.000000 纳入共识</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28 95.945946  0.000000 纳入共识</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29 93.243243  0.000000 纳入共识</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30 95.945946  0.000000 纳入共识</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31 91.891892  0.000000 纳入共识</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32 94.594595  0.000000 纳入共识</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33  1.351351 82.432432 排除共识</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34  0.000000 64.864865 未达共识</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35  4.054054 71.621622 排除共识</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36  2.702703 79.729730 排除共识</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37 26.470588 32.352941 未达共识</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38 21.621622 32.432432 未达共识</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39 18.055556 29.166667 未达共识</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40 29.729730 29.729730 未达共识</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41 17.567568 33.783784 未达共识</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42 67.567568 20.270270 未达共识</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43 60.810811 17.567568 未达共识</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44 56.338028 18.309859 未达共识</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45 66.197183 22.535211 未达共识</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46 63.513514 10.810811 未达共识</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47 78.378378  4.054054 纳入共识</span></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48 77.027027  9.459459 纳入共识</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49 79.729730  2.702703 纳入共识</span></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50 74.324324  2.702703 纳入共识</span></span></code></pre></div>
+<p><strong>逐类解读：</strong></p>
+<ul>
+<li><strong>纳入共识：</strong> 同时满足“多数视为关键”和“很少视为不重要”。死亡、肾脏复合终点等通常落在这里。</li>
+<li><strong>排除共识：</strong> 多数明确认为不是核心。进入 COS 会增加测量负担。</li>
+<li><strong>未达共识：</strong> 包括中间派多、或两端都有相当比例。这些应进入共识会议，而不是用均数强行排序塞进核心集。</li>
+</ul>
+<p>注意 <code>n_unable</code>：患者对某些实验室结局选“无法判断”是合理的，不能把 NA 填成 5 分。</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_item_distribution</span>(cos_demo, <span class="at">round =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="本教程最重要的一张表分层" class="section level1">
+<h1>7. 本教程最重要的一张表：分层</h1>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>st <span class="ot">&lt;-</span> res<span class="sc">$</span>stakeholder</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 找总体纳入但某组未纳入的结局</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>overall_in <span class="ot">&lt;-</span> last<span class="sc">$</span>item_id[last<span class="sc">$</span>class <span class="sc">==</span> <span class="st">&quot;consensus_in&quot;</span>]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>st_in <span class="ot">&lt;-</span> st[st<span class="sc">$</span>item_id <span class="sc">%in%</span> overall_in, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;group_level&quot;</span>, <span class="st">&quot;n_valid&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                                         <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>st_in</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id group_level n_valid    p_high     p_low class_zh</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1      O01        医生      35  85.71429  0.000000 纳入共识</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      O02        医生      35  94.28571  0.000000 纳入共识</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3      O03        医生      35  97.14286  0.000000 纳入共识</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4      O04        医生      35  91.42857  0.000000 纳入共识</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      O05        医生      35 100.00000  0.000000 纳入共识</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      O06        医生      35  91.42857  0.000000 纳入共识</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7      O07        医生      35  94.28571  0.000000 纳入共识</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22     O22        医生      35  74.28571  2.857143 纳入共识</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23     O23        医生      35  80.00000  8.571429 纳入共识</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24     O24        医生      35  85.71429  0.000000 纳入共识</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25     O25        医生      35  62.85714  5.714286 未达共识</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26     O01        患者      24  95.83333  0.000000 纳入共识</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27     O02        患者      24  95.83333  0.000000 纳入共识</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28     O03        患者      24  95.83333  0.000000 纳入共识</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29     O04        患者      24  91.66667  0.000000 纳入共识</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30     O05        患者      24  91.66667  0.000000 纳入共识</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31     O06        患者      24  95.83333  0.000000 纳入共识</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32     O07        患者      24  95.83333  0.000000 纳入共识</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47     O22        患者      24  79.16667  8.333333 纳入共识</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48     O23        患者      24  83.33333  4.166667 纳入共识</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 49     O24        患者      24  75.00000  4.166667 纳入共识</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 50     O25        患者      24  87.50000  0.000000 纳入共识</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 51     O01      研究者      15  93.33333  0.000000 纳入共识</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 52     O02      研究者      15  93.33333  0.000000 纳入共识</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 53     O03      研究者      15  93.33333  0.000000 纳入共识</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 54     O04      研究者      15 100.00000  0.000000 纳入共识</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 55     O05      研究者      15  93.33333  0.000000 纳入共识</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 56     O06      研究者      15  86.66667  0.000000 纳入共识</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 57     O07      研究者      15  93.33333  0.000000 纳入共识</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 72     O22      研究者      15  86.66667  0.000000 纳入共识</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 73     O23      研究者      15  60.00000 20.000000 未达共识</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 74     O24      研究者      15  73.33333  6.666667 纳入共识</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 75     O25      研究者      15  80.00000  0.000000 纳入共识</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_stakeholder</span>(res)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><strong>方法学解读（请停在这里看）：</strong></p>
+<p>假设某结局总体 74% 评 7–9，医生 92%、方法学 88%、患者 42%。只报总体会写成“接近共识/已共识”，但患者明确不认可。COMET 认为这种条目<strong>不能假装已经形成核心结局</strong>。</p>
+<p>正确做法：</p>
+<ol style="list-style-type: decimal">
+<li>分列各组 P(7–9) 与 P(1–3)；</li>
+<li>在共识会议上专门讨论组间相反的条目；</li>
+<li>可能的结果包括：纳入但必须同时测量患者报告结局、改定义、或保持 no consensus。</li>
+</ol>
+<p>这就是文档强调的 stakeholder-stratified analysis。</p>
+</div>
+<div id="与临床共识规则并排看会不会判错" class="section level1">
+<h1>8. 与临床共识规则并排，看会不会判错</h1>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>clinical_rule <span class="ot">&lt;-</span> <span class="fu">classify_consensus</span>(res<span class="sc">$</span>item_summary, <span class="fu">preset_protocol</span>(<span class="st">&quot;clinical_consensus&quot;</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>cmp <span class="ot">&lt;-</span> <span class="fu">merge</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;p_low&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)],</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  clinical_rule[clinical_rule<span class="sc">$</span>round <span class="sc">==</span> res<span class="sc">$</span>last_round,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">&quot;item_id&quot;</span>, <span class="at">suffixes =</span> <span class="fu">c</span>(<span class="st">&quot;_COMET&quot;</span>, <span class="st">&quot;_临床复合&quot;</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cmp, <span class="dv">10</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id    p_high    p_low class_zh_COMET class_zh_临床复合</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1      O01 90.540541  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      O02 94.594595  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3      O03 95.945946  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4      O04 93.243243  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      O05 95.945946  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      O06 91.891892  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7      O07 94.594595  0.00000       纳入共识          高度共识</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8      O08  1.351351 82.43243       排除共识          倾向排除</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9      O09  0.000000 64.86486       未达共识          未达共识</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10     O10  4.054054 71.62162       排除共识          未达共识</span></span></code></pre></div>
+<p><strong>解读：</strong> 同一组数字，规则不同结论就不同。这不是软件 bug，而是<strong>研究目的决定规则</strong>。写论文时必须报告你预先选择的是 70/15 还是复合标准。</p>
+</div>
+<div id="稳定性刚过-70-不一定能停" class="section level1">
+<h1>9. 稳定性：刚过 70% 不一定能停</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stability[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;p_high_r1&quot;</span>, <span class="st">&quot;p_high_r2&quot;</span>, <span class="st">&quot;class_r1&quot;</span>, <span class="st">&quot;class_r2&quot;</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;class_unchanged&quot;</span>)]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id p_high_r1 p_high_r2      class_r1      class_r2 class_unchanged</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1      O01  85.00000 90.540541  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      O02  87.50000 94.594595  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3      O03  85.00000 95.945946  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4      O04  88.75000 93.243243  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      O05  85.00000 95.945946  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      O06  85.00000 91.891892  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7      O07  85.00000 94.594595  consensus_in  consensus_in            TRUE</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8      O08   8.75000  1.351351  no_consensus consensus_out           FALSE</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9      O09  10.00000  0.000000 consensus_out  no_consensus           FALSE</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10     O10   3.75000  4.054054 consensus_out consensus_out            TRUE</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11     O11   2.50000  2.702703 consensus_out consensus_out            TRUE</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12     O12  25.00000 26.470588  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13     O13  30.00000 21.621622  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14     O14  25.31646 18.055556  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15     O15  28.75000 29.729730  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16     O16  25.00000 17.567568  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17     O17  52.50000 67.567568  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18     O18  52.50000 60.810811  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19     O19  61.53846 56.338028  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20     O20  60.81081 66.197183  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21     O21  56.25000 63.513514  no_consensus  no_consensus            TRUE</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22     O22  47.50000 78.378378  no_consensus  consensus_in           FALSE</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23     O23  46.25000 77.027027  no_consensus  consensus_in           FALSE</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24     O24  35.00000 79.729730  no_consensus  consensus_in           FALSE</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25     O25  43.75000 74.324324  no_consensus  consensus_in           FALSE</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>stopping</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $recommend_stop</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $class_unchanged_pct</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.76</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $median_stable_pct</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.84</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $p_high_stable_pct</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.72</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $max_rounds</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $current_round</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $note</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon P&gt;0.05 不能单独定义为意见稳定，因为 P 值依赖样本量。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 第 1 轮 60%、第 2 轮 76%、若还有第 3 轮冲到 90%，说明意见仍在变。COS 同样适用“稳定性 + 共识”双条件。未稳定的纳入会在后续试验中难以复现。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_round_shift</span>(res, <span class="at">metric =</span> <span class="st">&quot;p_high&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="脱落是否改变结局排序" class="section level1">
+<h1>10. 脱落是否改变结局排序</h1>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>db <span class="ot">&lt;-</span> res<span class="sc">$</span>dropout</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(db[<span class="fu">order</span>(db<span class="sc">$</span>wilcoxon_p), <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median_completer&quot;</span>, <span class="st">&quot;median_dropout&quot;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                                <span class="st">&quot;p_high_completer&quot;</span>, <span class="st">&quot;p_high_dropout&quot;</span>, <span class="st">&quot;wilcoxon_p&quot;</span>)])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median_completer median_dropout p_high_completer p_high_dropout</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      O05              8.0            9.0         83.78378      100.00000</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12     O12              5.0            6.0         24.28571       33.33333</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      O02              8.0            8.5         86.48649      100.00000</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      O06              8.0            7.5         83.78378      100.00000</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18     O18              6.5            7.5         50.00000       83.33333</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21     O21              7.0            7.5         55.40541       66.66667</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    wilcoxon_p</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   0.1621593</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12  0.2634166</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   0.3435886</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   0.3870505</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18  0.4112576</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21  0.4187421</span></span></code></pre></div>
+<p>若脱落者对“疲劳”“生命质量”评分更低，而留下的人把它们抬进核心集，COS 对患者的代表性就成问题。即使 Wilcoxon 不显著，也要描述人数和方向，不要只写 P 值。</p>
+</div>
+<div id="反馈给多利益相关者" class="section level1">
+<h1>11. 反馈给多利益相关者</h1>
+<p>COMET 实践通常反馈：本人评分 + 总体 + <strong>各利益相关者组</strong>摘要。</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fb <span class="ot">&lt;-</span> <span class="fu">prepare_feedback</span>(res, <span class="at">round =</span> <span class="dv">1</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>fb[fb<span class="sc">$</span>expert_id <span class="sc">==</span> fb<span class="sc">$</span>expert_id[<span class="dv">1</span>],</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;own_score&quot;</span>, <span class="st">&quot;p_high&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id own_score   p_high class_zh</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1      O01         8 85.00000 纳入共识</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2      O02         9 87.50000 纳入共识</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3      O03         7 85.00000 纳入共识</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4      O04         5 88.75000 纳入共识</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5      O05         5 85.00000 纳入共识</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6      O06         7 85.00000 纳入共识</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7      O07         9 85.00000 纳入共识</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8      O08         3  8.75000 未达共识</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9      O09         1 10.00000 排除共识</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10     O10         2  3.75000 排除共识</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11     O11         1  2.50000 排除共识</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12     O12         4 25.00000 未达共识</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13     O13         6 30.00000 未达共识</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14     O14         3 25.31646 未达共识</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15     O15         6 28.75000 未达共识</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16     O16         3 25.00000 未达共识</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17     O17         9 52.50000 未达共识</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18     O18         8 52.50000 未达共识</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19     O19         9 61.53846 未达共识</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20     O20         9 60.81081 未达共识</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21     O21         9 56.25000 未达共识</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22     O22         7 47.50000 未达共识</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23     O23         8 46.25000 未达共识</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24     O24         7 35.00000 未达共识</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25     O25         7 43.75000 未达共识</span></span></code></pre></div>
+<p>第二轮只对未达共识或新改写的结局重评，是常见设计；但至少要保证同一结局有两轮可比数据，否则无法谈稳定性。</p>
+</div>
+<div id="意见主题" class="section level1">
+<h1>12. 意见主题</h1>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_comments</span>(<span class="at">study =</span> cos_demo)<span class="sc">$</span>by_theme</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            theme  n</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     应分层报告 38</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3       定义不清 27</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     测量负担高 26</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       不是核心 23</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 对患者至关重要 20</span></span></code></pre></div>
+<p>“测量负担高”“定义不清”往往比再投一轮更有用：先改操作定义或更换测量工具，再评分。</p>
+</div>
+<div id="共识会议与最终-cos" class="section level1">
+<h1>13. 共识会议与最终 COS</h1>
+<p>会议不应推翻已稳定的 Consensus in / out。重点：</p>
+<ul>
+<li>总体与患者组冲突；</li>
+<li>临界（例如 68% vs 72%）；</li>
+<li>同一领域多个结局如何合并。</li>
+</ul>
+<p>最终文件建议同时给出：</p>
+<ul>
+<li>核心结局列表（必须测）；</li>
+<li>推荐但非核心；</li>
+<li>明确排除；</li>
+<li>仍无共识者。</li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(last<span class="sc">$</span>class_zh)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 纳入共识 排除共识 未达共识 </span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       11        3       11</span></span></code></pre></div>
+</div>
+<div id="报告与核对清单" class="section level1">
+<h1>14. 报告与核对清单</h1>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>html <span class="ot">&lt;-</span> <span class="fu">delphi_report</span>(res, <span class="at">file =</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.html&quot;</span>), <span class="at">template =</span> <span class="st">&quot;comet_cos&quot;</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(html)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>COS 报告除 ACCORD 外，还应对照 COMET 数据库的登记信息。DCAT 核心四项在在线 COS Delphi 中同样适用：匿名投票、至少两轮、统计汇总、个性化反馈。</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dcat_checklist</span>(res)[, <span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;core&quot;</span>, <span class="st">&quot;status&quot;</span>, <span class="st">&quot;item&quot;</span>)]</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        id  core status</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   DCAT1  TRUE    Yes</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   DCAT2  TRUE    Yes</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   DCAT3  TRUE    Yes</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   DCAT4  TRUE    Yes</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   DCAT5 FALSE    Yes</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   DCAT6 FALSE    Yes</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   DCAT7 FALSE    Yes</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   DCAT8 FALSE    Yes</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9   DCAT9 FALSE    Yes</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 DCAT10 FALSE    Yes</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11 DCAT11 FALSE Unsure</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12 DCAT12 FALSE    Yes</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13 DCAT13 FALSE Unsure</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 DCAT14 FALSE    Yes</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15 DCAT15 FALSE    Yes</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 DCAT16 FALSE    Yes</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                            item</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                    匿名：评分在收集与报告时是否适当保持匿名。</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        迭代：是否至少两轮使用相同评分协议，并允许修改原判断。</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3  统计汇总：是否用适当的集中与离散指标以及预先定义的共识规则。</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4            受控反馈：是否提供组结果及个性化的本人上一轮评分。</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                              是否充分论证选择 Delphi 的理由。</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                               Delphi 类型是否与研究问题匹配。</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7                                  专家准入标准与构成是否适当。</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8                                      是否报告并尽力降低脱落。</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9               第一轮前是否完成并分享预备工作（证据/开放题）。</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10     设计选择（轮次、停止规则、讨论会）是否合理且不强迫共识。</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11                       调查问题是否清楚、无诱导、无复合提问。</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12                             应答尺度是否合理并允许文字说明。</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13                                                 是否预测试。</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14                           分析是否预先规定且完整（含缺失）。</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15                               是否按 ACCORD 等规范透明报告。</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16                                       伦理问题是否得到处理。</span></span></code></pre></div>
+</div>
+<div id="本场景常见错误" class="section level1">
+<h1>15. 本场景常见错误</h1>
+<ol style="list-style-type: decimal">
+<li>只用总体百分比，掩盖患者组反对；</li>
+<li>把 70/15 的“15%”丢掉，只看是否 ≥70%；</li>
+<li>用临床共识的 Median+IQR 复合标准却声称遵循 COMET；</li>
+<li>患者人数过少还做分层结论；</li>
+<li>把实验室指标的“无法判断”填成中间值；</li>
+<li>会议用少数专家替换全体 Delphi；</li>
+<li>不报告各组脱落；</li>
+<li>把 Kendall W 显著当成“可以宣布核心结局集”。</li>
+</ol>
+</div>
+<div id="换成自己的-cos-数据" class="section level1">
+<h1>16. 换成自己的 COS 数据</h1>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>study <span class="ot">&lt;-</span> <span class="fu">delphi_study</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">preset_protocol</span>(<span class="st">&quot;comet_cos&quot;</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">panel =</span> your_panel,          <span class="co"># 必须含 stakeholder</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">items =</span> your_outcomes,       <span class="co"># 建议含 outcome_domain</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">ratings =</span> your_ratings,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">comments =</span> your_comments,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">meta =</span> <span class="fu">list</span>(</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;……核心结局集&quot;</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">objective =</span> <span class="st">&quot;确定试验至少应测量的结局&quot;</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">users =</span> <span class="st">&quot;申办者、研究者、患者组织&quot;</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">geography =</span> <span class="st">&quot;国际&quot;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="fu">analyze_delphi</span>(study) <span class="sc">|</span><span class="er">&gt;</span> <span class="fu">delphi_report</span>(<span class="at">file =</span> <span class="st">&quot;cos-report.html&quot;</span>)</span></code></pre></div>
+<p>另外两套教程：</p>
+<ul>
+<li><code>vignette(&quot;clinical-consensus&quot;, package = &quot;delphir&quot;)</code></li>
+<li><code>vignette(&quot;rand-ucla&quot;, package = &quot;delphir&quot;)</code></li>
+</ul>
+<p>可用 <code>delphi_guides()</code> 查看安装后的全部教学入口。</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

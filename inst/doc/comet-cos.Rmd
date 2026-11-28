@@ -1,0 +1,268 @@
+---
+title: "教学文档 3：COMET 核心结局集 Delphi 全流程"
+author: "delphir"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 3：COMET 核心结局集 Delphi 全流程}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# 1. COS 要解决的问题
+
+核心结局集（Core Outcome Set, COS）回答：
+
+> 某一健康状况的临床试验，**至少**应该测量哪些结局？
+
+它不是诊疗共识，也不是适宜性评价。COMET Handbook 广泛使用 9 分制：
+
+- 1–3：有限重要性
+- 4–6：重要但非关键
+- 7–9：关键结局
+
+以及 **70/15 规则**（须预先写进方案）：
+
+- **Consensus in：** ≥70% 评 7–9，且 <15% 评 1–3
+- **Consensus out：** ≥70% 评 1–3，且 <15% 评 7–9
+- 其余：**No consensus**
+
+本教程使用 `cos_demo`：80 人（医生 40、患者 25、研究者 15），25 个 IgA 肾病候选结局，两轮评分。数据里故意放了“总体过线、患者组未过线”的条目。
+
+```{r}
+library(delphir)
+data("cos_demo", package = "delphir")
+cos_demo
+table(cos_demo$panel$stakeholder)
+```
+
+# 2. 为什么阈值和临床共识不同
+
+临床专家共识常用 75%–80% + Median + IQR 的**复合标准**，因为要决定“写不写进共识条款”。
+
+COS 的 70/15 同时管“关键”和“明确不重要”，并防止少数强烈反对被平均掉。一条结局 76% 评 7–9 但 18% 评 1–3，按 70/15 **不能纳入**：反对虽不是主流，但已超过 15%。
+
+```{r}
+protocol <- preset_protocol("comet_cos")
+protocol$rules[c("comet_in_high", "comet_in_low_max",
+                 "comet_out_low", "comet_out_high_max")]
+```
+
+不要把临床共识的 80% 规则或 RAM 的 DI 偷偷换到 COS 上，除非方案里写明并论证。
+
+# 3. 范围、使用者和患者参与
+
+```{r}
+unlist(cos_demo$meta)
+```
+
+**解读：** ACCORD 的 M5（患者与公众参与）在 COS 中几乎是刚需。没有患者的“核心结局”很容易变成医生方便测量的实验室指标。本面板把患者当作与医生、研究者并列的利益相关者，而不是“咨询对象”。
+
+# 4. 候选结局从哪里来
+
+Modified Delphi 的第一轮不是开放提问，而是系统评价 + 患者访谈后的条目池。`outcome_domain` 帮助避免同一领域堆叠过多相似结局。
+
+```{r}
+table(cos_demo$items$outcome_domain)
+head(cos_demo$items[, c("item_id", "item_text", "outcome_domain", "pattern")])
+```
+
+`pattern = patient_dissent` 只在模拟数据中出现，对应教学点：医生认为关键、患者不认为关键。
+
+# 5. 参与与脱落
+
+COS 面板通常更大，在线调查脱落更常见。必须分轮、分组报告。
+
+```{r}
+response_summary(cos_demo)$by_round
+response_summary(cos_demo)$retention
+```
+
+**解读：** 若第 2 轮丢掉的主要是患者，最终 COS 会被临床视角主导。DCAT 的 Panelist retention 要求报告流失类型，而不仅是总人数。
+
+# 6. 总体 70/15 判定
+
+```{r}
+res <- analyze_delphi(cos_demo)
+res
+last <- res$last_classification
+last[, c("item_id", "item_text", "n_valid", "n_unable", "p_high", "p_low", "class_zh")]
+```
+
+**逐类解读：**
+
+- **纳入共识：** 同时满足“多数视为关键”和“很少视为不重要”。死亡、肾脏复合终点等通常落在这里。
+- **排除共识：** 多数明确认为不是核心。进入 COS 会增加测量负担。
+- **未达共识：** 包括中间派多、或两端都有相当比例。这些应进入共识会议，而不是用均数强行排序塞进核心集。
+
+注意 `n_unable`：患者对某些实验室结局选“无法判断”是合理的，不能把 NA 填成 5 分。
+
+```{r}
+plot_item_distribution(cos_demo, round = 2)
+```
+
+# 7. 本教程最重要的一张表：分层
+
+```{r}
+st <- res$stakeholder
+# 找总体纳入但某组未纳入的结局
+overall_in <- last$item_id[last$class == "consensus_in"]
+st_in <- st[st$item_id %in% overall_in, c("item_id", "group_level", "n_valid",
+                                         "p_high", "p_low", "class_zh")]
+st_in
+```
+
+```{r}
+plot_stakeholder(res)
+```
+
+**方法学解读（请停在这里看）：**
+
+假设某结局总体 74% 评 7–9，医生 92%、方法学 88%、患者 42%。只报总体会写成“接近共识/已共识”，但患者明确不认可。COMET 认为这种条目**不能假装已经形成核心结局**。
+
+正确做法：
+
+1. 分列各组 P(7–9) 与 P(1–3)；
+2. 在共识会议上专门讨论组间相反的条目；
+3. 可能的结果包括：纳入但必须同时测量患者报告结局、改定义、或保持 no consensus。
+
+这就是文档强调的 stakeholder-stratified analysis。
+
+# 8. 与临床共识规则并排，看会不会判错
+
+```{r}
+clinical_rule <- classify_consensus(res$item_summary, preset_protocol("clinical_consensus"))
+cmp <- merge(
+  last[, c("item_id", "p_high", "p_low", "class_zh")],
+  clinical_rule[clinical_rule$round == res$last_round,
+                c("item_id", "class_zh")],
+  by = "item_id", suffixes = c("_COMET", "_临床复合")
+)
+head(cmp, 10)
+```
+
+**解读：** 同一组数字，规则不同结论就不同。这不是软件 bug，而是**研究目的决定规则**。写论文时必须报告你预先选择的是 70/15 还是复合标准。
+
+# 9. 稳定性：刚过 70% 不一定能停
+
+```{r}
+res$stability[, c("item_id", "p_high_r1", "p_high_r2", "class_r1", "class_r2",
+                  "class_unchanged")]
+res$stopping
+```
+
+**解读：** 第 1 轮 60%、第 2 轮 76%、若还有第 3 轮冲到 90%，说明意见仍在变。COS 同样适用“稳定性 + 共识”双条件。未稳定的纳入会在后续试验中难以复现。
+
+```{r}
+plot_round_shift(res, metric = "p_high")
+```
+
+# 10. 脱落是否改变结局排序
+
+```{r}
+db <- res$dropout
+head(db[order(db$wilcoxon_p), c("item_id", "median_completer", "median_dropout",
+                                "p_high_completer", "p_high_dropout", "wilcoxon_p")])
+```
+
+若脱落者对“疲劳”“生命质量”评分更低，而留下的人把它们抬进核心集，COS 对患者的代表性就成问题。即使 Wilcoxon 不显著，也要描述人数和方向，不要只写 P 值。
+
+# 11. 反馈给多利益相关者
+
+COMET 实践通常反馈：本人评分 + 总体 + **各利益相关者组**摘要。
+
+```{r}
+fb <- prepare_feedback(res, round = 1)
+fb[fb$expert_id == fb$expert_id[1],
+   c("item_id", "own_score", "p_high", "class_zh")]
+```
+
+第二轮只对未达共识或新改写的结局重评，是常见设计；但至少要保证同一结局有两轮可比数据，否则无法谈稳定性。
+
+# 12. 意见主题
+
+```{r}
+summarize_comments(study = cos_demo)$by_theme
+```
+
+“测量负担高”“定义不清”往往比再投一轮更有用：先改操作定义或更换测量工具，再评分。
+
+# 13. 共识会议与最终 COS
+
+会议不应推翻已稳定的 Consensus in / out。重点：
+
+- 总体与患者组冲突；
+- 临界（例如 68% vs 72%）；
+- 同一领域多个结局如何合并。
+
+最终文件建议同时给出：
+
+- 核心结局列表（必须测）；
+- 推荐但非核心；
+- 明确排除；
+- 仍无共识者。
+
+```{r}
+table(last$class_zh)
+```
+
+# 14. 报告与核对清单
+
+```{r}
+html <- delphi_report(res, file = tempfile(fileext = ".html"), template = "comet_cos")
+file.exists(html)
+```
+
+COS 报告除 ACCORD 外，还应对照 COMET 数据库的登记信息。DCAT 核心四项在在线 COS Delphi 中同样适用：匿名投票、至少两轮、统计汇总、个性化反馈。
+
+```{r}
+dcat_checklist(res)[, c("id", "core", "status", "item")]
+```
+
+# 15. 本场景常见错误
+
+1. 只用总体百分比，掩盖患者组反对；
+2. 把 70/15 的“15%”丢掉，只看是否 ≥70%；
+3. 用临床共识的 Median+IQR 复合标准却声称遵循 COMET；
+4. 患者人数过少还做分层结论；
+5. 把实验室指标的“无法判断”填成中间值；
+6. 会议用少数专家替换全体 Delphi；
+7. 不报告各组脱落；
+8. 把 Kendall W 显著当成“可以宣布核心结局集”。
+
+# 16. 换成自己的 COS 数据
+
+```r
+study <- delphi_study(
+  preset_protocol("comet_cos"),
+  panel = your_panel,          # 必须含 stakeholder
+  items = your_outcomes,       # 建议含 outcome_domain
+  ratings = your_ratings,
+  comments = your_comments,
+  meta = list(
+    title = "……核心结局集",
+    objective = "确定试验至少应测量的结局",
+    users = "申办者、研究者、患者组织",
+    geography = "国际"
+  )
+)
+analyze_delphi(study) |> delphi_report(file = "cos-report.html")
+```
+
+另外两套教程：
+
+- `vignette("clinical-consensus", package = "delphir")`
+- `vignette("rand-ucla", package = "delphir")`
+
+可用 `delphi_guides()` 查看安装后的全部教学入口。
