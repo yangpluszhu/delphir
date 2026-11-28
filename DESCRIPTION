@@ -1,6 +1,6 @@
 Package: delphir
 Title: Structured Delphi and RAND/UCLA Analysis for Consensus Studies
-Version: 0.5.0
+Version: 0.6.0
 Authors@R: c(
     person("Ming", "Yang", email = "yangpluszhu@sina.com",
            role = c("aut", "cre"))
@@ -12,7 +12,9 @@ Description: Protocol-first toolkit for Delphi studies, RAND/UCLA
     between-round stability, prepares controlled feedback, generates
     multi-round Word/Excel questionnaires, screens first-round new items
     with a pre-specified dual pathway, and writes ACCORD, DCAT and
-    CREDES aligned reports.
+    CREDES aligned reports. RAND/UCLA panels use the manual panel-size
+    table by default, with IPRAS, necessity ratings, two-round
+    questionnaires and an optional Word report.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Language: zh
@@ -28,6 +30,6 @@ URL: https://github.com/yangpluszhu/delphir
 BugReports: https://github.com/yangpluszhu/delphir/issues
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2026-10-04 07:52:09 UTC; yangpluszhu
+Packaged: 2026-10-10 04:27:37 UTC; yangpluszhu
 Author: Ming Yang [aut, cre]
 Maintainer: Ming Yang <yangpluszhu@sina.com>

@@ -153,7 +153,11 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   }
 
   if (.is_first_scoring_round(study$protocol, round)) {
-    md <- .questionnaire_round1(study, round = round)
+    md <- if (identical(study$protocol$scenario, "rand_ucla")) {
+      .questionnaire_rand_round1(study)
+    } else {
+      .questionnaire_round1(study, round = round)
+    }
     docs <- md
     names(docs) <- sprintf("round%s", round)
     if (format %in% c("markdown", "html") && is.null(file)) {
@@ -168,6 +172,26 @@ delphi_questionnaire <- function(study = NULL, round = 1,
   src_round <- round - 1L
   have <- unique(study$ratings$round)
   .stop_if(!src_round %in% have, sprintf("\u7f3a\u5c11\u7b2c %s \u8f6e\u8bc4\u5206\uff0c\u65e0\u6cd5\u751f\u6210\u7b2c %s \u8f6e\u53cd\u9988\u3002", src_round, round))
+  ids <- if (is.null(expert_id)) unique(as.character(study$panel$expert_id)) else as.character(expert_id)
+
+  if (identical(study$protocol$scenario, "rand_ucla")) {
+    if (identical(items, "unresolved")) {
+      items <- "all"
+      message("RAND \u7b2c 2 \u8f6e\u53ca\u4ee5\u540e\u590d\u8bc4\u5168\u90e8\u6761\u76ee\uff0c\u4e0d\u5254\u9664\u5df2\u5224\u4e3a\u9002\u5b9c\u6216\u4e0d\u9002\u5b9c\u7684\u6761\u76ee\u3002")
+    }
+    docs <- .questionnaire_rand_followup(study, round, ids)
+    if (format %in% c("markdown", "html") && is.null(file)) {
+      if (format == "html") {
+        docs <- vapply(seq_along(docs), function(i) {
+          .md_to_html(docs[[i]], sprintf("\u7b2c %s \u8f6e RAND \u00b7 %s", round, ids[i]))
+        }, character(1))
+        names(docs) <- ids
+      }
+      return(docs)
+    }
+    return(.write_questionnaires(docs, study, round, format, file, items,
+                                 expert_id, result, split_experts, prefill))
+  }
 
   fb_dim <- if (.is_standard_scenario(study$protocol)) "\u91cd\u8981\u7a0b\u5ea6" else NULL
   fb <- prepare_feedback(if (!is.null(result)) result else study, round = src_round, dimension = fb_dim)
@@ -315,8 +339,45 @@ next_round_questionnaire <- function(result, format = "both", file = NULL,
   invisible(docs)
 }
 
+.protocol_rules_rand <- function(p) {
+  s <- .rand_settings(p)
+  mode <- switch(
+    s$round2_mode,
+    in_person = "\u9762\u5bf9\u9762\u4f1a\u8bae\u540e\u518d\u6b21\u72ec\u7acb\u8bc4\u5206",
+    online = "\u7ebf\u4e0a\u4f1a\u8bae\u540e\u518d\u6b21\u72ec\u7acb\u8bc4\u5206\uff08\u5bf9\u7ecf\u5178\u9762\u5bf9\u9762\u4f1a\u8bae\u7684\u53d8\u901a\uff09",
+    mail = "\u518d\u6b21\u51fd\u8be2\uff0c\u6ca1\u6709\u4f1a\u8bae\uff08\u5bf9\u7ecf\u5178 RAM \u7684\u53d8\u901a\uff09",
+    s$round2_mode
+  )
+  rule <- switch(
+    s$rule,
+    table4 = "\u624b\u518c\u8868 4\uff1a\u6309\u5b9e\u9645\u5e94\u7b54\u4eba\u6570\u67e5\u4e00\u81f4\u4e0e\u5206\u6b67\u9608\u503c\uff08Fitch \u7b49\uff0c2001\uff09\u3002",
+    ipras = sprintf("IPRAS\uff1aIPR = P70 - P30\uff0cIPRAS = %s + %s \u00d7 |5 - IPR \u4e2d\u5fc3|\u3002IPR \u4e25\u683c\u5927\u4e8e IPRAS \u4e3a\u5206\u6b67\u3002\u5206\u4f4d\u6570 type = %s\u3002",
+                     s$iprr, s$cfa, s$qtype),
+    classic_relaxed = "9 \u4eba\u5bbd\u677e\u5b9a\u4e49\uff1a\u4e24\u7aef\u5404\u81f3\u5c11 3 \u4eba\u4e3a\u5206\u6b67\uff1b\u5254\u9664\u4e00\u4e2a\u6700\u9ad8\u5206\u548c\u4e00\u4e2a\u6700\u4f4e\u5206\u540e\uff0c\u5176\u4f59\u5206\u6570\u843d\u5728\u4efb\u610f 3 \u5206\u8de8\u5ea6\u5185\u4e3a\u4e00\u81f4\u3002",
+    classic_strict = "9 \u4eba\u4e25\u683c\u5b9a\u4e49\uff1a\u4e24\u7aef\u5404\u81f3\u5c11 1 \u4eba\u4e3a\u5206\u6b67\uff1b\u5168\u90e8\u8bc4\u5206\u843d\u5728\u4efb\u610f 3 \u5206\u8de8\u5ea6\u5185\u4e3a\u4e00\u81f4\u3002",
+    percent = sprintf("\u767e\u5206\u6bd4\u89c4\u5219\uff08RAM \u4fee\u6539\u7248\uff09\uff1a\u9ad8\u533a\u6bd4\u4f8b \u2265 %.0f%% \u4e14\u4f4e\u533a\u6bd4\u4f8b < %.0f%% \u4e3a\u4e00\u81f4\u3002\u4e0d\u5957\u7528 IPRAS \u5e38\u6570\u3002",
+                       100 * s$percent_high, 100 * s$percent_low),
+    both = "\u540c\u65f6\u8ba1\u7b97\u8868 4 \u4e0e IPRAS\uff0c\u4efb\u4e00\u5224\u4e3a\u5206\u6b67\u5373\u8bb0\u4e3a\u5206\u6b67\u3002",
+    s$rule
+  )
+  bits <- c(
+    sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s\u3002%s", p$scale_min, p$scale_max, .rand_anchor_text(.rand_kind(p))),
+    sprintf("- **\u5206\u6b67\u89c4\u5219\uff1a** %s", rule),
+    "- **\u9002\u5b9c\u6027\uff1a** \u4e2d\u4f4d\u6570 7\u20139 \u4e14\u65e0\u5206\u6b67\u4e3a\u9002\u5b9c\uff1b1\u20133 \u4e14\u65e0\u5206\u6b67\u4e3a\u4e0d\u9002\u5b9c\uff1b\u4e2d\u4f4d\u6570 4\u20136\uff0c\u6216\u4efb\u4f55\u5206\u6b67\uff0c\u4e3a\u4e0d\u786e\u5b9a\u3002\u4e0d\u786e\u5b9a\u4f1a\u533a\u5206\u300c\u4e2d\u4f4d\u6570\u5c45\u4e2d\u300d\u4e0e\u300c\u5b58\u5728\u5206\u6b67\u300d\u3002",
+    sprintf("- **\u8f6e\u6b21\uff1a** \u7b2c 1 \u8f6e\u72ec\u7acb\u8bc4\u5206\uff1b\u7b2c 2 \u8f6e\u4e3a%s\u3002\u7ecf\u5178\u9002\u5b9c\u6027\u4e0d\u8d85\u8fc7 2 \u8f6e\u3002", mode),
+    if (isTRUE(s$necessity)) {
+      "- **\u5fc5\u8981\u6027\uff1a** \u53ea\u8bc4\u4ef7\u9002\u5b9c\u4e14\u65e0\u5206\u6b67\u7684\u6761\u76ee\u3002\u5fc5\u8981\u6027\u4e2d\u4f4d\u6570 \u2265 7 \u4e14\u65e0\u5206\u6b67\u4e3a\u5fc5\u8981\uff0c\u5426\u5219\u4e3a\u9002\u5b9c\u4f46\u975e\u5fc5\u8981\u3002"
+    } else {
+      "- **\u5fc5\u8981\u6027\uff1a** \u672c\u65b9\u6848\u4e0d\u505a\u5fc5\u8981\u6027\u8bc4\u4ef7\u3002"
+    },
+    if (isTRUE(p$rand$nonstandard_ipras)) "- **\u975e\u6807\u51c6 IPRAS \u53c2\u6570\uff1a** \u5df2\u504f\u79bb 2.35\u30011.5 \u6216 type 7\uff0c\u62a5\u544a\u4e2d\u6309\u4fee\u6539\u7248\u8bf4\u660e\u3002" else NULL
+  )
+  paste(bits, collapse = "\n")
+}
+
 .protocol_rules_md <- function(p) {
   r <- p$rules
+  if (identical(p$scenario, "rand_ucla")) return(.protocol_rules_rand(p))
   if (.is_standard_scenario(p)) {
     return(paste(
       sprintf("- **\u91cf\u8868\uff1a** %s\u2013%s \u5206\u3002\u91cd\u8981\u7a0b\u5ea6\uff1a1 \u5f88\u4e0d\u91cd\u8981\uff0c2 \u4e0d\u91cd\u8981\uff0c3 \u4e00\u822c\uff0c4 \u6bd4\u8f83\u91cd\u8981\uff0c5 \u5f88\u91cd\u8981\u3002",

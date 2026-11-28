@@ -83,3 +83,40 @@
 #' data(chf_new_item_demo, package = "delphir")
 #' sort(unique(chf_new_item_demo$ratings$round))
 "chf_new_item_demo"
+
+#' 经典两轮 RAND 适宜性教学数据
+#'
+#' 9 名专家、4 个情境 × 2 种干预、两轮 1–9 分。分数固定，使适宜、不适宜、
+#' 中位数居中的不确定和因分歧导致的不确定都会出现。与 [simulate_ram_classic()]
+#' 相同。供 `vignette("rand-classic-workflow", package = "delphir")` 使用。
+#'
+#' @format `delphi_study` 对象。规则为手册表 4，最多 2 轮。
+#' @seealso [simulate_ram_classic()], [run_rand()], [rand_questionnaire()]
+#' @examples
+#' data(ram_classic_demo, package = "delphir")
+#' table(classify_rand(ram_classic_demo, round = 2)$class_detail)
+"ram_classic_demo"
+
+#' 必要性评价教学数据
+#'
+#' 在 [ram_classic_demo] 的适宜性评分之后，只对适宜且无分歧的条目增加第 3 轮
+#' 必要性评分。第 3 轮不是新的适宜性评分。
+#'
+#' @format `delphi_study` 对象。
+#' @seealso [simulate_rand_necessity()], [classify_necessity()]
+#' @examples
+#' data(ram_necessity_demo, package = "delphir")
+#' table(classify_necessity(ram_necessity_demo)$necessity_zh, useNA = "ifany")
+"ram_necessity_demo"
+
+#' 推荐意见百分比共识教学数据
+#'
+#' 12 名专家对 8 条推荐意见做两轮评分。规则为百分比共识，属于 RAM 修改版，
+#' 不是经典适宜性评价。供 `vignette("rand-rules-workflow", package = "delphir")` 使用。
+#'
+#' @format `delphi_study` 对象。`protocol$rand$purpose` 为 `recommendation`。
+#' @seealso [simulate_rand_recommendation()], [classify_rand()]
+#' @examples
+#' data(ram_recommendation_demo, package = "delphir")
+#' ram_recommendation_demo$protocol$rand$rule
+"ram_recommendation_demo"

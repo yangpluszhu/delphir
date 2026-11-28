@@ -1,0 +1,168 @@
+---
+title: "教学文档 11：规则比较与推荐意见修改版"
+author: "Ming Yang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{教学文档 11：规则比较与推荐意见修改版}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 4.5,
+                      message = FALSE, warning = FALSE)
+```
+
+# 1. 规则必须先选，因为它们会给出不同分类
+
+RAM 的主分类只看两件事：中位数落在哪一区，以及有没有分歧。分歧的定义却有多套。同一组 9 个分数，表 4 和 IPRAS 可以一个说分歧、一个说不分歧。所以本包把规则写进 `preset_protocol()`，默认是引用最广的表 4，而不是把几种定义用「或」合并。
+
+这一节用手册里的三组 9 人分数核对软件，再用 7、9、12、15 人核对查表，最后用一份推荐意见样本说明百分比规则为什么必须标成修改版。
+
+```{r}
+library(delphir)
+```
+
+# 2. 三组手算例
+
+分位数使用 R 的 `quantile(..., type = 7)`，与手册示例的复算一致。分歧的 IPRAS 条件是 IPR **大于** IPRAS，相等不算。
+
+## 2.1 两端对拉：两种规则都判分歧
+
+```{r}
+polar <- rand_disagreement(c(1, 2, 2, 3, 5, 7, 8, 9, 9), method = "both")
+polar[, c("median", "n_low", "n_high", "p30", "p70", "ipr", "ai", "ipras", "di",
+          "table4_disagreement", "ipras_disagreement", "class_detail")]
+```
+
+**解读：** 中位数是 5，1–3 与 7–9 各有 4 人。9 人在表 4 里属于 8–10 人档，两端各 ≥3 即分歧。P30 = 2.4，P70 = 7.6，IPR = 5.2。分布中心几乎在 5 上，非对称指数 AI 为 0，IPRAS 就是 2.35。5.2 > 2.35，IPRAS 也判分歧。分类是「不确定（存在分歧）」，不是「中位数 4–6 所以大家意见温和」。这里的中位数居中，是因为两派对拉，不是因为分数集中在 5。
+
+## 2.2 高分集中：表 4 为一致
+
+```{r}
+agree <- rand_disagreement(c(6, 7, 7, 8, 8, 8, 9, 9, 9), method = "table4")
+agree[, c("median", "n_out", "agreement_max", "agreement_status", "p30", "p70",
+          "ipr", "ipras", "class")]
+```
+
+**解读：** 中位数 8，包含中位数的三分区是 7–9。只有 1 个 6 分落在区外，8–10 人档允许区外不超过 2 人，所以是一致，分类为适宜。IPR = 1.2，远小于 IPRAS。一个略低的 6 分没有把条目打成不确定。
+
+## 2.3 表 4 与 IPRAS 不一致的那一组
+
+```{r}
+split_rule <- rand_disagreement(c(2, 3, 3, 7, 8, 8, 8, 9, 9), method = "table4")
+split_rule[, c("median", "n_low", "n_high", "table4_disagreement", "p30", "p70",
+               "ipr", "iprcp", "ai", "ipras", "ipras_disagreement", "class_zh")]
+ipras_only <- rand_disagreement(c(2, 3, 3, 7, 8, 8, 8, 9, 9), method = "ipras")
+ipras_only$class
+```
+
+**解读：** 3 个人明确打在 1–3，6 个人打在 7–9。表 4 认为这是极化，分歧成立，中位数虽然是 8，分类仍是不确定。IPRAS 看到分布整体偏高（IPR 中心约 6.3，AI 约 1.3），把分歧阈值放宽到约 4.30，而 IPR 约 3.4，于是不判分歧。若方案选的是 IPRAS，这条会变成适宜。
+
+这不是应该在看到结果后挑选的空间。第 1 轮问卷发出前写 `table4` 或 `ipras`。敏感性分析的作用是报告「如果当初选了另一套，有几条会变」，不是更换已经锁定的规则。
+
+# 3. 人数一变，阈值就变
+
+```{r}
+rand_panel_thresholds(c(7, 9, 12, 15, 17))
+```
+
+**解读：**
+
+- 8–10 人：区外 ≤2 为一致，两端各 ≥3 为分歧。9 人用这一档。
+- 11–13 人：区外 ≤3，两端各 ≥4。12 人用这一档。
+- 14–16 人：区外 ≤4，两端各 ≥5。15 人用这一档。
+- 7 人沿用 8–10，`small_panel = TRUE`。手册允许的最小规模附近要在报告里写明。
+- 17 人及更多按「每增加 3 人，两个阈值各加 1」外推，`extrapolated = TRUE`。手册没有正式表列，报告必须写「外推」。
+- 少于 7 人仍会计算，但分类只供描述。不要用 5 个人的面板发表适宜性清单。
+
+查表用的是这条的实际应答人数。2 个人未答，9 人面板就按 7 人查，而不是仍按 9 人。
+
+9 人还有一套更早的严格/宽松定义（手册表 3）。严格定义几乎把任何跨区都当成分歧，宽松定义在去掉一个最高分和一个最低分后看是否落在任意 3 分跨度内。它们不是表 4。人数不是 9 时调用它们会警告。
+
+```{r}
+mild <- c(1, 7, 7, 8, 8, 8, 8, 8, 8)
+rand_disagreement(mild, method = "classic_strict", warn = FALSE)$class
+rand_disagreement(mild, method = "classic_relaxed", warn = FALSE)$class
+rand_disagreement(mild, method = "table4", warn = FALSE)$class
+```
+
+**解读：** 只有 1 个人打在低区。严格定义因此判分歧，条目变成不确定。宽松定义和表 4 仍判适宜。若论文写「采用 RAND 严格定义」，就不能在软件里调用默认的 `table4`。
+
+旧参数名 `classic` 从 0.6.0 起等于表 4，不再等于 `ceiling(人数/3)`。10 人和 16 人是两种算法分叉的例子，升级后应用同一批数据复算一次。
+
+# 4. 在教学数据上做敏感性，而不是改规则
+
+```{r}
+ram <- simulate_ram_classic()
+sens <- rand_sensitivity(ram, round = 2, loo = TRUE)
+sens$kappa
+sens$by_item[, c("item_id", "class_table4", "class_ipras")]
+```
+
+**解读：** κ 是两套规则分类的一致程度，无加权，用基础 R 计算，不依赖其他包。κ 不是适宜性指标。某一对规则的 κ 低，只说明附表对规则敏感，正文要写明锁定的是哪一套。`class_table4` 与 `class_ipras` 不同的那一行，就是上面第 2.3 节那种情形在样本里的对应条目（IND04）。
+
+```{r}
+sens$loo
+plot_rand_sensitivity(sens)
+```
+
+**解读：** `n_changed` 是拿掉该专家后分类翻转的条目数。全部为 0 并不证明结论无比稳固，只说明在这 8 条、这 9 个人里，没有单个人能翻转表 4 的分类。人数更少或条目更靠近阈值时，这个数会上升。图里的分组条形是各规则下适宜、不确定、不适宜的条数，方便放进附录。它不产生新的正式分类。
+
+# 5. 推荐意见：百分比规则是修改版
+
+很多指南实际上评的是一条推荐意见，而不是「情境 × 干预」矩阵，量表仍可能是 1–9。这时若借用「70% 的人打在 7–9，且不到 15% 打在 1–3」这类阈值，就不再是经典 RAM。软件可以算，但 `purpose` 必须是 `recommendation`，规则必须是 `percent`，报告里的分类中文会带「RAM 修改版」。IPRAS 的 2.35 和 1.5 不参与这个场景。
+
+样本由 `simulate_rand_recommendation()` 生成，也可 `data(ram_recommendation_demo)`。12 名专家、8 条推荐意见、两轮，第 2 轮设定为线上会议。
+
+```{r}
+rec <- simulate_rand_recommendation()
+rec$protocol$rand[c("rule", "purpose", "percent_high", "percent_low", "round2_mode")]
+rec$protocol$rationale
+```
+
+**解读：** 高区下限 0.70、低区上限 0.15 是本方案锁定的数，不是软件偷偷采用的「行业标准」。12 人里 0.70 意味着至少约 9 人打在 7–9，且低区人数必须少于 15%。换一个百分比就要写 `rationale`。`round2_mode = online` 会写进问卷和报告：这是对面对面会议的变通。
+
+```{r}
+q <- rand_questionnaire(rec, round = 1, format = "docx",
+                        file = tempfile("rec-q-", fileext = ".docx"))
+basename(q)
+cls <- classify_rand(rec, round = 2)
+cls[, c("item_id", "median", "n_low", "n_high", "agreement_status", "class", "class_zh", "modified_ram")]
+```
+
+**解读：**
+
+- 问卷是推荐意见的同意程度，不是危害—获益锚点。第 1 轮 docx 会写明修改版。
+- `modified_ram` 全为 TRUE。不要把这些中文标签抄成「RAND 适宜」。
+- 「达成共识（RAM 修改版）」表示高区比例达到 0.70 且低区低于 0.15，同时中位数落在高区。
+- 「倾向不采纳（RAM 修改版）」表示中位数在低区，且没有把百分比规则下的分歧定义触发成另一种状态。它不是经典的 Inappropriate。
+- 「未达成共识（RAM 修改版）」是其余情形，包括两头都有相当比例的人。这些意见应留下来讨论或放弃，而不是降低阈值让它们过线。
+
+第 2 轮同样复评全部意见，不因为第 1 轮已经过线就删掉。
+
+```{r}
+res <- run_rand(rec, report = FALSE, loo = FALSE)
+res$rand_meta$modified_ram
+res$rand_meta$round2_mode
+docx <- tempfile("rec-report-", fileext = ".docx")
+reported <- run_rand(rec, report = TRUE, format = "docx", file = docx, loo = FALSE)
+file.exists(attr(reported, "report_file"))
+```
+
+**解读：** 报告会标成修改版，并写明第 2 轮是线上会议。敏感性分析里如果 IPRAS 或表 4 与百分比规则不一致，这是预期的：三套规则回答的不是同一个问题。正式结论只采用锁定的百分比规则。表 4 的结果可以放在附录，并注明「若按经典适宜性规则，分类会不同」。
+
+1–5 或 1–7 的量表不能直接套表 4 的 1–3/4–6/7–9，更不能套 2.35 和 1.5。必须自己给出三分区，并改用百分比规则或在方案里显式声明非标准 IPRAS 常数。软件在默认常数遇上非 1–9 量表时会停止，避免一本正经地算出无法解释的 DI。
+
+# 6. 写进方法学段落的最低限度
+
+无论是经典适宜性还是推荐意见修改版，方法段至少要写清：
+
+1. 第 1 轮独立、第 2 轮是面对面、线上还是再次函询；
+2. 1–9 的锚点原文；
+3. 分歧规则的名称和文献，以及应答人数如何查表；
+4. 不确定分成「中位数居中」和「存在分歧」，二者都保留；
+5. 若做了必要性，只针对适宜且无分歧的条目；
+6. 百分比规则、线上会议、超过 2 轮的适宜性评分、非标准 IPRAS 常数，都写成对经典 RAM 的偏离；
+7. 权威系数和 Kendall's W 若报告，声明它们不参与分类。

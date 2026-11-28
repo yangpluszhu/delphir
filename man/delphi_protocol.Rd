@@ -21,8 +21,18 @@ delphi_protocol(
   comet_in_low_max = 0.15,
   comet_out_low = 0.7,
   comet_out_high_max = 0.15,
-  rand_disagreement = c("both", "classic", "ipras"),
+  rand_disagreement = c("table4", "ipras", "classic_relaxed", "classic_strict",
+    "percent", "both", "classic"),
   rand_di_threshold = 1,
+  rand_round2_mode = c("in_person", "online", "mail"),
+  rand_necessity = FALSE,
+  rand_boundary = c("uncertain", "round_half_down", "round_half_up"),
+  rand_iprr = 2.35,
+  rand_cfa = 1.5,
+  rand_qtype = 7L,
+  rand_percent_high = 0.7,
+  rand_percent_low = 0.15,
+  rand_purpose = c("appropriateness", "recommendation"),
   max_rounds = 3,
   stability_class_pct = 0.8,
   stability_median_delta = 1,
@@ -56,8 +66,9 @@ delphi_protocol(
 高区比例 + Median + IQR。这是最常用的预设。
 \item comet_cos：COMET 核心结局集。使用 70/15 纳入/排除规则，而不是
 high_pct 复合标准。
-\item rand_ucla：适宜性评价。按 Median 区间 + 分歧指数分类，
-\strong{不强迫共识}；high_pct / basic_pct 对本场景为 NA。
+\item rand_ucla：适宜性评价。默认按手册表 4（应答人数查表）加中位数分类，
+\strong{不强迫共识}。也可改用 IPRAS、9 人严格/宽松定义或百分比规则。
+high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
 \item indicator：指标体系筛选。在基本共识之外还要求 CV 不超过 cv_max。
 \item ranking：优先级排序。不判定必须共识，配合 \code{\link[=rank_priorities]{rank_priorities()}} /
 \code{\link[=kendall_w]{kendall_w()}} 使用。
@@ -105,12 +116,35 @@ Diamond 等系统评价显示文献阈值差异很大；正确原则是\strong{�
 \item{comet_out_high_max}{COMET 排除：高区比例上限，默认 0.15。
 两套 70/15 都不满足的条目进入下一轮或共识会议，而不是自动删除。}
 
-\item{rand_disagreement}{RAND 分歧定义。\code{"classic"} 为经典 9 人面板规则
-（≥3 人在 1–3 且 ≥3 人在 7–9）；\code{"ipras"} 为 IPRAS；\code{"both"}（默认）同时报告。
-仅 \code{rand_ucla} 场景进入 \code{\link[=classify_rand]{classify_rand()}}。}
+\item{rand_disagreement}{RAND 分歧定义，仅 \code{rand_ucla} 进入 \code{\link[=classify_rand]{classify_rand()}}。
+\code{"table4"}（默认）按 Fitch 等（2001）表 4 用实际应答人数查表。
+\code{"ipras"} 为 IPRAS（IPR 严格大于 IPRAS 才算分歧）。
+\code{"classic_relaxed"} / \code{"classic_strict"} 为 9 人小组的手册表 3。
+\code{"percent"} 为百分比共识，属于 RAM 修改版，用于推荐意见。
+\code{"both"} 为表 4 与 IPRAS 任一判分歧即分歧。
+\code{"classic"} 是旧参数名，现与 \code{"table4"} 相同，不再使用 \code{ceiling(n/3)}。}
 
-\item{rand_di_threshold}{分歧指数阈值，默认 1。DI > 阈值视为分歧，该指征
-即使 Median 落在 7–9 也只能标为不确定，而不是「适宜」。}
+\item{rand_di_threshold}{IPRAS 的倍率，默认 1，即 IPR > IPRAS 才算分歧。
+相等不算分歧。}
+
+\item{rand_round2_mode}{第 2 轮形式：\code{"in_person"} 面对面会议后复评，
+\code{"online"} 线上会议后复评，\code{"mail"} 再次函询。后两种须在报告中说明。}
+
+\item{rand_necessity}{是否计划在适宜且无分歧的条目上另做必要性评分。
+必要性不是第三轮适宜性评分。}
+
+\item{rand_boundary}{中位数为 3.5 或 6.5 时：\code{"uncertain"}（默认）归不确定，
+\code{"round_half_down"} 或 \code{"round_half_up"} 向相邻整数取整后再套三分区。}
+
+\item{rand_iprr, rand_cfa}{IPRAS 常数，默认 2.35 与 1.5。改动后报告标为非标准参数。}
+
+\item{rand_qtype}{分位数算法，默认 7（与手册示例的 R 复算一致）。}
+
+\item{rand_percent_high, rand_percent_low}{百分比规则的高区下限与低区上限。
+默认 0.70 与 0.15。只在 \code{rand_disagreement = "percent"} 时驱动分类。}
+
+\item{rand_purpose}{\code{"appropriateness"}（默认）或 \code{"recommendation"}。
+推荐意见应使用百分比规则，并在报告中标明 RAM 修改版。}
 
 \item{max_rounds}{计划最多轮次，默认 3。这是\strong{终止规则的上限}，不是「必须跑满」。
 问卷生成超过该值会报错。DCAT 将迭代视为核心特征，至少应有两轮相同量表。}
@@ -193,7 +227,7 @@ Policy 与 5 分核心技术要素为 \code{FALSE}。}
 \item \code{open_first}：第 1 轮是否为开放式征询
 \item \code{new_items}：第一轮新增条目规则（是否允许、独立人数、单人例外、
 每人上限、是否必须再迭代一轮、审查组说明）
-\item \code{rand}：分歧设定
+\item \code{rand}：规则、第 2 轮形式、必要性、边界中位数、IPRAS 常数与百分比阈值
 \item \code{modified_from_preset}, \code{rationale}, \code{locked}
 }
 }

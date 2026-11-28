@@ -114,7 +114,7 @@ if (is.null(res$authority)) {
 
 # 各轮问卷内容
 
-问卷由锁定方案自动生成：第 1 轮含规则原文、权威系数自评与 Likert；第 2 轮及以后为受控反馈（本人上轮评分 + 组 Median/IQR/高区 + 匿名意见），不再出现 Ca/Cs。
+问卷由锁定的 RAND 方案生成。第 1 轮独立评分，不展示他人分数。第 2 轮给出本人上轮分数、1–3/4–6/7–9 频数、中位数和分歧标记，并要求对全部条目复评。已判为适宜或不适宜的条目仍然复评。权威系数若收集，只作补充，不参与适宜性判定。
 
 ```{r}
 for (rnd in rounds_all) {
@@ -173,7 +173,7 @@ for (rnd in rounds_all) {
 }
 ```
 
-`r if (!is_final) "本轮分类用于决定下一轮问卷：高度/基本共识可考虑不再重评；临界、未达共识、两极分化及根据意见修改过的条目必须带反馈重评。"`
+RAND 第 2 轮复评全部指征。适宜、不适宜和不确定都是该轮的正式结果。不确定要区分「中位数落在 4–6」和「存在分歧」。分歧不是未完成，也不应用加轮评分把它消掉。
 
 # 证据与共识分列
 
@@ -244,6 +244,131 @@ if (!is.null(qs$by_theme) && nrow(qs$by_theme)) {
 } else {
   cat("无编码意见。")
 }
+```
+
+# RAND 判定明细
+
+规则、第 2 轮形式和是否偏离经典两轮流程：
+
+```{r}
+meta_rand <- res$rand_meta
+if (is.null(meta_rand)) meta_rand <- delphir:::.rand_meta(study)
+knitr::kable(data.frame(
+  项目 = c("锁定规则", "第 2 轮形式", "目的", "是否计划必要性评价", "适宜性轮次超过 2", "是否为修改版", "IPRAS 常数是否非标准"),
+  内容 = c(
+    meta_rand$rule, meta_rand$round2_mode, meta_rand$purpose,
+    if (isTRUE(meta_rand$necessity)) "是" else "否",
+    if (isTRUE(meta_rand$deviation)) "是。这是对经典 RAM 的偏离，作者必须说明理由。" else "否",
+    if (isTRUE(meta_rand$modified_ram)) "是。百分比规则、非 1–9 量表或非标准 IPRAS 常数均须标明修改版。" else "否",
+    if (isTRUE(meta_rand$nonstandard_ipras)) "是" else "否"
+  )
+), caption = "RAND 方案执行情况")
+cat(meta_rand$supplement)
+```
+
+```{r}
+keep <- intersect(c("item_id", "item_text", "n_valid", "median", "n_low", "n_mid", "n_high",
+                    "n_out", "p30", "p70", "ipr", "ipras", "di", "agreement_status",
+                    "disagreement_min", "threshold_note", "class", "class_zh"), names(last_show))
+show <- last_show[, keep, drop = FALSE]
+if ("item_text" %in% names(show)) show$item_text <- substr(show$item_text, 1, 28)
+knitr::kable(show, digits = 2, caption = "末轮适宜性：中位数、区间人数、IPR/IPRAS 与分类")
+```
+
+中位数 7–9 且无分歧为适宜，1–3 且无分歧为不适宜。中位数 4–6 而无分歧，是专家认为获益与危害接近。任何分歧都改为不确定，即使中位数仍在 7–9。两类不确定都保留，不合并成「未达成共识」后删去。
+
+```{r}
+if ("class_detail" %in% names(last_show)) {
+  knitr::kable(as.data.frame(table(last_show$class_detail, useNA = "ifany")),
+               col.names = c("分类明细", "n"),
+               caption = "末轮分类明细")
+}
+disagree_rows <- last_show
+if ("disagreement" %in% names(disagree_rows)) {
+  disagree_rows <- disagree_rows[disagree_rows$disagreement %in% TRUE, , drop = FALSE]
+  if (nrow(disagree_rows)) {
+    kk <- intersect(c("item_id", "item_text", "median", "n_low", "n_high", "di", "class_zh"), names(disagree_rows))
+    knitr::kable(disagree_rows[, kk, drop = FALSE], digits = 2,
+                 caption = "存在分歧的条目（正式结果，不是待补评清单）")
+  } else {
+    cat("本轮没有判为分歧的条目。")
+  }
+}
+```
+
+# 轮次变化
+
+```{r}
+cmp <- res$round_comparison
+if (is.null(cmp)) {
+  cmp <- tryCatch(delphir::rand_compare_rounds(res), error = function(e) NULL)
+}
+if (is.null(cmp) || is.null(cmp$group)) {
+  cat("轮次不足，或无法比较。")
+} else {
+  knitr::kable(cmp$group, digits = 2, caption = "各轮适宜、不适宜与两类不确定的条目数，以及 IPR 均数")
+  if (!is.null(cmp$items) && nrow(cmp$items)) {
+    cols <- intersect(c("item_id", "from_round", "to_round", "median_from", "median_to",
+                        "ipr_from", "ipr_to", "class_zh_from", "class_zh_to", "changed", "wilcoxon_p"),
+                      names(cmp$items))
+    knitr::kable(cmp$items[, cols, drop = FALSE], digits = 3, caption = "相邻轮分类是否改变")
+    cat(cmp$note)
+  }
+}
+```
+
+分类改变说明会议或反馈之后判断有移动。Wilcoxon 的 P 值不决定适宜或不适宜。
+
+# 规则敏感性
+
+```{r}
+sens <- res$sensitivity
+if (is.null(sens) || !is.null(sens$error)) {
+  sens <- tryCatch(delphir::rand_sensitivity(res, loo = FALSE), error = function(e) list(error = conditionMessage(e)))
+}
+if (!is.null(sens$error)) {
+  cat(sens$error)
+} else {
+  if (!is.null(sens$kappa) && nrow(sens$kappa)) {
+    knitr::kable(sens$kappa, digits = 3, caption = "规则之间的 Cohen's κ（无加权）。κ 低表示规则选择会改变分类，应遵守事先锁定的那一套。")
+  }
+  if (!is.null(sens$loo) && nrow(sens$loo)) {
+    knitr::kable(sens$loo, caption = "逐一剔除一名专家后，分类发生翻转的条目数")
+  } else {
+    cat("本次未做逐一剔除。需要时在 run_rand(loo = TRUE) 中打开。")
+  }
+  cat(sens$note %||% "")
+  if (length(sens$skipped)) cat(paste(sens$skipped, collapse = "\n"))
+}
+```
+
+```{r, fig.cap="不同规则下的分类计数"}
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  print(delphir::plot_rand_sensitivity(if (!is.null(res$sensitivity) && is.null(res$sensitivity$error)) res$sensitivity else res))
+}
+```
+
+# 必要性
+
+必要性只评价「适宜且无分歧」的条目。必要性中位数 ≥ 7 且无分歧为必要，否则为适宜但非必要。这不是第三轮适宜性评分。
+
+```{r}
+nec <- res$necessity
+if (is.null(nec)) {
+  cat("本方案没有必要性评分。")
+} else {
+  cols <- intersect(c("item_id", "appropriateness_zh", "eligible", "necessity_zh", "median", "disagreement", "note"), names(nec))
+  knitr::kable(nec[, cols, drop = FALSE], digits = 2, caption = "必要性分类")
+}
+```
+
+# 最终适宜性清单
+
+```{r}
+fin_cols <- intersect(c("item_id", "item_text", "class", "class_zh", "median", "di", "agreement_status"), names(last_show))
+fin <- last_show[, fin_cols, drop = FALSE]
+if ("item_text" %in% names(fin)) fin$item_text <- substr(fin$item_text, 1, 40)
+knitr::kable(fin, digits = 2, caption = "可放入指南附表的末轮清单。不确定与分歧条目一并列出。")
 ```
 
 # 最终结果与共识会议建议

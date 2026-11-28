@@ -35,11 +35,22 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
   participation <- response_summary(study)
   item_summary <- summarize_items(study)
 
+  necessity <- NULL
   if (identical(p$scenario, "rand_ucla")) {
-    classification <- do.call(rbind, lapply(.unique_sorted(item_summary$round), function(rnd) {
-      classify_rand(study, round = rnd, summary = item_summary)
+    summary_app <- item_summary
+    if ("dimension" %in% names(summary_app)) {
+      summary_app <- summary_app[!grepl("\u5fc5\u8981", summary_app$dimension), , drop = FALSE]
+    }
+    classification <- do.call(rbind, lapply(.unique_sorted(summary_app$round), function(rnd) {
+      classify_rand(study, round = rnd, summary = summary_app)
     }))
     rownames(classification) <- NULL
+    if ("dimension" %in% names(item_summary) && any(grepl("\u5fc5\u8981", item_summary$dimension))) {
+      necessity <- tryCatch(
+        classify_necessity(study, appropriateness = classification),
+        error = function(e) NULL
+      )
+    }
   } else if (identical(p$scenario, "ranking")) {
     classification <- classify_consensus(item_summary, p)
   } else {
@@ -97,8 +108,14 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
   comments_summary <- summarize_comments(study = study)
 
   last_round <- max(item_summary$round)
+  if (identical(p$scenario, "rand_ucla") && is.data.frame(classification) && nrow(classification)) {
+    last_round <- max(classification$round)
+  }
   dims_last <- unique(item_summary$dimension[item_summary$round == last_round])
-  prefer <- intersect(c("\u91cd\u8981\u7a0b\u5ea6", "\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027"), dims_last)
+  if (!length(dims_last) && is.data.frame(classification) && nrow(classification)) {
+    dims_last <- unique(classification$dimension[classification$round == last_round])
+  }
+  prefer <- intersect(c("\u91cd\u8981\u7a0b\u5ea6", "\u91cd\u8981\u6027", "overall", "\u9002\u5b9c\u6027", "\u540c\u610f\u7a0b\u5ea6"), dims_last)
   dim0 <- if (length(prefer)) prefer[1] else dims_last[1]
   kendall <- tryCatch(
     kendall_w(study, round = last_round, dimension = dim0),
@@ -169,6 +186,7 @@ analyze_delphi <- function(study, by_stakeholder = TRUE, check_dropout = TRUE,
       item_log = item_log,
       meeting_agenda = meeting_agenda,
       new_item_audit = new_item_audit,
+      necessity = necessity,
       last_round = last_round,
       last_classification = last
     ),

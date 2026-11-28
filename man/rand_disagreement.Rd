@@ -2,42 +2,88 @@
 % Please edit documentation in R/rand_ucla.R
 \name{rand_disagreement}
 \alias{rand_disagreement}
-\title{计算 RAND/UCLA 分歧指标}
+\title{计算一条 RAND/UCLA 评分的分歧、一致与适宜性}
 \usage{
 rand_disagreement(
   scores,
-  method = c("both", "classic", "ipras"),
-  di_threshold = 1
+  method = c("table4", "ipras", "classic_relaxed", "classic_strict", "percent", "both",
+    "classic"),
+  di_threshold = 1,
+  warn = TRUE,
+  low = c(1, 3),
+  mid = c(4, 6),
+  high = c(7, 9),
+  iprr = 2.35,
+  cfa = 1.5,
+  qtype = 7L,
+  percent_high = 0.7,
+  percent_low = 0.15,
+  boundary = c("uncertain", "round_half_down", "round_half_up"),
+  scale = c(1, 9)
 )
 }
 \arguments{
-\item{scores}{同一指征的有效 1–9 评分向量。}
+\item{scores}{同一条目的 1–9 评分向量。无法判断不要放进这个向量。}
 
-\item{method}{\code{"both"}、\code{"classic"} 或 \code{"ipras"}。}
+\item{method}{\code{"table4"}（默认）、\code{"ipras"}、\code{"classic_relaxed"}、
+\code{"classic_strict"}、\code{"percent"}、\code{"both"} 或 \code{"classic"}（表 4 的别名）。
+\code{"both"} 表示表 4 与 IPRAS 任一判为分歧即分歧。}
 
-\item{di_threshold}{DI 阈值，默认 1。}
+\item{di_threshold}{仅用于 IPRAS。分歧条件为 \code{IPR > IPRAS * di_threshold}，
+默认 1，即 IPR 严格大于 IPRAS。}
+
+\item{warn}{人数不足、外推或把 9 人定义用到其他人数时是否警告。}
+
+\item{low, mid, high}{三分区，默认 1–3、4–6、7–9。}
+
+\item{iprr, cfa, qtype}{IPRAS 常数与分位数算法。偏离 2.35、1.5 或 type 7
+时记为非标准参数。}
+
+\item{percent_high, percent_low}{百分比规则：高区比例至少为 \code{percent_high}
+且低区比例低于 \code{percent_low} 才算一致。这是 RAM 修改版。}
+
+\item{boundary}{中位数恰为两个三分区的分界（默认 3.5 或 6.5）时如何处理。
+\code{"uncertain"} 归入不确定。}
+
+\item{scale}{量表端点。不是 1–9 时不得套用默认 IPRAS 常数。}
 }
 \value{
-单行数据框：\code{n_valid}, \code{p30}, \code{p70}, \code{ipr}, \code{iprcp}, \code{ai}, \code{ipras},
-\code{di}, \code{classic_disagreement}, \code{ipras_disagreement}, \code{disagreement}。
+一行数据框。主分类在 \code{class}（appropriate / uncertain / inappropriate）。
+\code{class_detail} 把不确定拆成中位数居中、存在分歧或边界中位数。
+\code{agreement_status} 为 agreement / indeterminate / disagreement。
 }
 \description{
-按 Fitch 等（2001）手册实现两套定义：
-经典规则（两端各至少约 1/3）与 IPRAS / 分歧指数 DI。
+同时给出手册表 4、9 人严格/宽松定义和 IPRAS。\code{method} 决定哪一套进入
+\code{disagreement} 与 \code{class}。默认 \code{table4}。旧名 \code{classic} 与 \code{table4} 相同，
+不再使用 0.5.0 的 \code{ceiling(n/3)}。
 }
-\section{公式}{
+\details{
+IPRAS：\code{IPR = P70 - P30}，\verb{IPRAS = IPRr + CFA * |5 - (P30+P70)/2|}，
+默认 \code{IPRr = 2.35}、\code{CFA = 1.5}、分位数 \code{type = 7}。分歧为 \strong{IPR > IPRAS}
+（相等不算分歧）。IPRAS 本身不定义「一致」，一致状态沿用表 4 的区外人数。
+}
+\section{输入输出}{
 
-\deqn{IPR = P_{70}-P_{30}}
-\deqn{AI = |(P_{30}+P_{70})/2 - 5|}
-\deqn{IPRAS = 2.35 + 1.5 \times AI}
-\deqn{DI = IPR / IPRAS}
-\code{DI >= 1} 视为分歧。任何分歧都将使最终分类变为 Uncertain。
+\strong{输入}为数值向量，一个条目、一轮、一个量表。缺失值会被去掉。
+
+\strong{输出}始终包含 P30、P70、IPR、IPRAS、DI、两端人数、区外人数、所用阈值、
+各规则的分歧标记和最终分类，便于逐条复核。
+}
+
+\section{文献}{
+
+Fitch 等（2001）第 8 章；9 人严格/宽松定义见手册表 3（早期研究与
+Scott & Black, 1991）。百分比规则仅用于推荐意见，必须标明修改版。
 }
 
 \examples{
-# 高度一致
-rand_disagreement(c(8, 8, 9, 9, 8, 7, 9, 8, 8))
-# 两端拉扯
-rand_disagreement(c(1, 1, 2, 2, 5, 8, 9, 9, 9))
+# 手册示例：高度一致，表 4 为一致，IPRAS 无分歧
+rand_disagreement(c(6, 7, 7, 8, 8, 8, 9, 9, 9), method = "table4")
+# 两端对拉：表 4 与 IPRAS 都判分歧
+rand_disagreement(c(1, 2, 2, 3, 5, 7, 8, 9, 9), method = "both")
+# 表 4 判分歧、IPRAS 不判分歧
+d <- rand_disagreement(c(2, 3, 3, 7, 8, 8, 8, 9, 9), method = "table4")
+d$table4_disagreement
+d$ipras_disagreement
 
 }

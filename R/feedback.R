@@ -27,9 +27,13 @@ prepare_feedback <- function(study, round = NULL, dimension = NULL,
   } else {
     study <- .match_study(study)
     summary <- summarize_items(study)
-    if (study$protocol$scenario == "rand_ucla") {
-      classification <- do.call(rbind, lapply(.unique_sorted(summary$round), function(rnd) {
-        classify_rand(study, round = rnd, summary = summary)
+    if (identical(study$protocol$scenario, "rand_ucla")) {
+      summary_use <- summary
+      if ("dimension" %in% names(summary_use)) {
+        summary_use <- summary_use[!grepl("\u5fc5\u8981", summary_use$dimension), , drop = FALSE]
+      }
+      classification <- do.call(rbind, lapply(.unique_sorted(summary_use$round), function(rnd) {
+        classify_rand(study, round = rnd, summary = summary_use)
       }))
     } else {
       classification <- classify_consensus(summary, study$protocol)
@@ -60,7 +64,8 @@ prepare_feedback <- function(study, round = NULL, dimension = NULL,
     r[, c("expert_id", "item_id", "score", "unable", "stakeholder")],
     cls[, intersect(c("item_id", "median", "iqr", "q1", "q3", "p_high", "p_low",
                       "median_iqr", "class", "class_zh", "n_valid", "di",
-                      "disagreement", "mean", "sd", "cv", "full_rate", "n_full"), names(cls))],
+                      "disagreement", "agreement_status", "n_low", "n_mid", "n_high",
+                      "class_detail", "ipr", "mean", "sd", "cv", "full_rate", "n_full"), names(cls))],
     by = "item_id",
     all.x = TRUE
   )

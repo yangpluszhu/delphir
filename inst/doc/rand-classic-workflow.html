@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Ming Yang" />
+
+<meta name="date" content="2026-10-10" />
+
+<title>教学文档 9：经典 RAND 两轮适宜性，从问卷到 docx 报告</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">教学文档 9：经典 RAND 两轮适宜性，从问卷到 docx 报告</h1>
+<h4 class="author">Ming Yang</h4>
+<h4 class="date">2026-10-10</h4>
+
+
+
+<div id="这次要完成什么" class="section level1">
+<h1>1. 这次要完成什么</h1>
+<p>经典 RAND/UCLA 适宜性方法（RAM，Fitch 等，2001）不是把专家意见收敛成一条共识。它回答的是：在某个临床情境里，做某项干预，预期获益是否超过预期危害。</p>
+<p>标准结构是两轮：</p>
+<ol style="list-style-type: decimal">
+<li>第 1 轮独立评分，专家之间不讨论；</li>
+<li>第 2 轮先看匿名反馈，面对面会议讨论后，再独立评分。</li>
+</ol>
+<p>讨论不能代替评分。第 2 轮之后仍然不确定或存在分歧的条目，要作为正式结果写进报告，而不是再加一轮把分歧涂掉。</p>
+<p>本教程使用固定模拟数据 <code>ram_classic_demo</code>（与 <code>simulate_ram_classic()</code> 相同）：9 名专家，4 个情境 × 2 种干预，两轮 1–9 分。分数是事先排好的，用来同时出现适宜、不适宜、中位数居中的不确定，以及因分歧导致的不确定。它不是真实指南。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(delphir)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ram <span class="ot">&lt;-</span> <span class="fu">simulate_ram_classic</span>()</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ram</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 研究</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   题目: 稳定型冠心病血运重建适宜性（教学模拟）</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: RAND/UCLA 适宜性评价</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   专家: 9 人；条目: 8；轮次: 1, 2</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   评分行数: 144</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>meta<span class="sc">$</span>objective</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;判断特定情境下介入或外科血运重建是否适宜。不确定与分歧作为正式结果保留。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> 场景是 <code>rand_ucla</code>。目的写的是判断是否适宜，不是强迫形成单一结论。安装后也可以 <code>data(ram_classic_demo)</code> 取出同一份数据。</p>
+</div>
+<div id="先锁定方案再看问卷" class="section level1">
+<h1>2. 先锁定方案，再看问卷</h1>
+<p>方案必须在发第 1 轮问卷之前写定。分析函数不会根据结果把规则改宽松。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>protocol <span class="ot">&lt;-</span> ram<span class="sc">$</span>protocol</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>protocol</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: rand_ucla (RAND/UCLA 适宜性评价)</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   RAND 规则: table4；第 2 轮: in_person；必要性: 不评</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>rand</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $disagreement</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $legacy_alias</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $di_threshold</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $round2_mode</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;in_person&quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $necessity</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $boundary</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;uncertain&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $iprr</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2.35</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $cfa</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1.5</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $qtype</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 7</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_high</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_low</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $purpose</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;appropriateness&quot;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $nonstandard_ipras</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>stability<span class="sc">$</span>max_rounds</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<p><strong>解读：</strong></p>
+<ul>
+<li><code>rule = table4</code> 是手册默认：用这一条的实际应答人数查表，不是用邀请人数，也不是旧版的 <code>ceiling(n/3)</code>。</li>
+<li><code>round2_mode = in_person</code> 表示第 2 轮是面对面会议后的再次独立评分。若实际是线上会议或再次函询，要改成 <code>online</code> 或 <code>mail</code>，并在报告里说明这是变通。</li>
+<li><code>necessity = FALSE</code>：本教程不做必要性。必要性是另一张量表，不是第 3 轮适宜性评分。</li>
+<li><code>max_rounds = 2</code>：经典适宜性到第 2 轮为止。</li>
+<li><code>boundary = uncertain</code>：中位数若正好是 3.5 或 6.5，归入不确定，不偷偷归进适宜或不适宜。</li>
+<li><code>iprr = 2.35</code>、<code>cfa = 1.5</code>、<code>qtype = 7</code> 是 IPRAS 的标准常数。本方案的主规则不是 IPRAS，但报告和敏感性分析仍会算出这些数，便于对照。</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">protocol_table</span>(protocol)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tab[tab<span class="sc">$</span>parameter <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;rand_disagreement&quot;</span>, <span class="st">&quot;rand_round2_mode&quot;</span>, <span class="st">&quot;max_rounds&quot;</span>, <span class="st">&quot;rand_boundary&quot;</span>), ]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            parameter     value    preset modified</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 rand_disagreement    table4    table4    FALSE</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18  rand_round2_mode in_person in_person    FALSE</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20     rand_boundary uncertain uncertain    FALSE</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27        max_rounds         2         2    FALSE</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                                                          meaning</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16 RAND 规则：table4 / ipras / classic_relaxed / classic_strict / percent / both</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18                                        第 2 轮形式：in_person / online / mail</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20                                                      中位数 3.5 或 6.5 的处理</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27                                                                  计划最多轮次</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>modified</code> 为 FALSE 表示没有偏离该场景的预设。若把规则改成 <code>ipras</code> 或 <code>percent</code> 而不写 <code>rationale</code>，方案会警告，报告会标成偏离预设。</p>
+</div>
+<div id="第-1-轮问卷docx-与-xlsx" class="section level1">
+<h1>3. 第 1 轮问卷：docx 与 xlsx</h1>
+<p>第 1 轮不展示任何组内分布。锚点是：1 表示预期危害远大于获益，5 表示大致相当或无法判断，9 表示预期获益远大于危害。无法判断不填 5 分，也不进入中位数和分歧的分母。</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>qdir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-q1-&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(qdir)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> <span class="fu">rand_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">1</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>, <span class="at">file =</span> qdir)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>q1</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\Rtmpa61liL\\ram-q1-67e836cc5a3d/round1.docx&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [2] &quot;C:\\Users\\Lenovo\\AppData\\Local\\Temp\\Rtmpa61liL\\ram-q1-67e836cc5a3d/round1.xlsx&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>format = &quot;both&quot;</code> 同时写出 Word 和 Excel。Word 发给专家填写或打印；Excel 的「评分」表回收后用 <code>read_survey_xlsx()</code> 读回。两份文件覆盖全部 8 个指征。权威系数表如果出现，只是国内发表时的可选补充，不参与适宜性判定。</p>
+<p>条目必须写成「何种患者 + 何种干预」，不能只写病名。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ram<span class="sc">$</span>items[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;indication&quot;</span>, <span class="st">&quot;procedure&quot;</span>, <span class="st">&quot;evidence_level&quot;</span>, <span class="st">&quot;pattern&quot;</span>)]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id               indication        procedure evidence_level</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   IND01   稳定型心绞痛，单支病变 经皮冠状动脉介入              A</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   IND02   稳定型心绞痛，三支病变 经皮冠状动脉介入              B</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   IND03         无保护左主干病变 经皮冠状动脉介入              B</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   IND04 急性 ST 段抬高型心肌梗死 经皮冠状动脉介入              A</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   IND05   稳定型心绞痛，单支病变 冠状动脉旁路移植              C</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   IND06   稳定型心绞痛，三支病变 冠状动脉旁路移植              B</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   IND07         无保护左主干病变 冠状动脉旁路移植              A</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   IND08 急性 ST 段抬高型心肌梗死 冠状动脉旁路移植              B</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;               pattern</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1         appropriate</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2       inappropriate</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3           equipoise</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4        disagreement</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5               shift</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6       inappropriate</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7 appropriate_outlier</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8               polar</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>evidence_level</code> 是会前发给专家的证据准备，不是适宜性分类。<code>pattern</code> 只是教学数据的构造标签，真实研究不要靠它判定。同一情境下的介入和搭桥是两条独立条目。</p>
+</div>
+<div id="第-1-轮评了什么" class="section level1">
+<h1>4. 第 1 轮评了什么</h1>
+<p>下面用样本里已经填好的第 1 轮分数，代替「专家寄回 Excel」这一步。真实项目应 <code>read_survey_xlsx()</code> 后 <code>update_delphi_study()</code>。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cls1 <span class="ot">&lt;-</span> <span class="fu">classify_rand</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cls1[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;n_valid&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_mid&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;n_out&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;agreement_status&quot;</span>, <span class="st">&quot;class&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id n_valid median n_low n_mid n_high n_out agreement_status</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   IND01       9      8     0     0      9     0        agreement</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   IND02       9      2     9     0      0     0        agreement</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   IND03       9      5     0     9      0     0        agreement</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   IND04       9      8     3     0      6     3     disagreement</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   IND05       9      6     0     6      3     3    indeterminate</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   IND06       9      2     9     0      0     0        agreement</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   IND07       9      8     1     0      8     1        agreement</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   IND08       9      5     4     1      4     8     disagreement</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           class                     class_zh</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   appropriate                         适宜</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 inappropriate                       不适宜</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     uncertain 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     uncertain           不确定（存在分歧）</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5     uncertain 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 inappropriate                       不适宜</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   appropriate                         适宜</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8     uncertain           不确定（存在分歧）</span></span></code></pre></div>
+<p><strong>解读，逐列：</strong></p>
+<ul>
+<li><code>n_valid = 9</code>：9 人都给出了 1–9 分。阈值按 9 人查表 4：区外不超过 2 人算一致；1–3 与 7–9 两端都至少 3 人才算分歧。</li>
+<li><code>median</code> 是分类的第一依据，不是均数。</li>
+<li><code>n_low</code> / <code>n_mid</code> / <code>n_high</code> 是落在 1–3、4–6、7–9 的人数。</li>
+<li><code>n_out</code> 是落在「包含中位数的那个三分区」之外的人数。中位数为 8 时，这个区是 7–9。</li>
+<li><code>agreement_status</code> 有三种：agreement（一致）、indeterminate（既非一致也非分歧）、disagreement（分歧）。先判分歧，再判一致。</li>
+<li><code>class</code> 只有适宜、不确定、不适宜。<code>class_zh</code> 把不确定拆开，因为「大家都觉得获益和危害差不多」和「小组裂成两派」不是一回事。</li>
+</ul>
+<p>对照构造：</p>
+<ul>
+<li>IND01 中位数在 7–9，两端没有同时达到 3 人，适宜。</li>
+<li>IND02、IND06 中位数在 1–3 且无分歧，不适宜。</li>
+<li>IND03 中位数在 4–6 且无分歧，是「不确定（中位数 4–6，无分歧）」。</li>
+<li>IND04 中位数可以很高，但 1–3 与 7–9 都至少有 3 人，表 4 判分歧，最终仍是不确定。这就是 RAM 和「只看中位数」的差别。</li>
+<li>IND05 第 1 轮还在中区，第 2 轮才会移到适宜。会议的作用是让专家看到分布后再评，不是保证它变适宜。</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_rand_heatmap</span>(ram, <span class="at">round =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><strong>解读：</strong> 纵轴是临床情境，横轴是干预。颜色是适宜性，不是证据等级。格子里的点表示该条存在分歧。一张图同时看见「情境 × 干预」，避免把不同手术当成同一条意见。</p>
+</div>
+<div id="第-2-轮问卷反馈后复评全部条目" class="section level1">
+<h1>5. 第 2 轮问卷：反馈后复评全部条目</h1>
+<p>第 2 轮给每位专家三样东西：自己上一轮的分数、组内三个区间的人数、中位数和分歧标记，以及匿名意见。其他专家的姓名不出现。</p>
+<p>和 Delphi 不同：已经判为适宜或不适宜的条目<strong>仍然要评</strong>。RAM 不是「过线就退出」。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> <span class="fu">rand_questionnaire</span>(ram, <span class="at">round =</span> <span class="dv">2</span>, <span class="at">format =</span> <span class="st">&quot;both&quot;</span>,</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">file =</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-q2-&quot;</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(q2)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ram-q2-67e8586b754.docx&quot; &quot;ram-q2-67e8586b754.xlsx&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>raw2 <span class="ot">&lt;-</span> openxlsx<span class="sc">::</span><span class="fu">read.xlsx</span>(q2[<span class="fu">grepl</span>(<span class="st">&quot;xlsx&quot;</span>, q2)][<span class="dv">1</span>], <span class="at">sheet =</span> <span class="st">&quot;\u8bc4\u5206&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(raw2<span class="sc">$</span>item_id))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 8</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(raw2[, <span class="fu">intersect</span>(<span class="fu">c</span>(<span class="st">&quot;expert_id&quot;</span>, <span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;own_prev&quot;</span>, <span class="st">&quot;class_zh&quot;</span>), <span class="fu">names</span>(raw2))], <span class="dv">3</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   expert_id item_id own_prev                     class_zh</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        P1   IND01        8                         适宜</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        P1   IND02        1                       不适宜</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3        P1   IND03        4 不确定（中位数 4–6，无分歧）</span></span></code></pre></div>
+<p><strong>解读：</strong> 8 个条目都在。<code>own_prev</code> 是该专家自己的上轮分数，不是组均数。<code>class_zh</code> 是上轮的组结论，供讨论，不是要求专家改成和多数人一样。问卷说明里写明第 2 轮是面对面会议后的再次独立评分。</p>
+</div>
+<div id="末轮全流程" class="section level1">
+<h1>6. 末轮全流程</h1>
+<p><code>run_rand()</code> 对最后一轮适宜性做完分类、轮次比较和规则敏感性。<code>report = FALSE</code> 时只把结果留在 R 里。</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">run_rand</span>(ram, <span class="at">report =</span> <span class="cn">FALSE</span>, <span class="at">loo =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>last_round</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>rand_meta</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $round2_mode</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;in_person&quot;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $purpose</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;appropriateness&quot;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $necessity</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $deviation</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $modified_ram</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $nonstandard_ipras</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $supplement</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;权威系数与 Kendall&#39;s W 只作补充，不替代中位数、分歧和适宜性分类。&quot;</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(res<span class="sc">$</span>last_classification<span class="sc">$</span>class_detail)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            appropriate          inappropriate uncertain_disagreement </span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      3                      2                      2 </span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    uncertain_equipoise </span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                      1</span></span></code></pre></div>
+<p><strong>解读：</strong></p>
+<ul>
+<li><code>last_round = 2</code> 是最后一轮适宜性，不是「还有一轮没做」。</li>
+<li><code>deviation = FALSE</code>：适宜性没有超过 2 轮，没有偏离经典流程。</li>
+<li><code>modified_ram = FALSE</code>：用的是 1–9 分和表 4，不是百分比修改版。</li>
+<li><code>supplement</code> 提醒：若报告里出现权威系数或 Kendall’s W，它们不取代中位数和分歧。</li>
+<li>末轮四类都还在。IND04、IND08 仍是「不确定（存在分歧）」。这是结果，不是失败。</li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res<span class="sc">$</span>last_classification[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;n_low&quot;</span>, <span class="st">&quot;n_high&quot;</span>, <span class="st">&quot;ipr&quot;</span>, <span class="st">&quot;ipras&quot;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;di&quot;</span>, <span class="st">&quot;table4_disagreement&quot;</span>, <span class="st">&quot;ipras_disagreement&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median n_low n_high ipr ipras         di table4_disagreement</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    IND01      8     0      9 1.0  7.60 0.13157895               FALSE</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   IND02      2     9      0 0.6  7.30 0.08219178               FALSE</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   IND03      5     0      0 0.0  2.35 0.00000000               FALSE</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   IND04      8     3      6 3.4  4.30 0.79069767                TRUE</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   IND05      8     0      9 0.6  6.40 0.09375000               FALSE</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   IND06      2     9      0 1.0  7.60 0.13157895               FALSE</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   IND07      8     1      8 0.6  6.40 0.09375000               FALSE</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   IND08      5     4      4 6.0  2.35 2.55319149                TRUE</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ipras_disagreement                     class_zh</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9               FALSE                         适宜</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10              FALSE                       不适宜</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12              FALSE           不确定（存在分歧）</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13              FALSE                         适宜</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14              FALSE                       不适宜</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15              FALSE                         适宜</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16               TRUE           不确定（存在分歧）</span></span></code></pre></div>
+<p><strong>解读：</strong> <code>ipr</code> 是第 70 与第 30 百分位数之差，<code>ipras</code> 是按分布是否对称放宽后的分歧阈值，<code>di = ipr / ipras</code>。本方案锁定的是表 4，所以 <code>table4_disagreement</code> 决定分类。<code>ipras_disagreement</code> 列出来是为了让读者看到两种规则是否一致。IND04 就是反例：表 4 认为两端各有至少 3 人，是分歧；IPRAS 因为分布整体偏高，不判分歧。既然方案写的是表 4，分类按表 4，不能事后改用 IPRAS 把它变成适宜。</p>
+</div>
+<div id="轮次变了没有" class="section level1">
+<h1>7. 轮次变了没有</h1>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cmp <span class="ot">&lt;-</span> res<span class="sc">$</span>round_comparison</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cmp<span class="sc">$</span>group</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   round n_items n_appropriate n_inappropriate n_uncertain_equipoise</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1       8             2               2                     2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2       8             3               2                     1</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_uncertain_disagreement mean_ipr</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                        2     1.75</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                        2     1.65</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>cmp<span class="sc">$</span>items[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median_from&quot;</span>, <span class="st">&quot;median_to&quot;</span>, <span class="st">&quot;class_zh_from&quot;</span>, <span class="st">&quot;class_zh_to&quot;</span>, <span class="st">&quot;changed&quot;</span>, <span class="st">&quot;wilcoxon_p&quot;</span>)]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   item_id median_from median_to                class_zh_from</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1   IND01           8         8                         适宜</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2   IND02           2         2                       不适宜</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   IND03           5         5 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   IND04           8         8           不确定（存在分歧）</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   IND05           6         8 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   IND06           2         2                       不适宜</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7   IND07           8         8                         适宜</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8   IND08           5         5           不确定（存在分歧）</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                    class_zh_to changed wilcoxon_p</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                         适宜   FALSE 0.42371080</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                       不适宜   FALSE 0.82414090</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 不确定（中位数 4–6，无分歧）   FALSE 1.00000000</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4           不确定（存在分歧）   FALSE         NA</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                         适宜    TRUE 0.01922203</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                       不适宜   FALSE 0.67884530</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7                         适宜   FALSE 0.76559448</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8           不确定（存在分歧）   FALSE 0.77282999</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>cmp<span class="sc">$</span>note</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Wilcoxon 符号秩检验只描述各条目评分是否整体移动，不改变适宜性分类。&quot;</span></span></code></pre></div>
+<p><strong>解读：</strong></p>
+<ul>
+<li><code>group</code> 给出每一轮有多少条适宜、不适宜，以及两种不确定，还有该轮 IPR 的均数。IPR 均数下降只能说明分数更集中，不能单独作为停止调查的理由。经典 RAM 本来就停在第 2 轮。</li>
+<li><code>changed</code> 为 TRUE 的条目，分类在两轮之间变了。IND05 从不确定变为适宜，应在正文里写「会议后复评改变了分类」，并同时给出两轮的中位数。</li>
+<li><code>wilcoxon_p</code> 是同一批专家前后分数的探索性比较。P 值小不表示「达成适宜」，P 值大也不表示「应该再开一轮」。分类只看中位数和分歧。</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_rand_progress</span>(ram)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_round_shift</span>(ram)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><strong>解读：</strong> 进度图的纵轴是各类所占比例。不确定比例下降，不表示方法成功；若下降是因为把分歧条目反复送回评分直到表面一致，反而不符合 RAM。斜率图看的是各条目中位数是否移动，适合放进附录。</p>
+</div>
+<div id="规则换一套结论还在不在" class="section level1">
+<h1>8. 规则换一套，结论还在不在</h1>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> res<span class="sc">$</span>sensitivity</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>kappa</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;            rule_a          rule_b     kappa n</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1          table4           ipras 0.8095238 8</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2          table4 classic_relaxed 1.0000000 8</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3          table4  classic_strict 0.8095238 8</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4           ipras classic_relaxed 0.8095238 8</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5           ipras  classic_strict 0.6363636 8</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 classic_relaxed  classic_strict 0.8095238 8</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>loo</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   expert_id n_items n_changed changed_items</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        P1       8         1         IND04</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2        P2       8         1         IND04</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3        P3       8         1         IND04</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4        P4       8         0              </span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5        P5       8         0              </span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6        P6       8         0              </span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7        P7       8         0              </span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8        P8       8         0              </span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9        P9       8         0</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>sens<span class="sc">$</span>note</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;敏感性分析不替换锁定规则。κ 描述两套规则的分类一致程度。逐一剔除只说明结论是否依赖单个专家。&quot;</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_rand_sensitivity</span>(sens)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><strong>解读：</strong></p>
+<ul>
+<li>κ 比较的是两套规则给出的适宜 / 不确定 / 不适宜是否相同。κ 低，说明「事先写哪条规则」会改变指南附表，所以规则必须锁在第 1 轮之前。</li>
+<li>表 4 和 IPRAS 在这份数据上不会完全一致，IND04 就是原因。这不是程序错误。</li>
+<li><code>loo</code> 是每次拿掉一名专家后，有几条的分类翻转。翻转多的条目，结论依赖个别专家，讨论时要说明，但不要因为某人不合群就删掉他，除非方案事先定义了剔除规则。</li>
+<li>9 人严格/宽松定义只适用于 9 人。人数不是 9 时，软件仍可按字面计算，但会警告；正式分析应使用表 4。</li>
+</ul>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_rand_deviation</span>(ram, <span class="at">round =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><strong>解读：</strong> 每个箱子是一名匿名专家在各条目上「自己的分数 − 该条目中位数」。整组偏在 0 的一侧，表示这个人系统性更严或更松。编号是 P01 这种匿名号。反馈材料和报告里不要出现姓名。</p>
+</div>
+<div id="写出-docx-报告" class="section level1">
+<h1>9. 写出 docx 报告</h1>
+<p>是否写报告由 <code>report</code> 决定。格式至少要能得到 docx。下面把文件写到临时目录；真实使用时把 <code>file</code> 换成你的文件夹。</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>report_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;ram-report-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.docx&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>reported <span class="ot">&lt;-</span> <span class="fu">run_rand</span>(ram, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file, <span class="at">loo =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;C:/Users/Lenovo/AppData/Local/Temp/Rtmpa61liL/ram-report-67e85cc13745.docx&quot;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(<span class="fu">attr</span>(reported, <span class="st">&quot;report_file&quot;</span>))</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p><strong>解读：</strong> 报告按锁定规则写成。里面应能找到：表 4 的文献依据、第 2 轮是面对面会议、P30/P70/IPR/IPRAS/DI、两类不确定、分歧清单（作为正式结果）、轮次变化、规则之间的 κ、末轮清单，以及「权威系数和 Kendall’s W 不替代 RAM」的说明。选择 <code>format = &quot;html&quot;</code> 时仍会额外写一份 docx。</p>
+<p>不确定和分歧条目要放进清单，不要只导出适宜的那几条。适宜也不等于强推荐：证据等级和面板判断分列，诊疗推荐仍要回到系统评价。</p>
+</div>
+<div id="和真实项目的差别" class="section level1">
+<h1>10. 和真实项目的差别</h1>
+<p>样本没有缺失，也没有人中途退出。真实数据里，某条只有 6 个人作答时，软件会警告人数不足 7，并仍给出描述性分类。7 人沿用 8–10 人的阈值。超过 16 人会外推，报告里必须写明手册没有正式列出该档。</p>
+<p>第 2 轮若因条件限制改为线上或再次函询，把 <code>rand_round2_mode</code> 设成 <code>online</code> 或 <code>mail</code>，不要假装开过面对面会议。</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

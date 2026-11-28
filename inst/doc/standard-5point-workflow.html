@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-04" />
+<meta name="date" content="2026-10-10" />
 
 <title>教学文档 7：5 分量表核心技术要素，从开放式首轮到完整报告</title>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 7：5 分量表核心技术要素，从开放式首轮到完整报告</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-04</h4>
+<h4 class="date">2026-10-10</h4>
 
 
 
@@ -494,11 +494,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>res_doc <span class="ot">&lt;-</span> <span class="fu">run_delphi</span>(demo, <span class="at">report =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">&quot;docx&quot;</span>, <span class="at">file =</span> report_file)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">attr</span>(res_doc, <span class="st">&quot;report_file&quot;</span>)</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">basename</span>(out)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;standard-report-b0dcb863388.docx&quot;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;standard-report-67e869fc27a8.docx&quot;</span></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">file.exists</span>(out)</span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">file.info</span>(out)<span class="sc">$</span>size</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20949</span></span></code></pre></div>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 21636</span></span></code></pre></div>
 <p><strong>怎么读：</strong> 文件能生成并且不是空文件，才算这条流程走完。打开 Word 后按这个顺序核对：要素来源、调查对象是否符合要求、各轮问卷在问什么、积极系数、权威程度、专家个人情况、各轮均数和满分比、熟悉程度、协调系数为什么在第 4 轮才停、哪些条未纳入、附录三列表。中间轮次的报告可以同样用 <code>run_delphi(study3, report = TRUE, format = &quot;docx&quot;)</code> 生成，但不要把中间报告的数字抄进送审稿。</p>
 </div>
 <div id="做完以后不要做的事" class="section level1">

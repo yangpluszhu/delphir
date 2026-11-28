@@ -53,8 +53,9 @@ stakeholder_stratify <- function(study, round = NULL, group = "stakeholder") {
       sub <- r[r$item_id == res$item_id[i] & r$dimension == res$dimension[i] &
                  r$group_level == res$group_level[i], ]
       rand_disagreement(.valid_scores(sub$score, sub$unable),
-                        method = p$rand$disagreement,
-                        di_threshold = p$rand$di_threshold)
+                        method = p$rand$rule %||% p$rand$disagreement,
+                        di_threshold = p$rand$di_threshold,
+                        warn = FALSE)
     })
     res <- cbind(res, do.call(rbind, extra)[, c("di", "disagreement")])
   } else {

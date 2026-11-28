@@ -2,29 +2,40 @@
 % Please edit documentation in R/rand_ucla.R
 \name{classify_rand}
 \alias{classify_rand}
-\title{按 RAND/UCLA 规则判定适宜性}
+\title{按锁定的 RAND 规则判定一轮适宜性}
 \usage{
 classify_rand(study, round = NULL, method = NULL, summary = NULL)
 }
 \arguments{
-\item{study}{\code{\link[=delphi_study]{delphi_study()}} 或条目汇总。}
+\item{study}{\code{\link[=delphi_study]{delphi_study()}} 对象。}
 
-\item{round}{使用哪一轮，默认最后一轮。}
+\item{round}{轮次。默认该研究适宜性评分的最后一轮。}
 
-\item{method}{分歧定义，默认取方案中的设定。}
+\item{method}{覆盖方案中的规则，仅用于敏感性分析，不改写已锁定方案。}
 
-\item{summary}{若已计算 \code{\link[=summarize_items]{summarize_items()}}，可直接传入。}
+\item{summary}{可选的 \code{\link[=summarize_items]{summarize_items()}} 结果。}
 }
 \value{
-数据框，含 Median、DI、两种分歧标记与最终 \code{class}。
+带类 \code{delphi_rand} 的数据框。除描述统计外，含 \code{class}、
+\code{class_detail}、\code{class_zh}、\code{agreement_status}、\code{di}、\code{ipr}、\code{ipras}。
 }
 \description{
-Median 1–3 且无分歧 → Inappropriate；Median 7–9 且无分歧 → Appropriate；
-Median 4–6 \strong{或任何分歧} → Uncertain。不强迫面板达成一致。
+中位数 7–9 且无分歧为适宜；1–3 且无分歧为不适宜；中位数 4–6，或任何分歧，
+均为不确定。不确定会写成「中位数居中」或「存在分歧」，二者都是正式结果。
+必要性评分（维度名含「必要」）不在这里分类。
 }
+\section{输入输出}{
+
+\strong{输入}研究的 \code{ratings} 须含 \code{expert_id}、\code{item_id}、\code{round}、\code{score}。
+无法判断用 \code{unable = TRUE} 且 \code{score} 为缺失，不进入分母。
+
+\strong{输出}每个条目（及维度）一行。\code{action} 为 \code{keep}（适宜或不适宜，作为结果保留）
+或 \code{discuss}（不确定）。
+}
+
 \examples{
-ram <- simulate_rand_ucla(n_items = 10, seed = 8)
-cls <- classify_rand(ram)
-table(cls$class_zh)
+ram <- simulate_ram_classic()
+cls <- classify_rand(ram, round = 2)
+table(cls$class_detail)
 
 }

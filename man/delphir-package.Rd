@@ -12,14 +12,15 @@
 \section{从这里开始}{
 
 \itemize{
-\item \code{\link[=delphi_guides]{delphi_guides()}} 打开八套随包教学文档
+\item \code{\link[=delphi_guides]{delphi_guides()}} 打开十一套随包教学文档
 \item \code{\link[=preset_protocol]{preset_protocol()}} / \code{\link[=protocol_table]{protocol_table()}} 选择场景并锁定、打印阈值
 \item \code{\link[=delphi_blueprint]{delphi_blueprint()}} / \code{\link[=delphi_questionnaire]{delphi_questionnaire()}} / \code{\link[=read_survey_xlsx]{read_survey_xlsx()}}
 第 1 轮及后续轮次 docx/xlsx 问卷与回读
 \item \code{\link[=next_round_questionnaire]{next_round_questionnaire()}} 按分析结果生成下一轮
 \item \code{\link[=score_authority]{score_authority()}} / \code{\link[=expert_authority]{expert_authority()}} 由自评勾选计算 Ca、Cs、Cr
 \item \code{\link[=preset_protocol]{preset_protocol()}} 的 \code{standard_element}：5 分核心技术要素
-\item \code{\link[=simulate_delphi]{simulate_delphi()}} / \code{\link[=simulate_standard_delphi]{simulate_standard_delphi()}} / \code{\link[=simulate_rand_ucla]{simulate_rand_ucla()}} / \code{\link[=simulate_cos]{simulate_cos()}} / \code{\link[=simulate_chf_new_items]{simulate_chf_new_items()}} 生成示例
+\item \code{\link[=simulate_delphi]{simulate_delphi()}} / \code{\link[=simulate_standard_delphi]{simulate_standard_delphi()}} / \code{\link[=simulate_rand_ucla]{simulate_rand_ucla()}} / \code{\link[=simulate_ram_classic]{simulate_ram_classic()}} / \code{\link[=simulate_cos]{simulate_cos()}} / \code{\link[=simulate_chf_new_items]{simulate_chf_new_items()}} 生成示例
+\item \code{\link[=rand_questionnaire]{rand_questionnaire()}} / \code{\link[=run_rand]{run_rand()}} 完成 RAND 两轮问卷与末轮报告
 \item \code{\link[=screen_new_items]{screen_new_items()}} 审查第一轮新增条目；\code{\link[=item_changelog]{item_changelog()}} 留下审计轨迹
 \item \code{\link[=analyze_delphi]{analyze_delphi()}} / \code{\link[=run_delphi]{run_delphi()}} 全流程分析与可选完整报告
 \item \code{\link[=delphi_report]{delphi_report()}} 输出中间报告或 ACCORD 终稿（html / docx）

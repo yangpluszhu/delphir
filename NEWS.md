@@ -1,3 +1,23 @@
+# delphir 0.6.0
+
+* RAND/UCLA 预设规则改为 Fitch 等（2001）表 4，按实际应答人数查一致与分歧阈值。
+  旧名 `classic` 也改为表 4，不再使用 `ceiling(n/3)`。人数为 10 或 16 时，
+  与 0.5.0 的分歧判定可能不同。`both` 仍表示表 4 与 IPRAS 任一判分歧即分歧。
+* IPRAS 的分歧改为 IPR 严格大于 IPRAS。分位数固定 type 7。改动 2.35、1.5
+  或分位类型时，报告标为非标准参数。
+* 适宜性默认最多 2 轮。不确定拆成「中位数 4–6」和「存在分歧」。中位数
+  3.5 或 6.5 默认归不确定。超过 2 轮的适宜性评分会警告，并在报告中写成偏离。
+* 新增必要性评价：只对适宜且无分歧的条目分类（Kahan 等，1994）。
+  百分比规则仅用于推荐意见，并标明 RAM 修改版。
+* 新增 `rand_questionnaire()`：第 1 轮独立评分，第 2 轮反馈后复评全部条目，
+  可另生成必要性问卷。输出 docx 与 xlsx。xlsx 可用 `read_survey_xlsx()` 读回。
+* 新增 `run_rand()`：末轮完成分类、轮次比较和规则敏感性。是否写报告、
+  格式和路径由使用者选择；选择 html 时仍另写 docx。
+* 新增 `rand_compare_rounds()`、`rand_sensitivity()`、`rand_panel_thresholds()`、
+  `classify_necessity()` 和四幅 RAND 图形。
+* 新增教学文档 9–11 与数据 `ram_classic_demo`、`ram_necessity_demo`、
+  `ram_recommendation_demo`。安装后随 `delphi_guides()` 提供。
+
 # delphir 0.5.0
 
 * 第一轮新增条目按事先锁定的规则审查：五问、双通道（至少 2 名专家独立提出，

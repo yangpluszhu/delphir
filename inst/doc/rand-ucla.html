@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ming Yang" />
 
-<meta name="date" content="2026-10-04" />
+<meta name="date" content="2026-10-10" />
 
 <title>教学文档 2：RAND/UCLA 适宜性评价全流程</title>
 
@@ -149,7 +149,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <h1 class="title toc-ignore">教学文档 2：RAND/UCLA 适宜性评价全流程</h1>
 <h4 class="author">Ming Yang</h4>
-<h4 class="date">2026-10-04</h4>
+<h4 class="date">2026-10-10</h4>
 
 
 
@@ -243,26 +243,60 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Delphi 分析方案</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   场景: rand_ucla (RAND/UCLA 适宜性评价)</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   量表: 1–9  (低 1–3 / 中 4–6 / 高 7–9)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>rand</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $disagreement</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;both&quot;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $di_threshold</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   RAND 规则: table4；第 2 轮: in_person；必要性: 不评</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   锁定: 是</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>protocol<span class="sc">$</span>rand</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $rule</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $disagreement</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;table4&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $legacy_alias</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $di_threshold</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $round2_mode</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;in_person&quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $necessity</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $boundary</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;uncertain&quot;</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $iprr</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2.35</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $cfa</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1.5</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $qtype</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 7</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_high</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.7</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $percent_low</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.15</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $purpose</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] &quot;appropriateness&quot;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $nonstandard_ipras</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 <p>判定规则（写入方案，分析时不得改）：</p>
 <ul>
 <li>Median 1–3 且<strong>无分歧</strong> → Inappropriate</li>
 <li>Median 7–9 且<strong>无分歧</strong> → Appropriate</li>
 <li>Median 4–6，<strong>或任何分歧</strong> → Uncertain</li>
 </ul>
-<p>分歧有两套定义，本包默认都算：</p>
-<ol style="list-style-type: decimal">
-<li><strong>经典：</strong> 约三分之一评 1–3 且约三分之一评 7–9（9 人面板即各 ≥3 人）；</li>
-<li><strong>IPRAS / DI（Fitch 2001）：</strong></li>
-</ol>
-<p>[ IPR = P_{70}-P_{30}, AI = |-5|, IPRAS = 2.35 + 1.5AI, DI = IPR/IPRAS ]</p>
-<p><code>DI ≥ 1</code> 为分歧。IPRAS 可推广到非 3 倍数的面板。</p>
+<p>从 0.6.0 起，预设规则是手册<strong>表 4</strong>（按实际应答人数查一致与分歧阈值），不再把「表 4 或 IPRAS」取并集当作默认。<code>rand_disagreement = &quot;classic&quot;</code> 也改指表 4，不再使用旧的 <code>ceiling(n/3)</code>。人数为 10 或 16 时，和 0.5.0 的结果可能不同。</p>
+<p>IPRAS 仍可选用。分歧条件是 <strong>IPR 严格大于 IPRAS</strong>，分位数固定为 R 的 type 7：</p>
+<p>[ IPR = P_{70}-P_{30}, AI = |5-|, IPRAS = 2.35 + 1.5AI ]</p>
+<p>不确定要写成两种正式结果：中位数落在 4–6，或存在分歧。完整的两轮问卷、必要性评价和规则比较见教学文档 9–11：<code>delphi_guide(&quot;rand-classic-workflow&quot;)</code>、<code>delphi_guide(&quot;rand-necessity-workflow&quot;)</code>、<code>delphi_guide(&quot;rand-rules-workflow&quot;)</code>。</p>
 </div>
 <div id="指征表与证据" class="section level1">
 <h1>4. 指征表与证据</h1>
@@ -291,16 +325,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>5. 手工看清 DI 在算什么</h1>
 <p>高度一致：</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rand_disagreement</span>(<span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">7</span>, <span class="dv">9</span>, <span class="dv">8</span>, <span class="dv">8</span>))</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_valid p30 p70 ipr iprcp  ai ipras         di n_low n_high classic_threshold</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       9   8 8.6 0.6   8.3 3.3   7.3 0.08219178     0      9                 3</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   classic_disagreement ipras_disagreement disagreement</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                FALSE              FALSE        FALSE</span></span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_valid median p30 p70 ipr iprcp  ai ipras         di n_low n_mid n_high</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       9      8   8 8.6 0.6   8.3 3.3   7.3 0.08219178     0     0      9</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_out agreement_max disagreement_min threshold_note extrapolated small_panel</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     0             2                3       手册表 4        FALSE       FALSE</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   table4_disagreement classic_relaxed_disagreement classic_strict_disagreement</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1               FALSE                        FALSE                       FALSE</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   classic_disagreement ipras_disagreement agreement disagreement</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                FALSE              FALSE      TRUE        FALSE</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   agreement_status median_region       class class_detail class_zh modified_ram</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1        agreement          high appropriate  appropriate     适宜        FALSE</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   nonstandard_ipras rule_used</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1             FALSE    table4</span></span></code></pre></div>
 <p>两端拉扯：</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rand_disagreement</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="dv">9</span>, <span class="dv">9</span>))</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_valid p30 p70 ipr iprcp  ai ipras       di n_low n_high classic_threshold</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       9   2 8.6 6.6   5.3 0.3   2.8 2.357143     4      4                 3</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   classic_disagreement ipras_disagreement disagreement</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                 TRUE               TRUE         TRUE</span></span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   n_valid median p30 p70 ipr iprcp  ai ipras       di n_low n_mid n_high n_out</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1       9      5   2 8.6 6.6   5.3 0.3   2.8 2.357143     4     1      4     8</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   agreement_max disagreement_min threshold_note extrapolated small_panel</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1             2                3       手册表 4        FALSE       FALSE</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   table4_disagreement classic_relaxed_disagreement classic_strict_disagreement</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                TRUE                         TRUE                        TRUE</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   classic_disagreement ipras_disagreement agreement disagreement</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                 TRUE               TRUE     FALSE         TRUE</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   agreement_status median_region     class           class_detail</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     disagreement           mid uncertain uncertain_disagreement</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;             class_zh modified_ram nonstandard_ipras rule_used</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 不确定（存在分歧）        FALSE             FALSE    table4</span></span></code></pre></div>
 <p><strong>解读：</strong></p>
 <ul>
 <li>第一组 IPR 很小，DI 远小于 1，无分歧。</li>
@@ -339,35 +389,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   IND22       9    8 (7–9) 0.17518248                FALSE</span></span>
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   IND23       9    7 (6–8) 0.37383178                FALSE</span></span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   IND24       9    8 (8–9) 0.13157895                FALSE</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ipras_disagreement class_zh</span></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1               FALSE     适宜</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2               FALSE     适宜</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3               FALSE     适宜</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4               FALSE     适宜</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5               FALSE     适宜</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6               FALSE     适宜</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7               FALSE     适宜</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8               FALSE     适宜</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9               FALSE   不适宜</span></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10              FALSE   不适宜</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11              FALSE   不适宜</span></span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12              FALSE   不适宜</span></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13              FALSE   不确定</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14              FALSE   不确定</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15              FALSE   不确定</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16              FALSE   不确定</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17               TRUE   不确定</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18               TRUE   不确定</span></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19               TRUE   不确定</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20              FALSE   不确定</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21              FALSE   不确定</span></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22              FALSE     适宜</span></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23              FALSE     适宜</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24              FALSE     适宜</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ipras_disagreement                     class_zh</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1               FALSE                         适宜</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2               FALSE                         适宜</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3               FALSE                         适宜</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4               FALSE                         适宜</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5               FALSE                         适宜</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6               FALSE                         适宜</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7               FALSE                         适宜</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8               FALSE                         适宜</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9               FALSE                       不适宜</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10              FALSE                       不适宜</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11              FALSE                       不适宜</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12              FALSE                       不适宜</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17               TRUE           不确定（存在分歧）</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18               TRUE           不确定（存在分歧）</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19               TRUE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21              FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22              FALSE                         适宜</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23              FALSE                         适宜</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24              FALSE                         适宜</span></span>
 <span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(s1<span class="sc">$</span>class_zh)</span>
 <span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 不确定 不适宜   适宜 </span></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      9      4     11</span></span></code></pre></div>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 不确定（中位数 4–6，无分歧）           不确定（存在分歧） </span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                            7                            2 </span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                       不适宜                         适宜 </span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                            4                           11</span></span></code></pre></div>
 <p><strong>解读输出：</strong></p>
 <ul>
 <li><code>median_iqr</code>：位置。7–9 区只是“候选适宜”，还要过分歧关。</li>
@@ -376,7 +428,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Uncertain 既包含“大家觉得中等”，也包含“有人 1 分有人 9 分”。读表时不要混为一谈。</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_rand_panel</span>(s1)</span></code></pre></div>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <p>点的大小反映 DI。落在 7 右侧但仍可能被标成不确定——那就是分歧条目。</p>
 </div>
 <div id="受控反馈ram-的个性化表单" class="section level1">
@@ -385,55 +437,55 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fb <span class="ot">&lt;-</span> <span class="fu">prepare_feedback</span>(rand_ucla_demo, <span class="at">round =</span> <span class="dv">1</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fb[fb<span class="sc">$</span>expert_id <span class="sc">==</span> <span class="st">&quot;P1&quot;</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;own_score&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;anonymous_comments&quot;</span>)]</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id own_score median         di class_zh</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    IND01         8      8 0.08219178     适宜</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    IND02         8      9 0.07594937     适宜</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    IND03         6      8 0.36065574     适宜</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    IND04         3      7 0.16393443     适宜</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    IND05         7      7 0.16393443     适宜</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    IND06         8      8 0.00000000     适宜</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7    IND07         7      8 0.13157895     适宜</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    IND08         5      8 0.16393443     适宜</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    IND09         4      2 0.24427481   不适宜</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   IND10         5      2 0.17518248   不适宜</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   IND11         4      3 0.28318584   不适宜</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   IND12         1      3 0.16393443   不适宜</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   IND13         4      6 0.60377358   不确定</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   IND14         6      5 0.60377358   不确定</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   IND15         6      5 0.51063830   不确定</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   IND16         7      5 0.92857143   不确定</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17   IND17         9      5 1.50000000   不确定</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   IND18         8      4 1.35483871   不确定</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   IND19         4      4 1.03896104   不确定</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   IND20         5      5 0.64285714   不确定</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21   IND21         1      5 0.70967742   不确定</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   IND22         8      8 0.17518248     适宜</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   IND23         8      7 0.37383178     适宜</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   IND24         8      8 0.13157895     适宜</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                                     anonymous_comments</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                     </span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                     </span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                     </span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                     </span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                     </span></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                     </span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7                                                     </span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8                                                     </span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9                                                     </span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10                                                    </span></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11                                                    </span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12                                                    </span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13                                                    </span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14 指征定义与真实世界不完全对应。 | 仅对高危亚组适宜。</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15                                                    </span></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16                                  仅对高危亚组适宜。</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17                                  现有随机证据很少。</span></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18                                                    </span></span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19               并发症风险过高。 | 该指征下获益明确。</span></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20                                                    </span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21                                                    </span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22                                                    </span></span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23                                                    </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id own_score median         di                     class_zh</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    IND01         8      8 0.08219178                         适宜</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2    IND02         8      9 0.07594937                         适宜</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    IND03         6      8 0.36065574                         适宜</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4    IND04         3      7 0.16393443                         适宜</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5    IND05         7      7 0.16393443                         适宜</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6    IND06         8      8 0.00000000                         适宜</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7    IND07         7      8 0.13157895                         适宜</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8    IND08         5      8 0.16393443                         适宜</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9    IND09         4      2 0.24427481                       不适宜</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10   IND10         5      2 0.17518248                       不适宜</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11   IND11         4      3 0.28318584                       不适宜</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12   IND12         1      3 0.16393443                       不适宜</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13   IND13         4      6 0.60377358 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14   IND14         6      5 0.60377358 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15   IND15         6      5 0.51063830 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16   IND16         7      5 0.92857143 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17   IND17         9      5 1.50000000           不确定（存在分歧）</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18   IND18         8      4 1.35483871           不确定（存在分歧）</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19   IND19         4      4 1.03896104 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20   IND20         5      5 0.64285714 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21   IND21         1      5 0.70967742 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22   IND22         8      8 0.17518248                         适宜</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23   IND23         8      7 0.37383178                         适宜</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24   IND24         8      8 0.13157895                         适宜</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    anonymous_comments</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                    </span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                    </span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                    </span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                    </span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                    </span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                    </span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7                    </span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8                    </span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 9                    </span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10                   </span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 11                   </span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 12                   </span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 13                   </span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 14                   </span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 15                   </span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 16                   </span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 17                   </span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 18                   </span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 19                   </span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 20                   </span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 21                   </span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 22                   </span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 23                   </span></span>
 <span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 24</span></span></code></pre></div>
 <p><strong>解读：</strong> 讨论由有经验的主持人聚焦分歧指征。讨论后<strong>再次独立评分</strong>，不是举手表决出一个集体分数。匿名在讨论会中往往只能做到“发言可被识别、评分仍不具名”。</p>
 </div>
@@ -449,37 +501,63 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 1 轮  9/9  (100.0%)</span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     第 2 轮  8/9  (88.9%)</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   末轮分类:</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     不确定: 5</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     不适宜: 6</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     适宜: 13</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   稳定性建议终止: 否</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>last <span class="ot">&lt;-</span> res<span class="sc">$</span>last_classification</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median_iqr&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;disagreement&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;evidence_level&quot;</span>)]</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median_iqr        di disagreement class_zh evidence_level</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01    9 (8–9) 0.1172638        FALSE     适宜              A</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02    8 (8–9) 0.1196013        FALSE     适宜              A</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03    9 (8–9) 0.1172638        FALSE     适宜              A</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04    8 (6–9) 0.4590164        FALSE     适宜              C</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05    9 (8–9) 0.1172638        FALSE     适宜              B</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06    8 (7–8) 0.1457490        FALSE     适宜              B</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07    8 (7–9) 0.2627737        FALSE     适宜              C</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08    8 (7–8) 0.1639344        FALSE     适宜              C</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09    2 (1–3) 0.2627737        FALSE   不适宜              A</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10    2 (2–3) 0.1639344        FALSE   不适宜              A</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11    2 (2–2) 0.0000000        FALSE   不适宜              C</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12    2 (1–2) 0.1315789        FALSE   不适宜              C</span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13    3 (3–4) 0.1925134        FALSE   不适宜              B</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14    5 (4–5) 0.0000000        FALSE   不确定              C</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15    6 (5–6) 0.3225806        FALSE   不确定              C</span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16    4 (4–6) 0.7200000        FALSE   不确定              A</span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17    2 (2–3) 0.1457490        FALSE   不适宜              A</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18    7 (4–8) 0.5775401        FALSE     适宜              B</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19    4 (2–7) 1.5433071         TRUE   不确定              C</span></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20    7 (7–8) 0.1493776        FALSE     适宜              B</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21    6 (5–6) 0.2834646        FALSE   不确定              B</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22    9 (9–9) 0.0000000        FALSE     适宜              A</span></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23    8 (8–9) 0.1196013        FALSE     适宜              B</span></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24    8 (8–9) 0.1315789        FALSE     适宜              B</span></span></code></pre></div>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     不确定（中位数 4–6，无分歧）: 4</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     不确定（存在分歧）: 1</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     不适宜: 6</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     适宜: 13</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   稳定性建议终止: 否</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>last <span class="ot">&lt;-</span> res<span class="sc">$</span>last_classification</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;median_iqr&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;disagreement&quot;</span>, <span class="st">&quot;class_zh&quot;</span>, <span class="st">&quot;evidence_level&quot;</span>)]</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id median_iqr        di disagreement                     class_zh</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01    9 (8–9) 0.1172638        FALSE                         适宜</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02    8 (8–9) 0.1196013        FALSE                         适宜</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03    9 (8–9) 0.1172638        FALSE                         适宜</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04    8 (6–9) 0.4590164        FALSE                         适宜</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05    9 (8–9) 0.1172638        FALSE                         适宜</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06    8 (7–8) 0.1457490        FALSE                         适宜</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07    8 (7–9) 0.2627737        FALSE                         适宜</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08    8 (7–8) 0.1639344        FALSE                         适宜</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09    2 (1–3) 0.2627737        FALSE                       不适宜</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10    2 (2–3) 0.1639344        FALSE                       不适宜</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11    2 (2–2) 0.0000000        FALSE                       不适宜</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12    2 (1–2) 0.1315789        FALSE                       不适宜</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13    3 (3–4) 0.1925134        FALSE                       不适宜</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14    5 (4–5) 0.0000000        FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15    6 (5–6) 0.3225806        FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16    4 (4–6) 0.7200000        FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17    2 (2–3) 0.1457490        FALSE                       不适宜</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18    7 (4–8) 0.5775401        FALSE                         适宜</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19    4 (2–7) 1.5433071         TRUE           不确定（存在分歧）</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20    7 (7–8) 0.1493776        FALSE                         适宜</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21    6 (5–6) 0.2834646        FALSE 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22    9 (9–9) 0.0000000        FALSE                         适宜</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23    8 (8–9) 0.1196013        FALSE                         适宜</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24    8 (8–9) 0.1315789        FALSE                         适宜</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    evidence_level</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25              A</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26              A</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27              A</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28              C</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29              B</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30              B</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31              C</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32              C</span></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33              A</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34              A</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35              C</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36              C</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37              B</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38              C</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39              C</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40              A</span></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41              A</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42              B</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43              C</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44              B</span></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45              B</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46              A</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47              B</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48              B</span></span></code></pre></div>
 <p><strong>解读最终三类：</strong></p>
 <ul>
 <li><strong>适宜：</strong> 可以进入后续“该做”清单；若研究设计含 Necessity，只对这些指征再评“不做是否不可接受”。</li>
@@ -488,31 +566,56 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>对照两套分歧：</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;classic_disagreement&quot;</span>, <span class="st">&quot;ipras_disagreement&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id classic_disagreement ipras_disagreement        di class_zh</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01                FALSE              FALSE 0.1172638     适宜</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02                FALSE              FALSE 0.1196013     适宜</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03                FALSE              FALSE 0.1172638     适宜</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04                FALSE              FALSE 0.4590164     适宜</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05                FALSE              FALSE 0.1172638     适宜</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06                FALSE              FALSE 0.1457490     适宜</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07                FALSE              FALSE 0.2627737     适宜</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08                FALSE              FALSE 0.1639344     适宜</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09                FALSE              FALSE 0.2627737   不适宜</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10                FALSE              FALSE 0.1639344   不适宜</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11                FALSE              FALSE 0.0000000   不适宜</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12                FALSE              FALSE 0.1315789   不适宜</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13                FALSE              FALSE 0.1925134   不适宜</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14                FALSE              FALSE 0.0000000   不确定</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15                FALSE              FALSE 0.3225806   不确定</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16                FALSE              FALSE 0.7200000   不确定</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17                FALSE              FALSE 0.1457490   不适宜</span></span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18                FALSE              FALSE 0.5775401     适宜</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19                 TRUE               TRUE 1.5433071   不确定</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20                FALSE              FALSE 0.1493776     适宜</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21                FALSE              FALSE 0.2834646   不确定</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22                FALSE              FALSE 0.0000000     适宜</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23                FALSE              FALSE 0.1196013     适宜</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24                FALSE              FALSE 0.1315789     适宜</span></span></code></pre></div>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id classic_disagreement ipras_disagreement        di</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01                FALSE              FALSE 0.1172638</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02                FALSE              FALSE 0.1196013</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03                FALSE              FALSE 0.1172638</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04                FALSE              FALSE 0.4590164</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05                FALSE              FALSE 0.1172638</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06                FALSE              FALSE 0.1457490</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07                FALSE              FALSE 0.2627737</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08                FALSE              FALSE 0.1639344</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09                FALSE              FALSE 0.2627737</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10                FALSE              FALSE 0.1639344</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11                FALSE              FALSE 0.0000000</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12                FALSE              FALSE 0.1315789</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13                FALSE              FALSE 0.1925134</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14                FALSE              FALSE 0.0000000</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15                FALSE              FALSE 0.3225806</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16                FALSE              FALSE 0.7200000</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17                FALSE              FALSE 0.1457490</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18                FALSE              FALSE 0.5775401</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19                 TRUE               TRUE 1.5433071</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20                FALSE              FALSE 0.1493776</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21                FALSE              FALSE 0.2834646</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22                FALSE              FALSE 0.0000000</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23                FALSE              FALSE 0.1196013</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24                FALSE              FALSE 0.1315789</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        class_zh</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25                         适宜</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26                         适宜</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27                         适宜</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28                         适宜</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29                         适宜</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30                         适宜</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31                         适宜</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32                         适宜</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33                       不适宜</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34                       不适宜</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35                       不适宜</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36                       不适宜</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37                       不适宜</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41                       不适宜</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42                         适宜</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43           不确定（存在分歧）</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44                         适宜</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46                         适宜</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47                         适宜</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48                         适宜</span></span></code></pre></div>
 </div>
 <div id="稳定性ram-允许改变但不追求全员一致" class="section level1">
 <h1>9. 稳定性：RAM 允许改变，但不追求全员一致</h1>
@@ -557,7 +660,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5</span></span>
 <span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $max_rounds</span></span>
-<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
 <span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $current_round</span></span>
 <span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
@@ -571,42 +674,38 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="证据列与适宜性列必须分开" class="section level1">
 <h1>10. 证据列与适宜性列必须分开</h1>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>last[, <span class="fu">c</span>(<span class="st">&quot;item_id&quot;</span>, <span class="st">&quot;evidence_level&quot;</span>, <span class="st">&quot;median&quot;</span>, <span class="st">&quot;di&quot;</span>, <span class="st">&quot;class_zh&quot;</span>)]</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id evidence_level median        di class_zh</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01              A    9.0 0.1172638     适宜</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02              A    8.0 0.1196013     适宜</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03              A    9.0 0.1172638     适宜</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04              C    7.5 0.4590164     适宜</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05              B    9.0 0.1172638     适宜</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06              B    8.0 0.1457490     适宜</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07              C    8.0 0.2627737     适宜</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08              C    7.5 0.1639344     适宜</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09              A    2.0 0.2627737   不适宜</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10              A    2.5 0.1639344   不适宜</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11              C    2.0 0.0000000   不适宜</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12              C    1.5 0.1315789   不适宜</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13              B    3.0 0.1925134   不适宜</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14              C    5.0 0.0000000   不确定</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15              C    5.5 0.3225806   不确定</span></span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16              A    4.0 0.7200000   不确定</span></span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17              A    2.0 0.1457490   不适宜</span></span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18              B    7.0 0.5775401     适宜</span></span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19              C    4.0 1.5433071   不确定</span></span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20              B    7.0 0.1493776     适宜</span></span>
-<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21              B    6.0 0.2834646   不确定</span></span>
-<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22              A    9.0 0.0000000     适宜</span></span>
-<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23              B    8.0 0.1196013     适宜</span></span>
-<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24              B    8.5 0.1315789     适宜</span></span></code></pre></div>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    item_id evidence_level median        di                     class_zh</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 25   IND01              A    9.0 0.1172638                         适宜</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 26   IND02              A    8.0 0.1196013                         适宜</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 27   IND03              A    9.0 0.1172638                         适宜</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 28   IND04              C    7.5 0.4590164                         适宜</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 29   IND05              B    9.0 0.1172638                         适宜</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 30   IND06              B    8.0 0.1457490                         适宜</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 31   IND07              C    8.0 0.2627737                         适宜</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 32   IND08              C    7.5 0.1639344                         适宜</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 33   IND09              A    2.0 0.2627737                       不适宜</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 34   IND10              A    2.5 0.1639344                       不适宜</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 35   IND11              C    2.0 0.0000000                       不适宜</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 36   IND12              C    1.5 0.1315789                       不适宜</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 37   IND13              B    3.0 0.1925134                       不适宜</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 38   IND14              C    5.0 0.0000000 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 39   IND15              C    5.5 0.3225806 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 40   IND16              A    4.0 0.7200000 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 41   IND17              A    2.0 0.1457490                       不适宜</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 42   IND18              B    7.0 0.5775401                         适宜</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 43   IND19              C    4.0 1.5433071           不确定（存在分歧）</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 44   IND20              B    7.0 0.1493776                         适宜</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 45   IND21              B    6.0 0.2834646 不确定（中位数 4–6，无分歧）</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 46   IND22              A    9.0 0.0000000                         适宜</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 47   IND23              B    8.0 0.1196013                         适宜</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 48   IND24              B    8.5 0.1315789                         适宜</span></span></code></pre></div>
 <p>证据等级 C 的指征仍可能被评为适宜（专家判断补证据缺口）；证据等级 A 仍可能不确定（获益伤害权衡有争议）。RAM 明确把文献综述和面板判断分成两步。</p>
 </div>
 <div id="定性意见" class="section level1">
 <h1>11. 定性意见</h1>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_comments</span>(<span class="at">study =</span> rand_ucla_demo)<span class="sc">$</span>by_theme</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          theme n</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 伤害大于获益 2</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     证据不足 2</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5   需限定人群 2</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 获益大于伤害 1</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3   表述需澄清 1</span></span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] theme n    </span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
 <p>“仅对高危亚组适宜”提示：也许应该<strong>拆分指征</strong>，而不是强行给一条总指征打分。手册允许在会中修改指征清单。</p>
 </div>
 <div id="报告" class="section level1">

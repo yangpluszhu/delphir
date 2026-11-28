@@ -63,7 +63,7 @@ vapply(
 |---|---|---|
 | `clinical_consensus` | `high_pct`、`basic_pct`、`median_min`、`iqr_max`、`reject_pct`、极化与稳定性 | COMET 70/15、`cv_max` |
 | `comet_cos` | `comet_in_*`、`comet_out_*` | 临床复合 80% |
-| `rand_ucla` | Median 区间 + `rand_disagreement` / `rand_di_threshold` | `high_pct` 为 NA |
+| `rand_ucla` | 表 4（或改选的 IPRAS / 百分比规则）+ 中位数；默认最多 2 轮 | `high_pct` 为 NA |
 | `indicator` | `basic_pct`、Median、IQR、`cv_max` | COMET |
 | `ranking` | 不强制共识；`ranking_topk` 给排序函数 | 百分比多为 NA |
 | `definition` | 接近临床，基本共识默认也是 80% | 同临床 |

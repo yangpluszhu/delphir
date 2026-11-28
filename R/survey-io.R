@@ -15,6 +15,11 @@
 
 .questionnaire_dimensions <- function(study, round = 1L) {
   p <- study$protocol
+  force_round <- attr(study, "rand_force_round")
+  force_dim <- attr(study, "rand_force_dimension")
+  if (!is.null(force_dim) && (is.null(force_round) || identical(as.integer(round), as.integer(force_round)))) {
+    return(as.character(force_dim))
+  }
   if (.is_open_round(p, round)) return(character())
   if (.is_standard_scenario(p)) return(c("\u91cd\u8981\u7a0b\u5ea6", "\u719f\u6089\u7a0b\u5ea6"))
   if (!is.null(study$ratings) && nrow(study$ratings) > 0L) {
@@ -27,7 +32,7 @@
     p$scenario,
     clinical_consensus = if (round <= 1L) c("\u91cd\u8981\u6027", "\u53ef\u884c\u6027") else "\u91cd\u8981\u6027",
     definition = if (round <= 1L) c("\u91cd\u8981\u6027", "\u53ef\u884c\u6027") else "\u91cd\u8981\u6027",
-    rand_ucla = "\u9002\u5b9c\u6027",
+    rand_ucla = if (identical(p$rand$purpose, "recommendation")) "\u540c\u610f\u7a0b\u5ea6" else "\u9002\u5b9c\u6027",
     "\u91cd\u8981\u6027"
   )
 }
@@ -687,6 +692,18 @@ read_survey_xlsx <- function(path, study = NULL, protocol = NULL) {
   if (length(hr) == 2L) args$high_range <- hr
   rd <- getv("rand_disagreement")
   if (!is.null(rd) && !is.na(rd) && nzchar(rd)) args$rand_disagreement <- rd
+  for (nm in c("rand_round2_mode", "rand_boundary", "rand_purpose")) {
+    v <- getv(nm)
+    if (!is.null(v) && !is.na(v) && nzchar(as.character(v))) args[[nm]] <- as.character(v)
+  }
+  for (nm in c("rand_iprr", "rand_cfa", "rand_qtype", "rand_percent_high", "rand_percent_low")) {
+    v <- num(getv(nm))
+    if (!is.na(v)) args[[nm]] <- v
+  }
+  nec <- getv("rand_necessity")
+  if (!is.null(nec) && !is.na(nec) && nzchar(as.character(nec))) {
+    args$rand_necessity <- tolower(as.character(nec)) %in% c("true", "1", "yes", "\u662f")
+  }
   rat <- getv("rationale")
   if (!is.null(rat) && !is.na(rat) && nzchar(rat)) args$rationale <- rat
   of <- getv("open_first")

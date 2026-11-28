@@ -12,8 +12,9 @@
 #'     高区比例 + Median + IQR。这是最常用的预设。
 #'   - comet_cos：COMET 核心结局集。使用 70/15 纳入/排除规则，而不是
 #'     high_pct 复合标准。
-#'   - rand_ucla：适宜性评价。按 Median 区间 + 分歧指数分类，
-#'     **不强迫共识**；high_pct / basic_pct 对本场景为 NA。
+#'   - rand_ucla：适宜性评价。默认按手册表 4（应答人数查表）加中位数分类，
+#'     **不强迫共识**。也可改用 IPRAS、9 人严格/宽松定义或百分比规则。
+#'     high_pct / basic_pct 对本场景为 NA。经典适宜性默认最多 2 轮。
 #'   - indicator：指标体系筛选。在基本共识之外还要求 CV 不超过 cv_max。
 #'   - ranking：优先级排序。不判定必须共识，配合 [rank_priorities()] /
 #'     [kendall_w()] 使用。
@@ -48,11 +49,27 @@
 #' @param comet_out_low COMET 排除：低区比例下限，默认 0.70。
 #' @param comet_out_high_max COMET 排除：高区比例上限，默认 0.15。
 #'   两套 70/15 都不满足的条目进入下一轮或共识会议，而不是自动删除。
-#' @param rand_disagreement RAND 分歧定义。`"classic"` 为经典 9 人面板规则
-#'   （≥3 人在 1–3 且 ≥3 人在 7–9）；`"ipras"` 为 IPRAS；`"both"`（默认）同时报告。
-#'   仅 `rand_ucla` 场景进入 [classify_rand()]。
-#' @param rand_di_threshold 分歧指数阈值，默认 1。DI > 阈值视为分歧，该指征
-#'   即使 Median 落在 7–9 也只能标为不确定，而不是「适宜」。
+#' @param rand_disagreement RAND 分歧定义，仅 `rand_ucla` 进入 [classify_rand()]。
+#'   `"table4"`（默认）按 Fitch 等（2001）表 4 用实际应答人数查表。
+#'   `"ipras"` 为 IPRAS（IPR 严格大于 IPRAS 才算分歧）。
+#'   `"classic_relaxed"` / `"classic_strict"` 为 9 人小组的手册表 3。
+#'   `"percent"` 为百分比共识，属于 RAM 修改版，用于推荐意见。
+#'   `"both"` 为表 4 与 IPRAS 任一判分歧即分歧。
+#'   `"classic"` 是旧参数名，现与 `"table4"` 相同，不再使用 `ceiling(n/3)`。
+#' @param rand_di_threshold IPRAS 的倍率，默认 1，即 IPR > IPRAS 才算分歧。
+#'   相等不算分歧。
+#' @param rand_round2_mode 第 2 轮形式：`"in_person"` 面对面会议后复评，
+#'   `"online"` 线上会议后复评，`"mail"` 再次函询。后两种须在报告中说明。
+#' @param rand_necessity 是否计划在适宜且无分歧的条目上另做必要性评分。
+#'   必要性不是第三轮适宜性评分。
+#' @param rand_boundary 中位数为 3.5 或 6.5 时：`"uncertain"`（默认）归不确定，
+#'   `"round_half_down"` 或 `"round_half_up"` 向相邻整数取整后再套三分区。
+#' @param rand_iprr,rand_cfa IPRAS 常数，默认 2.35 与 1.5。改动后报告标为非标准参数。
+#' @param rand_qtype 分位数算法，默认 7（与手册示例的 R 复算一致）。
+#' @param rand_percent_high,rand_percent_low 百分比规则的高区下限与低区上限。
+#'   默认 0.70 与 0.15。只在 `rand_disagreement = "percent"` 时驱动分类。
+#' @param rand_purpose `"appropriateness"`（默认）或 `"recommendation"`。
+#'   推荐意见应使用百分比规则，并在报告中标明 RAM 修改版。
 #' @param max_rounds 计划最多轮次，默认 3。这是**终止规则的上限**，不是「必须跑满」。
 #'   问卷生成超过该值会报错。DCAT 将迭代视为核心特征，至少应有两轮相同量表。
 #' @param stability_class_pct 相邻轮分类不变条目的比例阈值，默认 0.80。
@@ -110,7 +127,7 @@
 #' * `open_first`：第 1 轮是否为开放式征询
 #' * `new_items`：第一轮新增条目规则（是否允许、独立人数、单人例外、
 #'   每人上限、是否必须再迭代一轮、审查组说明）
-#' * `rand`：分歧设定
+#' * `rand`：规则、第 2 轮形式、必要性、边界中位数、IPRAS 常数与百分比阈值
 #' * `modified_from_preset`, `rationale`, `locked`
 #'
 #' @section 输入输出:
@@ -171,8 +188,20 @@ delphi_protocol <- function(
     comet_in_low_max = 0.15,
     comet_out_low = 0.70,
     comet_out_high_max = 0.15,
-    rand_disagreement = c("both", "classic", "ipras"),
+    rand_disagreement = c(
+      "table4", "ipras", "classic_relaxed", "classic_strict",
+      "percent", "both", "classic"
+    ),
     rand_di_threshold = 1,
+    rand_round2_mode = c("in_person", "online", "mail"),
+    rand_necessity = FALSE,
+    rand_boundary = c("uncertain", "round_half_down", "round_half_up"),
+    rand_iprr = 2.35,
+    rand_cfa = 1.5,
+    rand_qtype = 7L,
+    rand_percent_high = 0.70,
+    rand_percent_low = 0.15,
+    rand_purpose = c("appropriateness", "recommendation"),
     max_rounds = 3,
     stability_class_pct = 0.80,
     stability_median_delta = 1,
@@ -199,6 +228,26 @@ delphi_protocol <- function(
 ) {
   scenario <- match.arg(scenario)
   rand_disagreement <- match.arg(rand_disagreement)
+  rand_round2_mode <- match.arg(rand_round2_mode)
+  rand_boundary <- match.arg(rand_boundary)
+  rand_purpose <- match.arg(rand_purpose)
+  rand_qtype <- as.integer(rand_qtype)[1]
+  .stop_if(is.na(rand_qtype) || !rand_qtype %in% 1:9, "rand_qtype \u5fc5\u987b\u662f 1 \u5230 9\u3002")
+  rand_alias <- NULL
+  if (identical(rand_disagreement, "classic")) {
+    rand_alias <- "classic"
+    rand_disagreement <- "table4"
+    warning(
+      "rand_disagreement=\"classic\" \u73b0\u6309\u624b\u518c\u8868 4 \u5224\u5b9a\u5206\u6b67\uff0c\u4e0d\u518d\u4f7f\u7528 ceiling(n/3)\u3002n \u4e3a 10 \u6216 16 \u7b49\u65f6\u4e0e 0.5.0 \u7684\u7ed3\u679c\u53ef\u80fd\u4e0d\u540c\u3002",
+      call. = FALSE
+    )
+  }
+  if (identical(rand_disagreement, "percent") && !identical(rand_purpose, "recommendation")) {
+    warning(
+      "\u767e\u5206\u6bd4\u89c4\u5219\u662f RAM \u4fee\u6539\u7248\uff0c\u5efa\u8bae\u628a rand_purpose \u8bbe\u4e3a recommendation\uff0c\u5e76\u5728\u62a5\u544a\u4e2d\u6807\u660e\u3002",
+      call. = FALSE
+    )
+  }
   if (identical(scenario, "standard_element")) {
     ov <- .standard_element_overrides()
     if (missing(scale_min)) scale_min <- ov$scale_min
@@ -257,6 +306,12 @@ delphi_protocol <- function(
       )
     }
   }
+  if (identical(scenario, "rand_ucla")) {
+    if (missing(max_rounds)) max_rounds <- 2L
+    if (missing(high_pct)) high_pct <- NA_real_
+    if (missing(basic_pct)) basic_pct <- NA_real_
+    if (missing(reject_pct)) reject_pct <- NA_real_
+  }
   if (identical(scenario, "standard_element") && is.null(rationale)) {
     defaults <- .preset_defaults(scenario)
     if (!isTRUE(all.equal(mean_min, defaults$mean_min)) ||
@@ -271,15 +326,39 @@ delphi_protocol <- function(
   }
 
   defaults <- .preset_defaults(scenario)
+  if (identical(scenario, "rand_ucla") && is.null(rationale)) {
+    if (!identical(rand_disagreement, defaults$rand_disagreement) ||
+        !isTRUE(all.equal(rand_iprr, defaults$rand_iprr)) ||
+        !isTRUE(all.equal(rand_cfa, defaults$rand_cfa)) ||
+        !identical(as.integer(rand_qtype), as.integer(defaults$rand_qtype)) ||
+        !isTRUE(all.equal(rand_percent_high, defaults$rand_percent_high)) ||
+        !isTRUE(all.equal(rand_percent_low, defaults$rand_percent_low)) ||
+        !identical(rand_purpose, defaults$rand_purpose) ||
+        !identical(rand_round2_mode, defaults$rand_round2_mode) ||
+        !identical(isTRUE(rand_necessity), isTRUE(defaults$rand_necessity)) ||
+        !identical(rand_boundary, defaults$rand_boundary)) {
+      warning(
+        "\u4fee\u6539\u4e86 RAND \u5224\u5b9a\u89c4\u5219\u6216 IPRAS/\u767e\u5206\u6bd4\u53c2\u6570\u4f46\u672a\u586b\u5199 rationale\u3002\u62a5\u544a\u5c06\u6807\u8bb0\u4e3a\u201c\u65b9\u6848\u504f\u79bb\u9884\u8bbe\u4e14\u7406\u7531\u7f3a\u5931\u201d\u3002",
+        call. = FALSE
+      )
+    }
+  }
   modified <- !isTRUE(all.equal(
     list(high_pct, basic_pct, median_min, iqr_max, reject_pct,
          comet_in_high, comet_in_low_max, comet_out_low, comet_out_high_max,
-         rand_di_threshold, cv_max, mean_min, w_min, mean_delta_max,
+         rand_di_threshold, rand_disagreement, rand_iprr, rand_cfa, rand_qtype,
+         rand_percent_high, rand_percent_low, rand_purpose, rand_round2_mode,
+         isTRUE(rand_necessity), rand_boundary,
+         cv_max, mean_min, w_min, mean_delta_max,
          min_experts, open_first, scale_max, max_rounds),
     list(defaults$high_pct, defaults$basic_pct, defaults$median_min, defaults$iqr_max,
          defaults$reject_pct, defaults$comet_in_high, defaults$comet_in_low_max,
          defaults$comet_out_low, defaults$comet_out_high_max,
-         defaults$rand_di_threshold, defaults$cv_max, defaults$mean_min, defaults$w_min,
+         defaults$rand_di_threshold, defaults$rand_disagreement, defaults$rand_iprr,
+         defaults$rand_cfa, defaults$rand_qtype, defaults$rand_percent_high,
+         defaults$rand_percent_low, defaults$rand_purpose, defaults$rand_round2_mode,
+         isTRUE(defaults$rand_necessity), defaults$rand_boundary,
+         defaults$cv_max, defaults$mean_min, defaults$w_min,
          defaults$mean_delta_max, defaults$min_experts, defaults$open_first,
          defaults$scale_max, defaults$max_rounds)
   ))
@@ -342,8 +421,21 @@ delphi_protocol <- function(
         high_pct_delta = stability_high_pct_delta
       ),
       rand = list(
+        rule = rand_disagreement,
         disagreement = rand_disagreement,
-        di_threshold = rand_di_threshold
+        legacy_alias = rand_alias,
+        di_threshold = rand_di_threshold,
+        round2_mode = rand_round2_mode,
+        necessity = isTRUE(rand_necessity),
+        boundary = rand_boundary,
+        iprr = rand_iprr,
+        cfa = rand_cfa,
+        qtype = rand_qtype,
+        percent_high = rand_percent_high,
+        percent_low = rand_percent_low,
+        purpose = rand_purpose,
+        nonstandard_ipras = !isTRUE(all.equal(rand_iprr, 2.35)) ||
+          !isTRUE(all.equal(rand_cfa, 1.5)) || !identical(rand_qtype, 7L)
       ),
       rationale = rationale,
       modified_from_preset = modified,
@@ -361,6 +453,17 @@ delphi_protocol <- function(
     mid_range = c(4, 6),
     high_range = c(7, 9),
     max_rounds = 3,
+    rand_disagreement = "table4",
+    rand_di_threshold = 1,
+    rand_round2_mode = "in_person",
+    rand_necessity = FALSE,
+    rand_boundary = "uncertain",
+    rand_iprr = 2.35,
+    rand_cfa = 1.5,
+    rand_qtype = 7L,
+    rand_percent_high = 0.70,
+    rand_percent_low = 0.15,
+    rand_purpose = "appropriateness",
     mean_min = NA_real_,
     w_min = NA_real_,
     w_p_max = 0.05,
@@ -416,7 +519,8 @@ delphi_protocol <- function(
       high_pct = NA_real_, basic_pct = NA_real_, median_min = 7, iqr_max = 2,
       reject_pct = NA_real_, comet_in_high = 0.70, comet_in_low_max = 0.15,
       comet_out_low = 0.70, comet_out_high_max = 0.15,
-      rand_di_threshold = 1, cv_max = 0.25
+      rand_di_threshold = 1, rand_disagreement = "table4", max_rounds = 2,
+      cv_max = 0.25
     ),
     indicator = list(
       high_pct = 0.75, basic_pct = 0.70, median_min = 7, iqr_max = 2,
@@ -497,8 +601,9 @@ delphi_protocol <- function(
 #'   稳定性三条与 `max_rounds`。COMET/RAND/`cv_max` 写入对象但不驱动分类。
 #' - COMET (comet_cos)：`comet_in_*`、`comet_out_*`。`high_pct` 默认改为
 #'   0.70 以与 70/15 叙述一致，但 [classify_consensus()] 走 COMET 分支。
-#' - RAND/UCLA (rand_ucla)：`rand_disagreement`、`rand_di_threshold`、
-#'   Median 区间（由量表高/低区导出）。`high_pct` 为 `NA`。
+#' - RAND/UCLA (rand_ucla)：`rand_disagreement`（默认 `table4`）、
+#'   `rand_di_threshold`、`rand_round2_mode`、`rand_boundary`、IPRAS 常数。
+#'   `high_pct` 为 `NA`。`max_rounds` 默认为 2。百分比规则须标明修改版。
 #' - 指标体系 (indicator)：`basic_pct`、`median_min`、`iqr_max`、`cv_max`。
 #' - 排序 (ranking)：共识百分比多为 `NA`；用 [rank_priorities()] 与
 #'   `ranking_topk`。
@@ -546,6 +651,14 @@ print.delphi_protocol <- function(x, ...) {
               x$low_range[1], x$low_range[2],
               x$mid_range[1], x$mid_range[2],
               x$high_range[1], x$high_range[2]))
+  if (identical(x$scenario, "rand_ucla")) {
+    cat(sprintf(
+      "  RAND \u89c4\u5219: %s\uff1b\u7b2c 2 \u8f6e: %s\uff1b\u5fc5\u8981\u6027: %s\n",
+      x$rand$rule %||% x$rand$disagreement,
+      x$rand$round2_mode %||% "in_person",
+      if (isTRUE(x$rand$necessity)) "\u8ba1\u5212\u53e6\u8bc4" else "\u4e0d\u8bc4"
+    ))
+  }
   if (identical(x$scenario, "standard_element")) {
     cat(sprintf(
       "  \u7eb3\u5165: \u91cd\u8981\u7a0b\u5ea6\u5747\u6570 \u2265 %s \u4e14 CV \u2264 %s\uff1b\u7ec8\u6b62: W \u2265 %s\u3001P < %s\u3001\u5747\u6570\u53d8\u5316 < %s\n",
@@ -617,10 +730,29 @@ protocol_table <- function(protocol) {
       "COMET \u6392\u9664\uff1a\u4f4e\u533a\u6bd4\u4f8b\u4e0b\u9650"),
     c("comet_out_high_max", fmt_num(protocol$rules$comet_out_high_max), fmt_num(d$comet_out_high_max),
       "COMET \u6392\u9664\uff1a\u9ad8\u533a\u6bd4\u4f8b\u4e0a\u9650"),
-    c("rand_disagreement", protocol$rand$disagreement, "both",
-      "RAND \u5206\u6b67\u5b9a\u4e49\uff08classic / ipras / both\uff09"),
+    c("rand_disagreement", protocol$rand$rule %||% protocol$rand$disagreement, d$rand_disagreement %||% "table4",
+      "RAND \u89c4\u5219\uff1atable4 / ipras / classic_relaxed / classic_strict / percent / both"),
     c("rand_di_threshold", fmt_num(protocol$rand$di_threshold), fmt_num(d$rand_di_threshold),
-      "\u5206\u6b67\u6307\u6570\u9608\u503c"),
+      "IPRAS\uff1aIPR > IPRAS \u00d7 \u8be5\u500d\u7387\u624d\u7b97\u5206\u6b67"),
+    c("rand_round2_mode", protocol$rand$round2_mode %||% "in_person", d$rand_round2_mode %||% "in_person",
+      "\u7b2c 2 \u8f6e\u5f62\u5f0f\uff1ain_person / online / mail"),
+    c("rand_necessity", if (isTRUE(protocol$rand$necessity)) "TRUE" else "FALSE",
+      if (isTRUE(d$rand_necessity)) "TRUE" else "FALSE",
+      "\u662f\u5426\u53e6\u505a\u5fc5\u8981\u6027\u8bc4\u4ef7\uff08\u4e0d\u662f\u7b2c 3 \u8f6e\u9002\u5b9c\u6027\uff09"),
+    c("rand_boundary", protocol$rand$boundary %||% "uncertain", d$rand_boundary %||% "uncertain",
+      "\u4e2d\u4f4d\u6570 3.5 \u6216 6.5 \u7684\u5904\u7406"),
+    c("rand_iprr", fmt_num(protocol$rand$iprr %||% 2.35), fmt_num(d$rand_iprr %||% 2.35),
+      "IPRAS \u5e38\u6570 IPRr\uff0c\u6807\u51c6\u4e3a 2.35"),
+    c("rand_cfa", fmt_num(protocol$rand$cfa %||% 1.5), fmt_num(d$rand_cfa %||% 1.5),
+      "IPRAS \u975e\u5bf9\u79f0\u6821\u6b63 CFA\uff0c\u6807\u51c6\u4e3a 1.5"),
+    c("rand_qtype", fmt_num(protocol$rand$qtype %||% 7L), fmt_num(d$rand_qtype %||% 7L),
+      "\u5206\u4f4d\u6570\u7b97\u6cd5\uff0c\u6807\u51c6\u4e3a type 7"),
+    c("rand_percent_high", fmt_num(protocol$rand$percent_high %||% 0.70), fmt_num(d$rand_percent_high %||% 0.70),
+      "\u767e\u5206\u6bd4\u89c4\u5219\uff1a\u9ad8\u533a\u6bd4\u4f8b\u4e0b\u9650\uff08RAM \u4fee\u6539\u7248\uff09"),
+    c("rand_percent_low", fmt_num(protocol$rand$percent_low %||% 0.15), fmt_num(d$rand_percent_low %||% 0.15),
+      "\u767e\u5206\u6bd4\u89c4\u5219\uff1a\u4f4e\u533a\u6bd4\u4f8b\u4e0a\u9650\uff08RAM \u4fee\u6539\u7248\uff09"),
+    c("rand_purpose", protocol$rand$purpose %||% "appropriateness", d$rand_purpose %||% "appropriateness",
+      "appropriateness \u6216 recommendation"),
     c("max_rounds", fmt_num(protocol$stability$max_rounds), fmt_num(d$max_rounds),
       "\u8ba1\u5212\u6700\u591a\u8f6e\u6b21"),
     c("stability_class_pct", fmt_num(protocol$stability$class_pct), "0.8",

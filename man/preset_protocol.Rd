@@ -29,8 +29,9 @@ preset_protocol(scenario = "clinical_consensus", ...)
 稳定性三条与 \code{max_rounds}。COMET/RAND/\code{cv_max} 写入对象但不驱动分类。
 \item COMET (comet_cos)：\verb{comet_in_*}、\verb{comet_out_*}。\code{high_pct} 默认改为
 0.70 以与 70/15 叙述一致，但 \code{\link[=classify_consensus]{classify_consensus()}} 走 COMET 分支。
-\item RAND/UCLA (rand_ucla)：\code{rand_disagreement}、\code{rand_di_threshold}、
-Median 区间（由量表高/低区导出）。\code{high_pct} 为 \code{NA}。
+\item RAND/UCLA (rand_ucla)：\code{rand_disagreement}（默认 \code{table4}）、
+\code{rand_di_threshold}、\code{rand_round2_mode}、\code{rand_boundary}、IPRAS 常数。
+\code{high_pct} 为 \code{NA}。\code{max_rounds} 默认为 2。百分比规则须标明修改版。
 \item 指标体系 (indicator)：\code{basic_pct}、\code{median_min}、\code{iqr_max}、\code{cv_max}。
 \item 排序 (ranking)：共识百分比多为 \code{NA}；用 \code{\link[=rank_priorities]{rank_priorities()}} 与
 \code{ranking_topk}。

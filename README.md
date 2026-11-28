@@ -7,7 +7,7 @@
 
 **Protocol-first toolkit for Delphi studies, RAND/UCLA appropriateness panels, and COMET core outcome sets.**
 
-以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。第一轮新增条目按双通道审查，并要求再迭代一轮。自动生成问卷并回读，写出 Word 报告。安装后即获得八套中文教学文档、问卷样稿与示例数据。
+以第一轮前锁定的方案，完成医学专家共识、适宜性评价、核心结局集，以及标准核心技术要素（5 分量表）的分析。第一轮新增条目按双通道审查，并要求再迭代一轮。自动生成问卷并回读，写出 Word 报告。安装后即获得十一套中文教学文档、问卷样稿与示例数据。RAND/UCLA 默认按手册表 4 判定，并可生成两轮 docx/xlsx 问卷与末轮 Word 报告。
 
 - **Repository:** https://github.com/yangpluszhu/delphir
 - **Issues:** https://github.com/yangpluszhu/delphir/issues
@@ -143,7 +143,7 @@ delphir/
 ├── NEWS.md
 ├── R/                   # 分析、问卷、报告函数
 ├── man/                 # roxygen 帮助文档
-├── vignettes/           # 八套教学文档源稿
+├── vignettes/           # 十一套教学文档源稿
 ├── inst/
 │   ├── questionnaires/  # 第 1/2/3 轮问卷样稿
 │   ├── extdata/         # 录入模板与迷你示例
